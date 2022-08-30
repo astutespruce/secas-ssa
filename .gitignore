@@ -1,0 +1,13 @@
+*__pycache__/*
+*.pyc
+*.egg-info/*
+*.zip
+/build/*
+/dist/*
+
+.env
+
+/data/*
+
+/source_data/*
+!/source_data/**/README.md
