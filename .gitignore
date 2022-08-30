@@ -6,8 +6,11 @@
 /dist/*
 
 .env
+.env.*
 
 /data/*
 
 /source_data/*
 !/source_data/**/README.md
+
+/ui/node_modules
