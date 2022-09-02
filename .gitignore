@@ -4,6 +4,8 @@
 *.zip
 /build/*
 /dist/*
+/analysis/lib/*.c
+/analysis/lib/*.so
 
 .env
 .env.*
