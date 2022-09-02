@@ -72,7 +72,7 @@ for infile in src_dir.glob("*/*.img"):
 
         ### Set areas outside the SE Blueprint to NODATA
         print("Masking to inland areas in the SE")
-        data[bnd_raster.read(1) == 0] = 0
+        data[(data == 0) | (bnd_raster.read(1) == 0)] = NODATA
 
         ### Remap values to contiguous integers
         print("Remapping to contiguous integers")
