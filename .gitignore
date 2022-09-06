@@ -16,3 +16,5 @@
 !/source_data/**/README.md
 
 /ui/node_modules
+
+/examples/*
