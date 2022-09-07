@@ -1,0 +1,38 @@
+{
+    "nlcd": {
+        "name": "National Land Cover Database 2001-2019",
+        "sheet_name": "Landcover trends",
+        "source": "U.S. Geological Survey",
+        "date": "2019",
+        "citation": "Yang, L., et al. (2018). 'A new generation of the United States National Land Cover Database: Requirements, research priorities, design, and implementation strategies.' ISPRS Journal of Photogrammetry and Remote Sensing 146: 108-123.",
+        "url": "https://www.usgs.gov/centers/eros/science/national-land-cover-database",
+        "description": "Values show the acres in each land cover class that is present within each population analysis area for each year data are available from NLCD.  Land cover classes that are not present at any time within a given population analysis area are not shown."
+    },
+    "urban": {
+        "name": "Current and projected urbanization",
+        "sheet_name": "Urbanization",
+        "source": "FUTURES",
+        "date": "2022",
+        "citation": "TODO:",
+        "url": "TODO:",
+        "description": "Current urbanization is derived from NLCD 2019.  Projected urbanization for 2020 through 2100 is based on the proportion of stochastic simulations out of 50 that predicted a given pixel will convert to urban.  The Low level of urbanization includes areas where at least 50% of the runs predicted that a pixel will convert to urban, and the High level of urbanization corresponds to areas where any of the runs predicted that a pixel will urbanize.  To calculate the total amount of urbanization within each population analysis area, the proportion of stochastic urbanization simulations that predict urbanization for a given pixel is multiplied by the area associated with each proportion."
+    },
+    "slr_depth": {
+        "name": "Sea-level rise inundation area",
+        "sheet_name": "SLR inundation area",
+        "source": "National Oceanic and Atmospheric Administration",
+        "citation": "TODO:",
+        "url": "https://coast.noaa.gov/slrdata/",
+        "date": "2022",
+        "description": "Sea-level rise inundation depth data are provided by NOAA in 1 foot increments, based on available digital elevation model data.  Values show the amount of area that would be inundated by that amount of sea-level rise depth based on the number of 15-meter pixels rasterized from NOAA inundation depth polygons that overlap with each population unit."
+    },
+    "slr_proj": {
+        "name": "Projected sea-level rise",
+        "sheet_name": "Projected SLR",
+        "source": "National Oceanic and Atmospheric Administration",
+        "citation": "Sweet, W.V., B.D. Hamlington, R.E. Kopp, C.P. Weaver, P.L.Barnard, D. Bekaert, W. Brooks, M. Craghan, G. Dusek, T. Frederikse, G.Garner, A.S. Genz, J.P. Krasting, E. Larour, D. Marcy,J.J. Marra, J.Obeysekera, M. Osler, M. Pendleton, D. Roman, L. Schmied, W. Veatch, K.D.White, and C. Zuzak, 2022: Global and Regional Sea Level Rise Scenarios for the United States: Updated Mean Projections and Extreme Water Level Probabilities Along U.S. Coastlines. NOAA Technical Report NOS 01. National Oceanic and Atmospheric Administration, National Ocean Service, Silver Spring, MD",
+        "url": "https://oceanservice.noaa.gov/hazards/sealevelrise/sealevelrise-tech-report.html",
+        "date": "2022",
+        "description": "Sea-level rise projections are derived from 1-degree grid cells that accompany the 2022 Sea Level Rise Technical Report by NOAA.  Values show the area-weighted mean of 1-degree grid cells that overlap each population unit based on a baseline of 2000.  Sea-level rise scenarios correspond to a global sea level rise of between 1, 1.64, 3.2, 4.9, and 6.56 feet."
+    }
+}

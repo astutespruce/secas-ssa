@@ -3,7 +3,6 @@ import pandas as pd
 import pygeos as pg
 import numpy as np
 
-from analysis.lib.geometry.explode import explode
 from analysis.lib.graph import DirectedGraph
 
 
@@ -45,7 +44,7 @@ def dissolve(df, by, grid_size=None, agg=None, allow_multi=True, op="union"):
 
     if not allow_multi:
         # flatten any multipolygons
-        dissolved = explode(dissolved).reset_index(drop=True)
+        dissolved = dissolved.explode(index_parts=False).reset_index(drop=True)
 
     return dissolved
 

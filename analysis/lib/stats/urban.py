@@ -1,28 +1,19 @@
 from pathlib import Path
 
-import numpy as np
-import rasterio
-
 from analysis.constants import (
     URBAN_YEARS,
     URBAN_PROBABILITIES,
     URBAN_BINS,
     URBAN_THRESHOLD,
-    ACRES_PRECISION,
-    M2_ACRES,
+    AREA_PRECISION,
 )
-from analysis.lib.raster import (
-    boundless_raster_geometry_mask,
-    extract_count_in_geometry,
-    detect_data,
-)
+from analysis.lib.raster import extract_count_in_geometry
 
 
 src_dir = Path("data/inputs/threats/urban")
 
 
-# TODO: pass mask and window
-def extract_by_geometry(shapes, bounds):
+def extract_urban_by_mask(shape_mask, window, cellsize):
     """Calculate the area of overlap between shapes and urbanization
     for each decade from 2020 to 2100.
 
@@ -30,47 +21,22 @@ def extract_by_geometry(shapes, bounds):
 
     Parameters
     ----------
-    shapes : list-like of geometry objects that provide __geo_interface__
-    bounds : list-like of [xmin, ymin, xmax, ymax]
+    shape_mask : ndarray, True outside shapes
+    window : rasterio.windows.Window for extracting area of shape_mask from raster
+    cellsize : area of each pixel
 
     Returns
     -------
     dict
         {
-            'shape_mask': <acres>,
             'urban': <acres already urban>,
-            'projections': [<acres 2020>, <acres 2030>, ..., <acres 2100>]
+            "high": [<acres 2020>, <acres 2030>, ..., <acres 2100>],
+            "low": [<acres 2020>, <acres 2030>, ..., <acres 2100>],
         }
     """
 
-    results = {}
-
-    # prescreen to make sure data are present
-    with rasterio.open(src_dir / "urban_mask.tif") as src:
-        if not detect_data(src, shapes, bounds):
-            return None
-
-    # create mask and window
-    with rasterio.open(src_dir / "urban_2020.tif") as src:
-        try:
-            shape_mask, transform, window = boundless_raster_geometry_mask(
-                src, shapes, bounds, all_touched=False
-            )
-
-        except ValueError:
-            return None
-
-        # square meters to acres
-        cellsize = src.res[0] * src.res[1] * M2_ACRES
-
-    results["shape_mask"] = (
-        ((~shape_mask).sum() * cellsize).round(ACRES_PRECISION).astype("float32")
-    )
-
-    if results["shape_mask"] == 0:
-        return None
-
-    projections = {"High": [], "Low": []}
+    high = []
+    low = []
 
     for year in URBAN_YEARS:
         filename = src_dir / f"urban_{year}.tif"
@@ -79,24 +45,22 @@ def extract_by_geometry(shapes, bounds):
         )
 
         if year == 2020:
-            # extract area already urban (in index 51)
-            results["urban"] = (
-                (counts[51] * cellsize).round(ACRES_PRECISION).astype("float32")
-            )
+            # extract area already urban (in index 51) and add to front of list
+            already_urban = (counts[51] * cellsize).round(AREA_PRECISION)
+            high.append(already_urban)
+            low.append(already_urban)
 
         # high urbanization is sum of pixel counts * probability for all urbanized pixels
-        projections["High"].append(
-            ((counts * URBAN_PROBABILITIES).sum() * cellsize).round(ACRES_PRECISION)
+        high.append(
+            ((counts * URBAN_PROBABILITIES).sum() * cellsize).round(AREA_PRECISION)
         )
 
         # low urbanization is sum of pixel counts * probability for probabilities >= 50% (25 of 50 runs)
-        projections["Low"].append(
+        low.append(
             (
                 (counts[URBAN_THRESHOLD:] * URBAN_PROBABILITIES[URBAN_THRESHOLD:]).sum()
                 * cellsize
-            ).round(ACRES_PRECISION)
+            ).round(AREA_PRECISION)
         )
 
-    results["projections"] = projections
-
-    return results
+    return {"high": high, "low": low}

@@ -8,7 +8,7 @@ import geopandas as gp
 import rasterio
 
 from analysis.constants import (
-    ACRES_PRECISION,
+    AREA_PRECISION,
     M2_ACRES,
     SLR_PROJ_COLUMNS,
     SLR_YEARS,
@@ -27,7 +27,7 @@ depth_filename = src_dir / "slr.tif"
 proj_filename = src_dir / "noaa_1deg_cells.feather"
 
 
-def extract_by_geometry(geometry, shapes, bounds):
+def extract_slr_by_geometry(geometry, shapes, bounds):
     """Calculate the area of overlap between geometries and each level of SLR
     between 0 (currently inundated) and 6 meters.
 
@@ -84,7 +84,7 @@ def extract_by_geometry(geometry, shapes, bounds):
         data = np.where(mask, nodata, data)
 
     results["shape_mask"] = (
-        ((~shape_mask).sum() * cellsize).round(ACRES_PRECISION).astype("float32")
+        ((~shape_mask).sum() * cellsize).round(AREA_PRECISION).astype("float32")
     )
 
     if results["shape_mask"] == 0:
@@ -99,7 +99,7 @@ def extract_by_geometry(geometry, shapes, bounds):
     for bin in bins[1:]:
         counts[bin] = counts[bin] + counts[bin - 1]
 
-    results["depth"] = (counts * cellsize).round(ACRES_PRECISION).tolist()
+    results["depth"] = (counts * cellsize).round(AREA_PRECISION).tolist()
 
     # intersect with 1-degree pixels; there should always be data available if
     # there are SLR depth data

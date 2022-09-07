@@ -6,14 +6,14 @@ import pygeos as pg
 import rasterio
 
 from analysis.constants import (
+    AREA_PRECISION,
     M2_ACRES,
 )
 from analysis.lib.geometry import to_dict_all
 from analysis.lib.raster import boundless_raster_geometry_mask
-from analysis.lib.stats import (
-    extract_urban_by_geometry,
-    extract_slr_by_geometry,
-)
+from analysis.lib.stats.slr import extract_slr_by_geometry
+from analysis.lib.stats.urban import extract_urban_by_mask
+from analysis.lib.stats.nlcd import extract_nlcd_by_mask
 
 
 data_dir = Path("data/inputs")
@@ -24,12 +24,12 @@ extent_filename = bnd_dir / "nonmarine_mask.tif"
 # ownership_filename = data_dir / "boundaries/ownership.feather"
 
 
-# TODO: param for progress callback
-def get_results(df, progress_callback=None):
+def get_population_results(df, progress_callback=None):
     # convert to plain DataFrame with just pygeos geometries
     df = pd.DataFrame(df)
+    df["count"] = pg.get_num_geometries(df.geometry.values.data)
     df["geometry"] = df.geometry.values.data
-    df["acres"] = pg.area(df.geometry.values) * M2_ACRES
+    df["acres"] = (pg.area(df.geometry.values) * M2_ACRES).round(AREA_PRECISION)
     df["__geo__"] = to_dict_all(df.geometry.values)
     df["bounds"] = pg.bounds(df.geometry.values).tolist()
 
@@ -53,13 +53,16 @@ def get_results(df, progress_callback=None):
                 extent_raster, shapes, row.bounds, all_touched=False
             )
 
-            result["shape_mask"] = (~shape_mask).sum() * cellsize
+            result["shape_mask"] = ((~shape_mask).sum() * cellsize).round(
+                AREA_PRECISION
+            )
 
             data = extent_raster.read(1, window=window, boundless=True)
             mask = (data == nodata) | shape_mask
 
             # slice out flattened array of values that are not masked
-            result["overlap"] = data[~mask].sum() * cellsize
+            result["overlap"] = (data[~mask].sum() * cellsize).round(AREA_PRECISION)
+            result["outside_se"] = result["shape_mask"] - result["overlap"]
             if result["overlap"] == 0:
                 results.append(result)
 
@@ -70,22 +73,13 @@ def get_results(df, progress_callback=None):
                 continue
 
             # Extract SLR
-            slr = extract_slr_by_geometry(row.geometry, shapes, row.bounds)
-            result["has_slr"] = slr is not None
-            if slr is not None:
-                result["slr_depth"] = slr["depth"]
-                result["slr_proj"] = slr["projections"]
-                result["slr_shape_mask"] = slr["shape_mask"]
+            result["slr"] = extract_slr_by_geometry(row.geometry, shapes, row.bounds)
 
             # Extract urban
-            urban = extract_urban_by_geometry(shapes, row.bounds)
-            result["has_urban"] = urban is not None
-            if urban is not None:
-                result["urban"] = urban["urban"]
-                result["urban_proj"] = urban["projections"]
+            result["urban"] = extract_urban_by_mask(shape_mask, window, cellsize)
 
             # Extract NLCD
-            # TODO:
+            result["nlcd"] = extract_nlcd_by_mask(shape_mask, window, cellsize)
 
             results.append(result)
 
@@ -94,4 +88,4 @@ def get_results(df, progress_callback=None):
 
             count += 1
 
-        return df[["acres"]].join(pd.DataFrame(results, index=df.index))
+        return df[["count", "acres"]].join(pd.DataFrame(results, index=df.index))

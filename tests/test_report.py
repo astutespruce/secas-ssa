@@ -1,14 +1,15 @@
-import os
 from pathlib import Path
+import subprocess
 from time import time
 
 import numpy as np
 import pygeos as pg
 from pyogrio.geopandas import read_dataframe
 
-from analysis.constants import DATA_CRS, M2_ACRES
-from analysis.lib.geometry import dissolve, explode, make_valid
-from analysis.lib.stats.population import get_results
+from analysis.constants import DATA_CRS
+from analysis.lib.geometry import dissolve, make_valid
+from analysis.lib.stats.population import get_population_results
+from api.report.xlsx import create_xlsx
 
 
 ### Create XLSX reports for an AOI
@@ -46,12 +47,17 @@ for aoi in aois:
 
     columns = [field] if population is None else []
     df = read_dataframe(f"examples/{path}.shp", columns=columns).to_crs(DATA_CRS)
+
+    # FIXME:
+    # df = df.head(2)
+    # df = df.tail(15)
+
     if population is not None:
         df[field] = population
 
     # make valid and only keep polygon parts
     df["geometry"] = make_valid(df.geometry.values.data)
-    df = explode(df)
+    df = df.explode(index_parts=False)
     df = df.loc[pg.get_type_id(df.geometry.values.data) == 3]
 
     # dissolve by population
@@ -59,19 +65,24 @@ for aoi in aois:
 
     ### calculate results, data must be in DATA_CRS
     print("Calculating results...")
-    results = get_results(df)
+    results = get_population_results(df)
+
+    # FIXME:
+    # results.reset_index().to_feather("/tmp/test.feather")
 
     if results is None:
         print(f"AOI: {path} does not overlap SECAS states")
         continue
 
     out_dir = Path("/tmp/aoi") / path
-    if not out_dir.exists():
-        os.makedirs(out_dir)
+    out_dir.mkdir(exist_ok=True, parents=True)
 
-    xlsx = create_xlsx(results=results)
+    xlsx = create_xlsx(results)
 
-    with open(out_dir / f"{path}_report.pdf", "wb") as out:
-        out.write(pdf)
+    outfilename = out_dir / f"{path}_report.xlsx"
+    with open(outfilename, "wb") as out:
+        out.write(xlsx)
 
     print("Elapsed {:.2f}s".format(time() - start))
+
+    subprocess.run(["open", outfilename])
