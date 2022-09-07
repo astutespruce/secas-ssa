@@ -6,7 +6,7 @@ import numpy as np
 import pygeos as pg
 from pyogrio.geopandas import read_dataframe
 
-from analysis.constants import DATA_CRS
+from analysis.constants import DATA_CRS, DATASETS
 from analysis.lib.geometry import dissolve, make_valid
 from analysis.lib.stats.population import get_population_results
 from api.report.xlsx import create_xlsx
@@ -15,11 +15,11 @@ from api.report.xlsx import create_xlsx
 ### Create XLSX reports for an AOI
 aois = [
     # template: {"name": "", "path": "", "field": ""},
-    {
-        "name": "Balduina",
-        "path": "Balduina_pop_resiliency_final",
-        "field": "Population",
-    },
+    # {
+    #     "name": "Balduina",
+    #     "path": "Balduina_pop_resiliency_final",
+    #     "field": "Population",
+    # },
     # {
     #     "name": "Rabbitsfoot",
     #     "path": "Rabbitsfott_resilience_final_SECAS_only",
@@ -30,6 +30,7 @@ aois = [
         "path": "SingleTest",
         "field": None,
         "population_label": "Pop A",
+        "datasets": list(DATASETS.keys()),  # all datasets
     },
 ]
 
@@ -37,7 +38,9 @@ aois = [
 for aoi in aois:
     name = aoi["name"]
     path = aoi["path"]
-    # if field is misisng, population must be present and will be added
+    datasets = aoi["datasets"]
+
+    # if field is missing, population must be present and will be added
     field = aoi.get("field", None) or "__pop"
     population_label = aoi.get("population_label", None)
 
@@ -65,7 +68,7 @@ for aoi in aois:
 
     ### calculate results, data must be in DATA_CRS
     print("Calculating results...")
-    results = get_population_results(df)
+    results = get_population_results(df, datasets)
 
     # FIXME:
     # results.reset_index().to_feather("/tmp/test.feather")
@@ -77,7 +80,7 @@ for aoi in aois:
     out_dir = Path("/tmp/aoi") / path
     out_dir.mkdir(exist_ok=True, parents=True)
 
-    xlsx = create_xlsx(results)
+    xlsx = create_xlsx(results, datasets)
 
     outfilename = out_dir / f"{path}_report.xlsx"
     with open(outfilename, "wb") as out:

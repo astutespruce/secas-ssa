@@ -8,6 +8,7 @@ from time import time
 
 import rasterio
 from rasterio.features import geometry_mask, dataset_features
+from rasterio.windows import Window
 import pandas as pd
 import numpy as np
 import pygeos as pg
@@ -176,8 +177,8 @@ colormap = {i: hex_to_uint8(e) + (255,) for i, e in enumerate(SLR_COLORS)}
 # use the Base Blueprint extent grid to derive the master offset coordinates
 # so that everything is correctly aligned
 # NOTE: SLR data extends beyond the base blueprint extent, don't use it for masking
-with rasterio.open(bnd_dir / "base_blueprint_extent.tif") as src:
-    align_ul = np.take(src.transform, [2, 5]).tolist()
+extent_raster = rasterio.open(bnd_dir / "base_blueprint_extent.tif")
+align_ul = np.take(extent_raster.transform, [2, 5]).tolist()
 
 for gdb in sorted(src_dir.glob("*slr_data_dist/*.gdb")):
     chunk_start = time()
@@ -286,9 +287,25 @@ ret.check_returncode()
 ## Combine into a single raster
 print("Combining into single raster")
 outfilename = out_dir / "slr.tif"
-with rasterio.open(vrt_filename) as src:
-    data = src.read(1)
-    write_raster(outfilename, data, transform=src.transform, crs=src.crs, nodata=NODATA)
+with rasterio.open(vrt_filename) as vrt:
+    # calculate write window
+    left = int((vrt.transform[2] - extent_raster.transform[2]) / vrt.res[0])
+    top = int((extent_raster.transform[5] - vrt.transform[5]) / vrt.res[0])
+
+    width = extent_raster.width - left
+    height = extent_raster.height - top
+
+    data = vrt.read(1, window=Window(0, 0, width, height))
+    out = np.ones(extent_raster.shape, dtype="uint8") * np.uint8(NODATA)
+    out[top:, left:] = data
+
+    write_raster(
+        outfilename,
+        out,
+        transform=extent_raster.transform,
+        crs=extent_raster.crs,
+        nodata=NODATA,
+    )
 
     with rasterio.open(outfilename, "r+") as out:
         out.write_colormap(1, colormap)

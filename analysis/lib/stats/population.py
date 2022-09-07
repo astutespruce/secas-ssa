@@ -9,7 +9,10 @@ import rasterio
 from analysis.constants import AREA_PRECISION, M2_ACRES, SECAS_STATES
 from analysis.lib.geometry import to_dict_all
 from analysis.lib.raster import boundless_raster_geometry_mask
-from analysis.lib.stats.slr import extract_slr_by_geometry
+from analysis.lib.stats.slr import (
+    extract_slr_depth_by_mask,
+    extract_slr_projections_by_geometry,
+)
 from analysis.lib.stats.urban import extract_urban_by_mask
 from analysis.lib.stats.nlcd import extract_nlcd_by_mask
 
@@ -23,7 +26,23 @@ states_filename = bnd_dir / "states.feather"
 # ownership_filename = data_dir / "boundaries/ownership.feather"
 
 
-def get_population_results(df, progress_callback=None):
+def get_population_results(df, datasets, progress_callback=None):
+    """Calculate statistics for each population unit
+
+    Parameters
+    ----------
+    df : GeoDataFrame
+        each row is a separate population unit
+    datasets : list-like
+        list of dataset IDs to query
+    progress_callback : function, optional (default: None)
+        function to call each after each population unit is processed
+
+    Returns
+    -------
+    DataFrame
+    """
+
     states = gp.read_feather(states_filename, columns=["state", "id", "geometry"])
     states = states.loc[states.id.isin(SECAS_STATES)]
     tree = pg.STRtree(df.geometry.values.data)
@@ -87,13 +106,21 @@ def get_population_results(df, progress_callback=None):
                 continue
 
             # Extract SLR
-            result["slr"] = extract_slr_by_geometry(row.geometry, shapes, row.bounds)
+            if "slr_depth" in datasets:
+                result["slr_depth"] = extract_slr_depth_by_mask(
+                    shape_mask, window, cellsize
+                )
+
+            if "slr_proj" in datasets:
+                result["slr_proj"] = extract_slr_projections_by_geometry(row.geometry)
 
             # Extract urban
-            result["urban"] = extract_urban_by_mask(shape_mask, window, cellsize)
+            if "urban" in datasets:
+                result["urban"] = extract_urban_by_mask(shape_mask, window, cellsize)
 
             # Extract NLCD
-            result["nlcd"] = extract_nlcd_by_mask(shape_mask, window, cellsize)
+            if "nlcd" in datasets:
+                result["nlcd"] = extract_nlcd_by_mask(shape_mask, window, cellsize)
 
             results.append(result)
 
