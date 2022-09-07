@@ -25,12 +25,12 @@ aois = [
     #     "path": "Rabbitsfott_resilience_final_SECAS_only",
     #     "field": "HUC10",
     # },
-    # {
-    #     "name": "Test single area",
-    #     "path": "SingleTest",
-    #     "field": None,
-    #     "population": "Pop A",
-    # },
+    {
+        "name": "Test single area",
+        "path": "SingleTest",
+        "field": None,
+        "population_label": "Pop A",
+    },
 ]
 
 
@@ -38,22 +38,22 @@ for aoi in aois:
     name = aoi["name"]
     path = aoi["path"]
     # if field is misisng, population must be present and will be added
-    field = aoi.get("field", "__pop")
-    population = aoi.get("population", None)
+    field = aoi.get("field", None) or "__pop"
+    population_label = aoi.get("population_label", None)
 
     print(f"Creating report for {name}...")
 
     start = time()
 
-    columns = [field] if population is None else []
+    columns = [field] if population_label is None else []
     df = read_dataframe(f"examples/{path}.shp", columns=columns).to_crs(DATA_CRS)
 
     # FIXME:
     # df = df.head(2)
     # df = df.tail(15)
 
-    if population is not None:
-        df[field] = population
+    if population_label is not None:
+        df[field] = population_label
 
     # make valid and only keep polygon parts
     df["geometry"] = make_valid(df.geometry.values.data)

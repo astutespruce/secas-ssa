@@ -10,10 +10,19 @@
 .env
 .env.*
 
-/data/*
+data/inputs/boundaries/*
+data/inputs/indicators/*
+!data/inputs/indicators/README.md
+data/inputs/nlcd/*
+data/inputs/threats/slr/*
+!data/inputs/threats/slr/README.md
+data/inputs/threats/urban/*
+!data/inputs/threats/urban/README.md
 
-/source_data/*
-!/source_data/**/README.md
+/source_data/nlcd/*
+!/source_data/nlcd/README.md
+/source_data/slr/*
+/source_data/urban/*
 
 /ui/node_modules
 

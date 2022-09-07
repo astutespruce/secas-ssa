@@ -126,20 +126,26 @@ def add_data_note(ws, content, columns=None):
 def add_summary_sheet(xlsx, df, name_col_width, area_col_width, area_label, outside_se):
     sheet_name = "Summary"
 
-    cols = ["acres", "overlap", "count"]
+    cols = ["acres", "overlap"]
+    col_widths = [name_col_width, area_col_width, area_col_width]
     if outside_se:
         cols.append("outside_se")
+        col_widths.append(16)
+
+    cols.extend(["count", "states"])
+    col_widths.extend([16, 20])
 
     df[cols].reset_index().rename(
         columns={
-            "count": "Number of areas",
             "acres": "GIS acres",
             "overlap": area_label + " (rasterized to 30m pixels)",
             "outside_se": "Acres outside Southeast data extent (rasterized to 30m pixels)",
+            "count": "Number of areas in population unit",
+            "states": "State(s)",
         }
     ).to_excel(xlsx, sheet_name=sheet_name, index=False)
     ws = xlsx.sheets[sheet_name]
-    set_column_widths(ws, [name_col_width, area_col_width, 16, 16, 10])
+    set_column_widths(ws, col_widths)
     set_cell_styles(ws)
 
 
@@ -315,7 +321,9 @@ def create_xlsx(df):
     df.index.name = "Population unit"
     outside_se = df.outside_se.sum() > 0
 
-    name_col_width = min(pd.Series(df.index).apply(len).max() * CHAR_PER_WIDTH_UNIT, 28)
+    name_col_width = max(
+        min(pd.Series(df.index).apply(len).max() * CHAR_PER_WIDTH_UNIT, 28), 14
+    )
     area_col_width = max(
         df.overlap.astype("str").apply(len).max() * CHAR_PER_WIDTH_UNIT, 10
     )

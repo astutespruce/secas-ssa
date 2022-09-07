@@ -1,14 +1,12 @@
 from pathlib import Path
 
+import geopandas as gp
 import pandas as pd
 import pygeos as pg
 
 import rasterio
 
-from analysis.constants import (
-    AREA_PRECISION,
-    M2_ACRES,
-)
+from analysis.constants import AREA_PRECISION, M2_ACRES, SECAS_STATES
 from analysis.lib.geometry import to_dict_all
 from analysis.lib.raster import boundless_raster_geometry_mask
 from analysis.lib.stats.slr import extract_slr_by_geometry
@@ -19,23 +17,39 @@ from analysis.lib.stats.nlcd import extract_nlcd_by_mask
 data_dir = Path("data/inputs")
 bnd_dir = data_dir / "boundaries"
 extent_filename = bnd_dir / "nonmarine_mask.tif"
+states_filename = bnd_dir / "states.feather"
 # boundary_filename = data_dir / "boundaries/se_boundary.feather"
 # county_filename = data_dir / "boundaries/counties.feather"
 # ownership_filename = data_dir / "boundaries/ownership.feather"
 
 
 def get_population_results(df, progress_callback=None):
+    states = gp.read_feather(states_filename, columns=["state", "id", "geometry"])
+    states = states.loc[states.id.isin(SECAS_STATES)]
+    tree = pg.STRtree(df.geometry.values.data)
+    left, right = tree.query_bulk(states.geometry.values.data, predicate="intersects")
+    state_join = (
+        pd.DataFrame(
+            {"state": states.state.values.take(left)}, index=df.index.values.take(right)
+        )
+        .groupby(level=0)
+        .state.unique()
+        .apply(sorted)
+        .apply(lambda x: ", ".join(x))
+        .rename("states")
+    )
+
     # convert to plain DataFrame with just pygeos geometries
-    df = pd.DataFrame(df)
+    df = pd.DataFrame(df).join(state_join)
     df["count"] = pg.get_num_geometries(df.geometry.values.data)
     df["geometry"] = df.geometry.values.data
     df["acres"] = (pg.area(df.geometry.values) * M2_ACRES).round(AREA_PRECISION)
     df["__geo__"] = to_dict_all(df.geometry.values)
     df["bounds"] = pg.bounds(df.geometry.values).tolist()
 
-    # TODO: prefilter polygons to those that overlap boundary
-
     results = []
+
+    # TODO: prefilter polygons to those that overlap boundary
 
     count = 0
     with rasterio.open(extent_filename) as extent_raster:
@@ -88,4 +102,6 @@ def get_population_results(df, progress_callback=None):
 
             count += 1
 
-        return df[["count", "acres"]].join(pd.DataFrame(results, index=df.index))
+        return df[["states", "count", "acres"]].join(
+            pd.DataFrame(results, index=df.index)
+        )

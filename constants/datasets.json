@@ -6,7 +6,7 @@
         "date": "2019",
         "citation": "Yang, L., et al. (2018). 'A new generation of the United States National Land Cover Database: Requirements, research priorities, design, and implementation strategies.' ISPRS Journal of Photogrammetry and Remote Sensing 146: 108-123.",
         "url": "https://www.usgs.gov/centers/eros/science/national-land-cover-database",
-        "description": "Values show the acres in each land cover class that is present within each population analysis area for each year data are available from NLCD.  Land cover classes that are not present at any time within a given population analysis area are not shown."
+        "description": "Values show the amount of each land cover class that is present within each population analysis area for each year data are available from NLCD.  Only those land cover classes that are present within a given population analysis area are shown."
     },
     "urban": {
         "name": "Current and projected urbanization",

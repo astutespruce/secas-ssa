@@ -31,12 +31,12 @@ SECAS_STATES = [
     "MS",
     "NC",
     "OK",
-    "PR",
+    # "PR",  # no meaningful data available
     "SC",
     "TN",
     "TX",
     "VA",
-    # "USVI",  # expected to be added in 2023
+    # "USVI",  # no meaningful data available
     "WV",
 ]
 
@@ -65,6 +65,21 @@ SLR_PROJ_COLUMNS = [
     f"{decade}_{scenario}"
     for decade, scenario in product(SLR_YEARS, SLR_PROJ_SCENARIOS)
 ]
+
+SLR_COLORS = [
+    "#00094E",
+    "#031386",
+    "#0821BD",
+    "#1136E0",
+    "#1E50EE",
+    "#2D6BFC",
+    "#2D8CFC",
+    "#2CADFC",
+    "#47D4FC",
+    "#7DF5FD",
+    "#B3FEF7",
+]
+
 
 # color are (R,G,B) tuples
 # Original codes
