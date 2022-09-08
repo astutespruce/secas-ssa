@@ -2,7 +2,7 @@ from pathlib import Path
 
 import numpy as np
 
-from analysis.constants import AREA_PRECISION, NLCD_YEARS, NLCD_INDEXES
+from analysis.constants import NLCD_YEARS, NLCD_INDEXES
 from analysis.lib.raster import extract_count_in_geometry
 
 
@@ -39,7 +39,7 @@ def extract_nlcd_by_mask(shape_mask, window, cellsize):
             filename, shape_mask, window, bins, boundless=True
         )
 
-        areas.append((counts * cellsize).round(AREA_PRECISION))
+        areas.append(counts * cellsize)
 
     # Transpose and convert to dict, only keep those that have areas
     areas = np.array(areas).T

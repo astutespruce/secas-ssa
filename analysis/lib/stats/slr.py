@@ -1,22 +1,15 @@
 from pathlib import Path
 
-from progress.bar import Bar
 import numpy as np
-import pandas as pd
 import pygeos as pg
 import geopandas as gp
-import rasterio
 
 from analysis.constants import (
-    AREA_PRECISION,
-    M2_ACRES,
     SLR_PROJ_COLUMNS,
     SLR_YEARS,
     SLR_PROJ_SCENARIOS,
 )
 from analysis.lib.raster import (
-    detect_data,
-    boundless_raster_geometry_mask,
     extract_count_in_geometry,
 )
 
@@ -45,7 +38,7 @@ def extract_slr_depth_by_mask(shape_mask, window, cellsize):
 
     Returns
     -------
-    list
+    ndarray
         [area for 0ft inundation, area for 1ft, ..., area for 10f]
     """
 
@@ -61,7 +54,7 @@ def extract_slr_depth_by_mask(shape_mask, window, cellsize):
     for bin in bins[1:]:
         counts[bin] = counts[bin] + counts[bin - 1]
 
-    return (counts * cellsize).round(AREA_PRECISION).tolist()
+    return counts * cellsize
 
 
 def extract_slr_projections_by_geometry(geometry):

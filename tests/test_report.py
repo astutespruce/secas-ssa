@@ -15,23 +15,25 @@ from api.report.xlsx import create_xlsx
 ### Create XLSX reports for an AOI
 aois = [
     # template: {"name": "", "path": "", "field": ""},
-    # {
-    #     "name": "Balduina",
-    #     "path": "Balduina_pop_resiliency_final",
-    #     "field": "Population",
-    # },
-    # {
-    #     "name": "Rabbitsfoot",
-    #     "path": "Rabbitsfott_resilience_final_SECAS_only",
-    #     "field": "HUC10",
-    # },
     {
-        "name": "Test single area",
-        "path": "SingleTest",
-        "field": None,
-        "population_label": "Pop A",
-        "datasets": list(DATASETS.keys()),  # all datasets
+        "name": "Balduina",
+        "path": "Balduina_pop_resiliency_final",
+        "field": "Population",
+        "datasets": list(DATASETS.keys()),
     },
+    {
+        "name": "Rabbitsfoot",
+        "path": "Rabbitsfott_resilience_final_SECAS_only",
+        "field": "HUC10",
+        "datasets": list(DATASETS.keys()),
+    },
+    # {
+    #     "name": "Test single area",
+    #     "path": "SingleTest",
+    #     "field": None,
+    #     "population_label": "Pop A",
+    #     "datasets": list(DATASETS.keys()),  # all datasets
+    # },
 ]
 
 
@@ -71,7 +73,7 @@ for aoi in aois:
     results = get_population_results(df, datasets)
 
     # FIXME:
-    # results.reset_index().to_feather("/tmp/test.feather")
+    results.reset_index().to_feather("/tmp/test.feather")
 
     if results is None:
         print(f"AOI: {path} does not overlap SECAS states")

@@ -5,7 +5,6 @@ from analysis.constants import (
     URBAN_PROBABILITIES,
     URBAN_BINS,
     URBAN_THRESHOLD,
-    AREA_PRECISION,
 )
 from analysis.lib.raster import extract_count_in_geometry
 
@@ -46,21 +45,19 @@ def extract_urban_by_mask(shape_mask, window, cellsize):
 
         if year == 2020:
             # extract area already urban (in index 51) and add to front of list
-            already_urban = (counts[51] * cellsize).round(AREA_PRECISION)
+            already_urban = counts[51] * cellsize
             high.append(already_urban)
             low.append(already_urban)
 
         # high urbanization is sum of pixel counts * probability for all urbanized pixels
-        high.append(
-            ((counts * URBAN_PROBABILITIES).sum() * cellsize).round(AREA_PRECISION)
-        )
+        high.append(((counts * URBAN_PROBABILITIES).sum() * cellsize))
 
         # low urbanization is sum of pixel counts * probability for probabilities >= 50% (25 of 50 runs)
         low.append(
             (
                 (counts[URBAN_THRESHOLD:] * URBAN_PROBABILITIES[URBAN_THRESHOLD:]).sum()
                 * cellsize
-            ).round(AREA_PRECISION)
+            )
         )
 
     return {"high": high, "low": low}

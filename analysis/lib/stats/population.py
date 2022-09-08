@@ -6,7 +6,7 @@ import pygeos as pg
 
 import rasterio
 
-from analysis.constants import AREA_PRECISION, M2_ACRES, SECAS_STATES
+from analysis.constants import M2_ACRES, SECAS_STATES
 from analysis.lib.geometry import to_dict_all
 from analysis.lib.raster import boundless_raster_geometry_mask
 from analysis.lib.stats.slr import (
@@ -15,6 +15,7 @@ from analysis.lib.stats.slr import (
 )
 from analysis.lib.stats.urban import extract_urban_by_mask
 from analysis.lib.stats.nlcd import extract_nlcd_by_mask
+from analysis.lib.stats.se_blueprint_indicators import extract_indicator_by_mask
 
 
 data_dir = Path("data/inputs")
@@ -62,7 +63,7 @@ def get_population_results(df, datasets, progress_callback=None):
     df = pd.DataFrame(df).join(state_join)
     df["count"] = pg.get_num_geometries(df.geometry.values.data)
     df["geometry"] = df.geometry.values.data
-    df["acres"] = (pg.area(df.geometry.values) * M2_ACRES).round(AREA_PRECISION)
+    df["acres"] = pg.area(df.geometry.values) * M2_ACRES
     df["__geo__"] = to_dict_all(df.geometry.values)
     df["bounds"] = pg.bounds(df.geometry.values).tolist()
 
@@ -86,15 +87,13 @@ def get_population_results(df, datasets, progress_callback=None):
                 extent_raster, shapes, row.bounds, all_touched=False
             )
 
-            result["shape_mask"] = ((~shape_mask).sum() * cellsize).round(
-                AREA_PRECISION
-            )
+            result["shape_mask"] = (~shape_mask).sum() * cellsize
 
             data = extent_raster.read(1, window=window, boundless=True)
             mask = (data == nodata) | shape_mask
 
             # slice out flattened array of values that are not masked
-            result["overlap"] = (data[~mask].sum() * cellsize).round(AREA_PRECISION)
+            result["overlap"] = data[~mask].sum() * cellsize
             result["outside_se"] = result["shape_mask"] - result["overlap"]
             if result["overlap"] == 0:
                 results.append(result)
@@ -121,6 +120,15 @@ def get_population_results(df, datasets, progress_callback=None):
             # Extract NLCD
             if "nlcd" in datasets:
                 result["nlcd"] = extract_nlcd_by_mask(shape_mask, window, cellsize)
+
+            # Extract SE Blueprint indicators
+            se_blueprint_indicators = [
+                dataset for dataset in datasets if dataset.startswith("se_blueprint")
+            ]
+            for dataset in se_blueprint_indicators:
+                result[dataset] = extract_indicator_by_mask(
+                    dataset, shape_mask, window, cellsize
+                )
 
             results.append(result)
 
