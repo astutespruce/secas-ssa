@@ -10,8 +10,8 @@ module.exports = {
     title: `SECAS Southeast Species Status Landscape Assessment Tool`,
     description: `Provides user interface to extract reports of standardized landscape indicators in the Southeast for Species Status Assessments`,
     author: `Southeast Conservation Adaptation Strategy`,
-    contactEmail: `hilary_morris@fws.gov`,
-    contactPhone: `9197070252`,
+    contactEmail: `TODO:`,
+    contactPhone: `TODO:`,
     apiToken: process.env.GATSBY_API_TOKEN,
     apiHost: process.env.GATSBY_API_HOST,
     tileHost: process.env.GATSBY_TILE_HOST,
@@ -41,34 +41,27 @@ module.exports = {
       },
     },
     `gatsby-plugin-react-helmet`,
-    // {
-    //   resolve: `gatsby-source-filesystem`,
-    //   options: {
-    //     name: `images`,
-    //     path: `${__dirname}/src/images`,
-    //   },
-    // },
-    // {
-    //   resolve: `gatsby-source-filesystem`,
-    //   options: {
-    //     name: `constants`,
-    //     path: `${__dirname}/../constants`,
-    //   },
-    // },
-    // {
-    //   resolve: `gatsby-transformer-json`,
-    //   options: {
-    //     // name the top-level type after the filename
-    //     typeName: ({ node: { name, relativeDirectory } }) => {
-    //       // combine all indicators into a single JSON endpoint
-    //       if (relativeDirectory === 'indicators') {
-    //         return 'indicatorsJson'
-    //       }
-
-    //       return `${name}Json`
-    //     },
-    //   },
-    // },
+    {
+      resolve: `gatsby-source-filesystem`,
+      options: {
+        name: `images`,
+        path: `${__dirname}/src/images`,
+      },
+    },
+    {
+      resolve: `gatsby-source-filesystem`,
+      options: {
+        name: `constants`,
+        path: `${__dirname}/../constants`,
+      },
+    },
+    {
+      resolve: `gatsby-transformer-json`,
+      options: {
+        // name the top-level type after the filename
+        typeName: ({ node: { name } }) => `${name}Json`,
+      },
+    },
     {
       resolve: `gatsby-plugin-theme-ui`,
       options: {
@@ -81,7 +74,7 @@ module.exports = {
     {
       resolve: 'gatsby-plugin-robots-txt',
       options: {
-        policy: [{ userAgent: '*', disallow: ['/services', '/api'] }],
+        policy: [{ userAgent: '*', disallow: ['/api'] }],
       },
     },
   ],

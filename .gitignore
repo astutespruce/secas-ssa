@@ -25,5 +25,7 @@ data/inputs/threats/urban/*
 /source_data/urban/*
 
 /ui/node_modules
+/ui/.cache
+/ui/public
 
 /examples/*

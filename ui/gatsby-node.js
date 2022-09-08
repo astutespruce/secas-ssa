@@ -3,7 +3,7 @@ const path = require('path-browserify')
  * Enable absolute imports with `/src` as root.
  * See: https://github.com/alampros/gatsby-plugin-resolve-src/issues/4
  */
-exports.onCreateWebpackConfig = ({ actions, stage, loaders, plugins }) => {
+exports.onCreateWebpackConfig = ({ actions, plugins }) => {
   const config = {
     resolve: {
       alias: {
@@ -28,18 +28,6 @@ exports.onCreateWebpackConfig = ({ actions, stage, loaders, plugins }) => {
         Buffer: ['buffer', 'Buffer'],
       }),
     ],
-  }
-
-  // when building HTML, window is not defined, so mapbox-gl causes the build to blow up
-  if (stage === 'build-html') {
-    config.module = {
-      rules: [
-        {
-          test: /mapbox-gl/,
-          use: loaders.null(),
-        },
-      ],
-    }
   }
 
   actions.setWebpackConfig(config)
