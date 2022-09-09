@@ -2,7 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { graphql } from 'gatsby'
 
-import { Layout } from 'components/layout'
+import { Layout, SEO } from 'components/layout'
 import { HeaderImage } from 'components/image'
 import { UploadContainer } from 'components/report'
 
@@ -51,3 +51,5 @@ CustomReportPage.propTypes = {
 }
 
 export default CustomReportPage
+
+export const Head = () => <SEO title="Custom Report" />
