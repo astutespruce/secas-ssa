@@ -6,21 +6,20 @@ import { Box, Container, Flex } from 'theme-ui'
 import UploadContainer from './UploadContainer'
 import SelectAttribute from './SelectAttribute'
 import SelectDatasets from './SelectDatasets'
+import Download from './Download'
 import Steps from './Steps'
 
 const steps = [
-  { id: 'upload', label: 'Upload Population Units', shortLabel: 'Upload' },
+  { id: 'upload', label: 'Upload' },
   {
     id: 'selectAttribute',
-    label: 'Identify attribute that identifies unique population units',
-    shortLabel: 'Identify attribute',
+    label: 'Identify attribute',
   },
   {
     id: 'selectDatasets',
-    label: 'Select factors to include in report',
-    shortLabel: 'Select factors',
+    label: 'Select factors',
   },
-  { id: 'download', label: 'Download report', shortLabel: 'Download report' },
+  { id: 'download', label: 'Download report' },
 ]
 
 const ReportWorkflow = () => {
@@ -45,9 +44,13 @@ const ReportWorkflow = () => {
       stepContent = <SelectAttribute />
       break
     }
-    case 'selectFactors': {
+    case 'selectDatasets': {
       // TODO: pass dataset state from API
       stepContent = <SelectDatasets />
+      break
+    }
+    case 'download': {
+      stepContent = <Download />
       break
     }
     default: {

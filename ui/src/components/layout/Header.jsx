@@ -55,6 +55,7 @@ const Header = () => (
                 m: 0,
                 breakInside: 'avoid',
                 flex: '0 1 auto',
+                color: '#FFF',
               }}
             >
               {title}

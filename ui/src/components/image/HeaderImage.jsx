@@ -54,8 +54,6 @@ const HeaderImage = ({
             <Container
               sx={{
                 p: '1rem',
-                textShadow: '1px 1px 3px #000',
-                color: '#FFF',
                 lineHeight: 1.1,
               }}
             >
@@ -65,6 +63,8 @@ const HeaderImage = ({
                   m: 0,
                   fontSize: '4rem',
                   lineHeight: 1.1,
+                  textShadow: '1px 1px 3px #000',
+                  color: '#FFF',
                 }}
               >
                 {title}
@@ -77,6 +77,8 @@ const HeaderImage = ({
                     margin: '0.5rem 0 0 0',
                     fontWeight: 'normal',
                     fontSize: '1.75rem',
+                    textShadow: '1px 1px 3px #000',
+                    color: '#FFF',
                   }}
                 >
                   {subtitle}

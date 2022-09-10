@@ -62,7 +62,8 @@ const curStepCSS = {
 // disabled
 const nextStepCSS = {
   ...stepCSS,
-  cursor: 'not-allowed',
+  // cursor: 'not-allowed', // FIXME:
+  cursor: 'pointer',
   bg: 'grey.2',
   color: 'grey.7',
 }
@@ -95,7 +96,7 @@ const Steps = ({ steps, index, onClick }) => {
         boxShadow: '1px 1px 3px #666',
       }}
     >
-      {steps.map(({ id, shortLabel }, i) => (
+      {steps.map(({ id, label }, i) => (
         <Flex
           key={id}
           // TODO:
@@ -117,7 +118,7 @@ const Steps = ({ steps, index, onClick }) => {
           >
             {i + 1}
           </Box>{' '}
-          <Text>{shortLabel}</Text>
+          <Text>{label}</Text>
         </Flex>
       ))}
     </Flex>
@@ -129,7 +130,6 @@ Steps.propTypes = {
     PropTypes.shape({
       id: PropTypes.string.isRequired,
       label: PropTypes.string.isRequired,
-      shortLabel: PropTypes.string.isRequired,
       disabled: PropTypes.bool,
     })
   ).isRequired,
