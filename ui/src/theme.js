@@ -90,9 +90,23 @@ module.exports = {
       bg: 'error',
     },
   },
-  modal: {
-    background: 'grey.9',
+  boxes: {
+    step: {
+      display: 'flex',
+      flex: '0 0 auto',
+      color: '#FFF',
+      bg: 'grey.9',
+      borderRadius: '5em',
+      width: '3rem',
+      height: '3rem',
+      alignItems: 'center',
+      justifyContent: 'center',
+      fontWeight: 'bold',
+      mr: '0.75rem',
+      fontSize: '1.5rem',
+    },
   },
+
   buttons: {
     primary: {
       cursor: 'pointer',
@@ -121,12 +135,6 @@ module.exports = {
       border: '1px solid',
       borderRadius: '1rem',
       color: '#FFF',
-    },
-    mobileHeaderClose: {
-      cursor: 'pointer',
-      outline: 'none',
-      background: 'none',
-      color: 'grey.2',
     },
     header: {
       cursor: 'pointer',
@@ -165,39 +173,8 @@ module.exports = {
       },
     },
   },
-
-  tabs: {
-    default: {
-      cursor: 'pointer',
-      color: 'grey.7',
-      bg: 'grey.1',
-      borderBottom: '1px solid',
-      borderBottomColor: 'grey.7',
-      borderTop: '1px solid',
-      borderTopColor: 'transparent',
-    },
-    active: {
-      cursor: 'pointer',
-      color: 'text',
-      bg: '#FFF',
-      borderBottom: '1px solid #FFF',
-      borderLeft: '1px solid',
-      borderLeftColor: 'grey.3',
-      borderRight: '1px solid',
-      borderRightColor: 'grey.3',
-      borderTop: '1px solid',
-      borderTopColor: 'grey.3',
-    },
-    mobile: {
-      cursor: 'pointer',
-      color: 'grey.1',
-      bg: 'primary',
-    },
-    mobileActive: {
-      cursor: 'pointer',
-      color: '#FFF',
-      bg: darken('primary', 0.05),
-    },
+  modal: {
+    background: 'grey.9',
   },
   styles: {
     root: {
@@ -234,7 +211,7 @@ module.exports = {
       ul: {
         margin: 0,
         padding: '0 0 0 1rem',
-        color: 'grey.8',
+        color: 'grey.9',
         fontSize: 1,
         '& li + li': {
           mt: '0.5rem',
@@ -243,32 +220,28 @@ module.exports = {
       h1: {
         variant: 'text.heading',
         fontSize: [5, 6, 7],
+        color: 'grey.9',
       },
       h2: {
         variant: 'text.heading',
         fontSize: [4, 5],
+        color: 'grey.9',
       },
       h3: {
         variant: 'text.heading',
         fontSize: [3, 4],
+        color: 'grey.9',
       },
       h4: {
         fontSize: [2, 3],
         variant: 'text.subheading',
+        color: 'grey.9',
       },
     },
     hr: {
-      color: 'grey.3',
+      color: 'blue.9',
+      borderBottom: '0.5rem solid',
       my: '2rem',
-      dashed: {
-        borderBottom: '1px dashed',
-        color: 'grey.3',
-        my: '2rem',
-      },
-      light: {
-        color: 'grey.2',
-        my: '2rem',
-      },
     },
     progress: {
       color: 'primary',

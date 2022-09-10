@@ -4,16 +4,16 @@ import { graphql } from 'gatsby'
 
 import { Layout, SEO } from 'components/layout'
 import { HeaderImage } from 'components/image'
-import { UploadContainer } from 'components/report'
+import { ReportWorkflow } from 'components/report'
 
-const CustomReportPage = ({
+const ReportPage = ({
   data: {
     headerImage: {
       childImageSharp: { gatsbyImageData: headerImage },
     },
   },
 }) => (
-  <Layout title="Create a Population-level Landscape Status Report">
+  <Layout>
     <HeaderImage
       title="Create a Population-level Landscape Status Report"
       image={headerImage}
@@ -22,16 +22,17 @@ const CustomReportPage = ({
         url: 'https://www.flickr.com/photos/usfwssoutheast/26871026541/',
       }}
       caption="Black Skimmers"
-      height="10rem"
-      maxHeight="10rem"
+      height="16rem"
+      maxHeight="16rem"
+      minHeight="16rem"
     />
 
-    <UploadContainer />
+    <ReportWorkflow />
   </Layout>
 )
 
 export const pageQuery = graphql`
-  query CustomReportPageQuery {
+  query ReportPageQuery {
     headerImage: file(relativePath: { eq: "26871026541_48a8096dd9_o.jpg" }) {
       childImageSharp {
         gatsbyImageData(
@@ -44,12 +45,12 @@ export const pageQuery = graphql`
   }
 `
 
-CustomReportPage.propTypes = {
+ReportPage.propTypes = {
   data: PropTypes.shape({
     headerImage: PropTypes.object.isRequired,
   }).isRequired,
 }
 
-export default CustomReportPage
+export default ReportPage
 
 export const Head = () => <SEO title="Custom Report" />

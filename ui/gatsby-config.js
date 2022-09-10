@@ -7,7 +7,7 @@ const theme = require('./src/theme')
 module.exports = {
   siteMetadata: {
     siteUrl: process.env.SITE_URL || `https://localhost`,
-    title: `SECAS Southeast Species Status Landscape Assessment Tool`,
+    title: `Southeast Species Status Landscape Assessment Tool`,
     description: `Provides user interface to extract reports of standardized landscape indicators in the Southeast for Species Status Assessments`,
     author: `Southeast Conservation Adaptation Strategy`,
     contactEmail: `TODO:`,

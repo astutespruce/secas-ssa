@@ -63,7 +63,8 @@ const HeaderImage = ({
                 as="h1"
                 sx={{
                   m: 0,
-                  fontSize: '3rem',
+                  fontSize: '4rem',
+                  lineHeight: 1.1,
                 }}
               >
                 {title}
@@ -75,7 +76,7 @@ const HeaderImage = ({
                   sx={{
                     margin: '0.5rem 0 0 0',
                     fontWeight: 'normal',
-                    fontSize: '1.5rem',
+                    fontSize: '1.75rem',
                   }}
                 >
                   {subtitle}

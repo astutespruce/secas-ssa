@@ -9,6 +9,7 @@ import {
   Text,
   Divider,
   Grid,
+  Paragraph,
 } from 'theme-ui'
 import { FormProvider, useForm } from 'react-hook-form'
 
@@ -30,9 +31,9 @@ const UploadForm = ({ onFileChange, onCreateReport }) => {
 
   const handleSubmit = useCallback(
     (values) => {
-      const { areaName, file: fileProp } = values
+      const { speciesName, file: fileProp } = values
 
-      onCreateReport(fileProp, areaName)
+      onCreateReport(fileProp, speciesName)
     },
     [onCreateReport]
   )
@@ -46,15 +47,32 @@ const UploadForm = ({ onFileChange, onCreateReport }) => {
     <>
       <FormProvider {...methods}>
         <form onSubmit={methods.handleSubmit(handleSubmit)}>
-          <Grid columns={[0, 2]} gap={5} sx={{ mt: '2rem' }}>
+          <Grid columns={[0, 2]} gap={5}>
             <Box>
-              <Heading as="h3" sx={{ mb: '0.5rem' }}>
-                Area Name (optional):
+              <Flex sx={{ alignItems: 'center', mb: '1rem' }}>
+                <Box variant="boxes.step">1</Box>
+                <Heading as="h3" sx={{ m: 0 }}>
+                  Upload population boundaries
+                </Heading>
+              </Flex>
+              <Paragraph>
+                Upload a shapefile or ESRI File Geodatabase Feature Class with
+                the boundaries of the population units you want to use for your
+                report. Each population unit will be analyzed independently.
+                <br />
+                <br />
+                You will be able to select the attribute that identifies the
+                population units in the next step.
+              </Paragraph>
+            </Box>
+            <Box>
+              <Heading as="h4" sx={{ mb: '0.5rem' }}>
+                Species name (optional):
               </Heading>
               <Input
                 type="text"
-                name="areaName"
-                {...register('areaName', { required: false })}
+                name="speciesName"
+                {...register('speciesName', { required: false })}
               />
 
               <Flex
@@ -67,12 +85,12 @@ const UploadForm = ({ onFileChange, onCreateReport }) => {
               >
                 <div>
                   <Heading
-                    as="h3"
+                    as="h4"
                     sx={{
                       mb: 0,
                     }}
                   >
-                    Choose Area of Interest:
+                    Population unit boundaries:
                   </Heading>
                   <div>{file && <Text>{file.name}</Text>}</div>
                 </div>
@@ -106,8 +124,6 @@ const UploadForm = ({ onFileChange, onCreateReport }) => {
                 </Button>
               </Flex>
             </Box>
-
-            <Text as="p">TODO: instructions</Text>
           </Grid>
         </form>
       </FormProvider>

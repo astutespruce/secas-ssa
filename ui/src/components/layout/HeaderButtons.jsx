@@ -6,7 +6,7 @@ import { Link } from 'components/link'
 
 const HeaderButtons = () => (
   <Flex sx={{ alignItems: 'center', flex: '0 0 auto' }}>
-    <Link to="/custom_report">
+    <Link to="/report">
       <Button
         variant="header"
         sx={{
@@ -17,7 +17,7 @@ const HeaderButtons = () => (
       >
         <FileAlt size="1em" />
         <Box sx={{ marginLeft: '0.5rem', display: ['none', 'none', 'block'] }}>
-          Upload Shapefile
+          Create Custom Report
         </Box>
       </Button>
     </Link>

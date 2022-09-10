@@ -21,7 +21,7 @@ const NotFoundPage = ({
   }
 
   return (
-    <Layout title="404: Not found">
+    <Layout>
       <BackgroundImage
         {...convertToBgImage(image)}
         style={{
