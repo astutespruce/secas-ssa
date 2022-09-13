@@ -1,5 +1,6 @@
-{
-  "nlcd": {
+[
+  {
+    "id": "nlcd_landcover",
     "name": "National Land Cover Database 2001-2019",
     "sheet_name": "Landcover trends",
     "group": "land",
@@ -9,7 +10,19 @@
     "url": "https://www.usgs.gov/centers/eros/science/national-land-cover-database",
     "description": "Values show the amount of each land cover class that is present within each population analysis area for each year data are available from NLCD.  Only those land cover classes that are present within a given population analysis area are shown."
   },
-  "urban": {
+  {
+    "id": "nlcd_impervious",
+    "name": "National Land Cover Database 2001-2019",
+    "sheet_name": "Impervious surface trends",
+    "group": "land",
+    "source": "U.S. Geological Survey",
+    "date": "2019",
+    "citation": "Yang, L., et al. (2018). 'A new generation of the United States National Land Cover Database: Requirements, research priorities, design, and implementation strategies.' ISPRS Journal of Photogrammetry and Remote Sensing 146: 108-123.",
+    "url": "https://www.usgs.gov/centers/eros/science/national-land-cover-database",
+    "description": "Values show the total amount of impervious surface each population analysis area for each year data are available from NLCD.  These are calculated as the sum of the amount of area in each percent level of impervious surface times the percent."
+  },
+  {
+    "id": "urban",
     "name": "Current and projected urbanization",
     "sheet_name": "Urbanization",
     "group": "threats",
@@ -19,7 +32,8 @@
     "url": "TODO:",
     "description": "Current urbanization is derived from NLCD 2019.  Projected urbanization for 2020 through 2100 is based on the proportion of stochastic simulations out of 50 that predicted a given pixel will convert to urban.  The Low level of urbanization includes areas where at least 50% of the runs predicted that a pixel will convert to urban, and the High level of urbanization corresponds to areas where any of the runs predicted that a pixel will urbanize.  To calculate the total amount of urbanization within each population analysis area, the proportion of stochastic urbanization simulations that predict urbanization for a given pixel is multiplied by the area associated with each proportion."
   },
-  "slr_depth": {
+  {
+    "id": "slr_depth",
     "name": "Sea-level rise inundation area",
     "sheet_name": "SLR inundation area",
     "group": "threats",
@@ -29,7 +43,8 @@
     "date": "2022",
     "description": "Sea-level rise inundation depth data are provided by NOAA in 1 foot increments, based on available digital elevation model data.  Values show the amount of area that would be inundated by that amount of sea-level rise depth based on the number of 15-meter pixels rasterized from NOAA inundation depth polygons that overlap with each population unit."
   },
-  "slr_proj": {
+  {
+    "id": "slr_proj",
     "name": "Projected sea-level rise",
     "sheet_name": "Projected SLR",
     "group": "threats",
@@ -40,7 +55,8 @@
     "description": "Sea-level rise projections are derived from 1-degree grid cells that accompany the 2022 Sea Level Rise Technical Report by NOAA.  Values show the area-weighted mean of 1-degree grid cells that overlap each population unit based on a baseline of 2000.  Sea-level rise scenarios correspond to a global sea level rise of between 1, 1.64, 3.2, 4.9, and 6.56 feet."
   },
 
-  "se_blueprint_coastalshorelinecondition": {
+  {
+    "id": "se_blueprint_coastalshorelinecondition",
     "filename": "CoastalShorelineCondition.tif",
     "name": "Coastal shoreline condition",
     "sheet_name": "Coastal shoreline condition",
@@ -78,7 +94,8 @@
     "description": "TODO:",
     "url": ""
   },
-  "se_blueprint_resilientcoastalsites": {
+  {
+    "id": "se_blueprint_resilientcoastalsites",
     "filename": "ResilientCoastalSites.tif",
     "name": "Resilient coastal sites",
     "sheet_name": "Resilient coastal sites",
@@ -126,7 +143,8 @@
     "description": "TODO: description",
     "url": ""
   },
-  "se_blueprint_stablecoastalwetlands": {
+  {
+    "id": "se_blueprint_stablecoastalwetlands",
     "filename": "StableCoastalWetlands.tif",
     "name": "Stable coastal wetlands",
     "sheet_name": "Stable coastal wetlands",
@@ -145,7 +163,8 @@
     "description": "TODO: description",
     "url": ""
   },
-  "se_blueprint_naturallandcoverinfloodplains": {
+  {
+    "id": "se_blueprint_naturallandcoverinfloodplains",
     "filename": "NaturalLandcoverInFloodplains.tif",
     "name": "Natural landcover in floodplains",
     "sheet_name": "Floodplain natural landcover",
@@ -184,7 +203,8 @@
     "description": "TODO: within estimated floodplain, by catchment",
     "url": ""
   },
-  "se_blueprint_networkcomplexity": {
+  {
+    "id": "se_blueprint_networkcomplexity",
     "filename": "NetworkComplexity.tif",
     "name": "Aquatic network complexity",
     "sheet_name": "Aquatic network complexity",
@@ -233,7 +253,8 @@
     "description": "Network complexity depicts the number of different stream size classes in a river network not separated by dams or waterfalls. River networks with a variety of connected stream classes help retain aquatic biodiversity in a changing climate by allowing species to access climate refugia and move between habitats. This indicator applies only to the estimated floodplain, which spatially defines areas estimated to be inundated by a 100-year flood, also known as the 1% annual chance flood.",
     "url": ""
   },
-  "se_blueprint_permeablesurface": {
+  {
+    "id": "se_blueprint_permeablesurface",
     "filename": "PermeableSurface.tif",
     "name": "Permeable surface",
     "sheet_name": "Permeable surface",
@@ -266,7 +287,8 @@
     "description": "Permeable surface measures the percent of non-impervious cover by catchment. High levels of impervious surface degrade water quality and alter freshwater flow, impacting both aquatic species communities and ecosystem services for people, like the availability of clean drinking water.",
     "url": ""
   },
-  "se_blueprint_firefrequency": {
+  {
+    "id": "se_blueprint_firefrequency",
     "filename": "FireFrequency.tif",
     "name": "Fire frequency",
     "sheet_name": "Fire frequency",
@@ -299,7 +321,8 @@
     "description": "Fire frequency uses remote sensing to estimate the number of times an area has been burned from 2010-2019. Many Southeastern ecosystems rely on regular, low intensity fires to maintain habitat, encourage native plant growth, and reduce wildfire risk.",
     "url": ""
   },
-  "se_blueprint_intacthabitatcores": {
+  {
+    "id": "se_blueprint_intacthabitatcores",
     "filename": "IntactHabitatCores.tif",
     "name": "Intact habitat cores",
     "sheet_name": "Intact habitat cores",
@@ -332,7 +355,8 @@
     "description": "This indicator represents the size of large, unfragmented patches of natural habitat. It identifies minimally disturbed natural areas at least 100 acres in size and greater than 200 meters wide. Large areas of intact natural habitat benefit numerous species, including reptiles and amphibians, birds, and large mammals.",
     "url": ""
   },
-  "se_blueprint_resilientterrestrialsites": {
+  {
+    "id": "se_blueprint_resilientterrestrialsites",
     "filename": "ResilientTerrestrialSites.tif",
     "name": "Resilient terrestrial sites",
     "sheet_name": "Resilient terrestrial sites",
@@ -385,4 +409,4 @@
     "description": "Resilient sites depicts an area's capacity to continue supporting species diversity and ecosystem function in the face of climate change. It evaluates the ability of coastal habitats to migrate to adjacent lowlands in response to sea-level rise, based on the physical and condition characteristics of current tidal complexes, their predicted migration space, and surrounding buffer areas—characteristics like marsh complex size, sediment balance, water quality, and many others. In inland terrestrial areas, this indicator measures landscape diversity and local connectedness to identify resilient sites that contain many different microclimates and allow species to move to adjust to changing conditions.",
     "url": ""
   }
-}
+]

@@ -27,7 +27,7 @@ def interpolate_colormap(colormap):
     Parameters
     ----------
     colormap : dict
-        key / value pairs of data value to associated color
+        key / value pairs of data value to associated hex color
 
     Returns
     -------

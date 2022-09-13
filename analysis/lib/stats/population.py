@@ -14,7 +14,10 @@ from analysis.lib.stats.slr import (
     extract_slr_projections_by_geometry,
 )
 from analysis.lib.stats.urban import extract_urban_by_mask
-from analysis.lib.stats.nlcd import extract_nlcd_by_mask
+from analysis.lib.stats.nlcd import (
+    extract_nlcd_landcover_by_mask,
+    extract_nlcd_impervious_by_mask,
+)
 from analysis.lib.stats.se_blueprint_indicators import extract_indicator_by_mask
 
 
@@ -22,9 +25,6 @@ data_dir = Path("data/inputs")
 bnd_dir = data_dir / "boundaries"
 extent_filename = bnd_dir / "nonmarine_mask.tif"
 states_filename = bnd_dir / "states.feather"
-# boundary_filename = data_dir / "boundaries/se_boundary.feather"
-# county_filename = data_dir / "boundaries/counties.feather"
-# ownership_filename = data_dir / "boundaries/ownership.feather"
 
 
 def get_population_results(df, datasets, progress_callback=None):
@@ -118,8 +118,15 @@ def get_population_results(df, datasets, progress_callback=None):
                 result["urban"] = extract_urban_by_mask(shape_mask, window, cellsize)
 
             # Extract NLCD
-            if "nlcd" in datasets:
-                result["nlcd"] = extract_nlcd_by_mask(shape_mask, window, cellsize)
+            if "nlcd_landcover" in datasets:
+                result["nlcd_landcover"] = extract_nlcd_landcover_by_mask(
+                    shape_mask, window, cellsize
+                )
+
+            if "nlcd_impervious" in datasets:
+                result["nlcd_impervious"] = extract_nlcd_impervious_by_mask(
+                    shape_mask, window, cellsize
+                )
 
             # Extract SE Blueprint indicators
             se_blueprint_indicators = [
