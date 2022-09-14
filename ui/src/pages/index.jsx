@@ -198,7 +198,8 @@ const IndexPage = ({
           </li>
           <li>
             <OutboundLink to="https://www.usgs.gov/centers/eros/science/national-land-cover-database">
-              National Land Cover Database 2001 - 2019
+              National Land Cover Database 2001 - 2019: land cover and
+              impervious surface
             </OutboundLink>
           </li>
           <li>
@@ -230,11 +231,15 @@ const IndexPage = ({
       <Box sx={{ my: '2rem', bg: 'blue.0', p: '1rem', borderRadius: '0.5rem' }}>
         <Heading as="h2">Disclaimer</Heading>
         <Paragraph>
-          Some fine print goes here, maybe that these summaries are provided for
-          informational purposes only to help guide further detailed
-          investigation as part of the SSA process, and not intended to be
-          directly used to justify an ESA decision. Data have limitations, known
-          issues, etc ...
+          Use of this tool is not required for the development of SSAs. The
+          summaries provided here are intended to simplify the assessment of how
+          exposed populations of fish, wildlife & plants are to various
+          influences and stressors (list will grow over time). The biologist
+          performing the assessment must determine if the influences and
+          stressors provided here are relevant to the resiliency, redundancy,
+          and representation of their focal species, as well as whether the
+          spatial data summarized here is the most appropriate (i.e.,
+          best-available) for their species.
         </Paragraph>
       </Box>
 

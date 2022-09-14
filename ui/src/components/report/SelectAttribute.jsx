@@ -10,11 +10,10 @@ import {
   Paragraph,
   Heading,
   Select,
-  Text,
 } from 'theme-ui'
 
 const SelectAttribute = ({ attributes }) => (
-  <Grid columns={[0, 2]} gap={5}>
+  <Grid columns={2} gap={5}>
     <Box>
       <Flex sx={{ alignItems: 'center', mb: '1rem' }}>
         <Box variant="boxes.step">2</Box>

@@ -8,8 +8,7 @@ const { darken } = require('@theme-ui/color')
 // Accent green: 569031
 
 module.exports = {
-  // breakpoints are not used
-  // breakpoints: ['600px', '800px', '1600px'],
+  breakpoints: ['600px', '800px', '1600px'],
   colors: {
     text: '#333',
     background: '#fff',

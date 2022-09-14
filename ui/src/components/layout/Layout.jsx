@@ -40,7 +40,14 @@ const Layout = ({ children, overflowY }) => {
         {isUnsupported ? (
           <UnsupportedBrowser />
         ) : (
-          <Box sx={{ flex: '1 1 auto', overflowY, height: '100%' }}>
+          <Box
+            sx={{
+              flex: '1 1 auto',
+              overflowY,
+              height: '100%',
+              position: 'relative',
+            }}
+          >
             {didCatch ? (
               <ErrorMessage />
             ) : (

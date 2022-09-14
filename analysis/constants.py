@@ -106,4 +106,6 @@ NLCD_CODES = {
 NLCD_INDEXES = {i: e for i, e in enumerate(NLCD_CODES.values())}
 
 json_dir = Path("constants")
-DATASETS = {e["id"]: e for e in json.loads(open(json_dir / "datasets.json").read())}
+datasets_json = json.loads(open(json_dir / "datasets.json").read())
+DATASETS = {e["id"]: e for e in datasets_json["datasets"]}
+CATEGORIES = {e["id"]: e for e in datasets_json["categories"]}
