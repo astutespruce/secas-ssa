@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import {
   arrow,
   flip,
+  shift,
   autoUpdate,
   useFloating,
   useInteractions,
@@ -43,13 +44,13 @@ const InfoTooltip = ({ content }) => {
     floating,
     strategy,
     placement,
-    middlewareData: { arrow: { x: arrowX } = {} },
+    middlewareData: { arrow: { x: arrowX } = {}, shift: { x: shiftX } = {} },
   } = useFloating({
     placement: 'top',
     open,
     onOpenChange: setOpen,
     whileElementsMounted: autoUpdate,
-    middleware: [arrow({ element: arrowRef }), flip()],
+    middleware: [arrow({ element: arrowRef }), flip(), shift()],
   })
   const { getReferenceProps, getFloatingProps } = useInteractions([
     useHover(context),
@@ -105,6 +106,8 @@ const InfoTooltip = ({ content }) => {
               border: '1px solid',
               borderColor: 'grey.3',
               overflow: 'hidden',
+              maxWidth: '28rem',
+              fontSize: 1,
             }}
           >
             {content}
@@ -115,11 +118,11 @@ const InfoTooltip = ({ content }) => {
               placement === 'top'
                 ? {
                     ...topArrowCSS,
-                    left: `${arrowX}px`,
+                    left: `${arrowX - (shiftX || 0)}px`,
                   }
                 : {
                     ...bottomArrowCSS,
-                    left: `${arrowX}px`,
+                    left: `${arrowX - (shiftX || 0)}px`,
                   }
             }
           />

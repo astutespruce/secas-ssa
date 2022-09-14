@@ -4,7 +4,7 @@ import { Box, Flex, Checkbox, Label } from 'theme-ui'
 
 import { InfoTooltip } from 'components/tooltip'
 
-const Dataset = ({ id, name, selected, disabled, onChange }) => {
+const Dataset = ({ id, name, description, selected, disabled, onChange }) => {
   const handleToggle = useCallback(() => {
     onChange(id)
   }, [id, onChange])
@@ -16,6 +16,7 @@ const Dataset = ({ id, name, selected, disabled, onChange }) => {
           sx={{
             cursor: 'pointer',
             border: '2px solid transparent',
+            pr: '0.25rem',
             '&:focus-within': {
               border: '2px dashed',
               borderColor: 'highlight',
@@ -36,7 +37,7 @@ const Dataset = ({ id, name, selected, disabled, onChange }) => {
         </Label>
       </Box>
       <Box>
-        <InfoTooltip content="TODO: tooltip content for dataset" />
+        <InfoTooltip content={description} />
       </Box>
     </Flex>
   )
@@ -45,6 +46,7 @@ const Dataset = ({ id, name, selected, disabled, onChange }) => {
 Dataset.propTypes = {
   id: PropTypes.string.isRequired,
   name: PropTypes.string.isRequired,
+  description: PropTypes.string.isRequired,
   selected: PropTypes.bool,
   disabled: PropTypes.bool,
   onChange: PropTypes.func.isRequired,
