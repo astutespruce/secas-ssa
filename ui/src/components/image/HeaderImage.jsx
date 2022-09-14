@@ -15,6 +15,7 @@ const HeaderImage = ({
   subtitle,
   credits,
   caption,
+  backgroundPosition,
 }) => (
   <>
     <BackgroundImage
@@ -23,6 +24,7 @@ const HeaderImage = ({
         height,
         minHeight,
         maxHeight: maxHeight || height,
+        backgroundPosition: `center ${backgroundPosition}`,
       }}
       alt=""
       preserveStackingContext
@@ -47,7 +49,7 @@ const HeaderImage = ({
           <Box
             sx={{
               width: '100%',
-              background: 'linear-gradient(transparent 0%, #0000009c 30%)',
+              background: 'linear-gradient(transparent 0%, #00000066 30%)',
               py: ['2rem', '3rem'],
             }}
           >
@@ -105,6 +107,7 @@ HeaderImage.propTypes = {
     author: PropTypes.string.isRequired,
   }),
   caption: PropTypes.string,
+  backgroundPosition: PropTypes.string,
 }
 
 HeaderImage.defaultProps = {
@@ -115,6 +118,7 @@ HeaderImage.defaultProps = {
   subtitle: null,
   credits: null,
   caption: null,
+  backgroundPosition: 'center',
 }
 
 export default HeaderImage

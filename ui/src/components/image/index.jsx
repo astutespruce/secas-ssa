@@ -1,3 +1,4 @@
+import Credits from './Credits'
 import HeaderImage from './HeaderImage'
 
-export { HeaderImage }
+export { Credits, HeaderImage }

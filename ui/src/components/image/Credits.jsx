@@ -4,7 +4,7 @@ import { Box, NavLink } from 'theme-ui'
 
 import { OutboundLink } from 'components/link'
 
-const Credits = ({ author, url, caption }) => (
+const Credits = ({ author, url, caption, sx }) => (
   <Box
     sx={{
       fontSize: 'smaller',
@@ -16,6 +16,7 @@ const Credits = ({ author, url, caption }) => (
         color: 'grey.6',
         textDecoration: 'none',
       },
+      ...sx,
     }}
   >
     {caption ? `${caption} | ` : null}
@@ -28,11 +29,13 @@ Credits.propTypes = {
   author: PropTypes.string.isRequired,
   url: PropTypes.string,
   caption: PropTypes.string,
+  sx: PropTypes.object,
 }
 
 Credits.defaultProps = {
   url: NavLink,
   caption: null,
+  sx: {},
 }
 
 export default Credits

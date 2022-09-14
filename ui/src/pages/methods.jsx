@@ -19,9 +19,9 @@ const MethodsPage = ({
       image={headerImage}
       credits={{
         author: 'U.S. Fish and Wildlife Service Southeast Region',
-        url: 'https://www.flickr.com/photos/usfwssoutheast/26871026541/',
+        url: 'https://flickr.com/photos/usfwssoutheast/5142785230/in/photostream/',
       }}
-      caption="Black Skimmers"
+      caption="Prescribed burn at Florida Panther NWR"
       height="12rem"
       maxHeight="12rem"
       minHeight="12rem"
@@ -33,7 +33,7 @@ const MethodsPage = ({
 
 export const pageQuery = graphql`
   query MethodsPageQuery {
-    headerImage: file(relativePath: { eq: "26871026541_48a8096dd9_o.jpg" }) {
+    headerImage: file(relativePath: { eq: "5142785230_69f04b6562_o.jpg" }) {
       childImageSharp {
         gatsbyImageData(
           layout: FULL_WIDTH

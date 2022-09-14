@@ -25,6 +25,7 @@ const ReportPage = ({
       height="16rem"
       maxHeight="16rem"
       minHeight="16rem"
+      backgroundPosition="bottom"
     />
 
     <ReportWorkflow />
@@ -33,7 +34,7 @@ const ReportPage = ({
 
 export const pageQuery = graphql`
   query ReportPageQuery {
-    headerImage: file(relativePath: { eq: "26871026541_48a8096dd9_o.jpg" }) {
+    headerImage: file(relativePath: { eq: "5494812678_3849557155_o.jpg" }) {
       childImageSharp {
         gatsbyImageData(
           layout: FULL_WIDTH

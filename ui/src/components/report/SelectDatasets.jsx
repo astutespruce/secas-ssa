@@ -85,7 +85,7 @@ const SelectDatasets = ({ availableDatasets }) => {
   console.log('dataset state', selectedDatasets)
 
   return (
-    <Grid columns={[0, 0, 0, '1fr 2fr']} gap={5}>
+    <Grid columns={[0, 0, '1fr 2fr']} gap={5}>
       <Box>
         <Flex sx={{ alignItems: 'center', mb: '1rem' }}>
           <Box variant="boxes.step">2</Box>
