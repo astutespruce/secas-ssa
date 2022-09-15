@@ -182,7 +182,9 @@ def detect_data(datasets, shapes, bounds):
     for id, filename in datasets.items():
         with rasterio.open(filename) as src:
             data = src.read(1, window=window)
-            available_datasets[id] = np.any(data[~(mask | (data == int(src.nodata)))])
+            available_datasets[id] = np.any(
+                data[~(mask | (data == int(src.nodata)))]
+            ).item()
 
     return available_datasets
 
