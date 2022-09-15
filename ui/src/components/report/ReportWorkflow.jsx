@@ -59,7 +59,7 @@ const ReportWorkflow = () => {
   }
 
   return (
-    <Container sx={{ px: ['1rem', '1rem', '1rem', 0] }}>
+    <Container sx={{ px: ['1rem', '1rem', '1rem', 0], pb: '4rem' }}>
       <Box sx={{ mt: '0.5rem', mb: '2rem' }}>
         <Steps steps={steps} index={stepIndex} onClick={handleStepClick} />
       </Box>

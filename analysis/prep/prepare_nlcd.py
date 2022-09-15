@@ -8,9 +8,9 @@ from rasterio.enums import Resampling
 from rasterio.vrt import WarpedVRT
 from rasterio.windows import Window
 
-from analysis.constants import DATA_CRS, NLCD_CODES, NLCD_INDEXES
+from analysis.constants import DATA_CRS, NLCD_CODES, NLCD_INDEXES, MASK_RESOLUTION
 from analysis.lib.colors import interpolate_colormap, hex_to_uint8
-from analysis.lib.raster import add_overviews, write_raster
+from analysis.lib.raster import add_overviews, write_raster, create_lowres_mask
 from analysis.lib.speedups import remap
 
 NODATA = 255
@@ -104,6 +104,15 @@ for infile in src_dir.glob("landcover/*/*.img"):
         print(f"Done with {year} in {time()-year_start:.2f}s")
 
 
+print("Creating mask")
+create_lowres_mask(
+    out_dir / "landcover_2019.tif",
+    out_dir / "landcover_mask.tif",
+    resolution=MASK_RESOLUTION,
+    ignore_zero=False,
+)
+
+
 ### Extract percent impervious
 print("Processing percent impervious")
 
@@ -182,3 +191,11 @@ for infile in src_dir.glob("impervious/*/*.img"):
         tmp_filename.unlink()
 
         print(f"Done with {year} in {time()-year_start:.2f}s")
+
+print("Creating mask")
+create_lowres_mask(
+    out_dir / "impervious_2019.tif",
+    out_dir / "impervious_mask.tif",
+    resolution=MASK_RESOLUTION,
+    ignore_zero=False,
+)

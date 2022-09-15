@@ -6,7 +6,7 @@ from analysis.constants import DATASETS
 from analysis.lib.raster import extract_count_in_geometry
 
 
-src_dir = Path("data/inputs/se_blueprint_indicators")
+src_dir = Path("../secas-blueprint/data/inputs/indicators/base")
 
 
 def extract_indicator_by_mask(id, shape_mask, window, cellsize):

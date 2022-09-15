@@ -7,40 +7,37 @@ import pygeos as pg
 from pyogrio.geopandas import read_dataframe
 
 from analysis.constants import DATA_CRS, DATASETS
-from analysis.lib.geometry import dissolve, make_valid
+from analysis.lib.geometry import dissolve, make_valid, to_dict_all
 from analysis.lib.stats.population import get_population_results
+from analysis.lib.stats.prescreen import get_available_datasets
 from api.report.xlsx import create_xlsx
 
 
 ### Create XLSX reports for an AOI
 aois = [
     # template: {"name": "", "path": "", "field": ""},
-    {
-        "name": "Balduina",
-        "path": "Balduina_pop_resiliency_final",
-        "field": "Population",
-        "datasets": list(DATASETS.keys()),
-    },
-    {
-        "name": "Rabbitsfoot",
-        "path": "Rabbitsfott_resilience_final_SECAS_only",
-        "field": "HUC10",
-        "datasets": list(DATASETS.keys()),
-    },
     # {
-    #     "name": "Test single area",
-    #     "path": "SingleTest",
-    #     "field": None,
-    #     "population_label": "Pop A",
-    #     "datasets": list(DATASETS.keys()),  # all datasets
+    #     "name": "Balduina",
+    #     "path": "Balduina_pop_resiliency_final",
+    #     "field": "Population",
     # },
+    # {
+    #     "name": "Rabbitsfoot",
+    #     "path": "Rabbitsfott_resilience_final_SECAS_only",
+    #     "field": "HUC10",
+    # },
+    {
+        "name": "Test single area",
+        "path": "SingleTest",
+        "field": None,
+        "population_label": "Pop A",
+    },
 ]
 
 
 for aoi in aois:
     name = aoi["name"]
     path = aoi["path"]
-    datasets = aoi["datasets"]
 
     # if field is missing, population must be present and will be added
     field = aoi.get("field", None) or "__pop"
@@ -64,6 +61,16 @@ for aoi in aois:
     df["geometry"] = make_valid(df.geometry.values.data)
     df = df.explode(index_parts=False)
     df = df.loc[pg.get_type_id(df.geometry.values.data) == 3]
+
+    # find available datasets
+    datasets = [
+        id
+        for id, present in get_available_datasets(
+            to_dict_all(df.geometry.values.data),
+            pg.total_bounds(df.geometry.values.data),
+        ).items()
+        if present
+    ]
 
     # dissolve by population
     df = dissolve(df, by=field).set_index(field)

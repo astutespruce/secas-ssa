@@ -29,7 +29,8 @@ def add_data_note(ws, content, columns=None):
 
 
 def add_data_details_sheet(xlsx, datasets):
-    pd.DataFrame([DATASETS[dataset] for dataset in datasets])[
+    # Keep original order so it matches sheets
+    pd.DataFrame([DATASETS[dataset] for dataset in DATASETS if dataset in datasets])[
         [
             "name",
             "sheet_name",

@@ -139,7 +139,7 @@ def extract_zonal_mean(filename, geometry_mask, window, boundless=False):
     return data[~mask].mean()
 
 
-def detect_data(dataset, shapes, bounds):
+def detect_data(datasets, shapes, bounds):
     """Detect if any data pixels are found in shapes.
 
     Typically this is performed against a reduced resolution version of a data
@@ -147,49 +147,48 @@ def detect_data(dataset, shapes, bounds):
 
     Parameters
     ----------
-    dataset : open rasterio dataset
+    datasets : dict
+        {<id>: <filename>, ...}
     shapes : list-like of GeoJSON features
     bounds : list-like of [xmin, ymin, xmax, ymax]
 
     Returns
     -------
-    bool
-        Returns True if there are data pixels present
+    dict
+        {<id>: True if there are data pixels present in shapes, otherwise False}
     """
-    window = get_window(dataset, bounds)
-    raster_window = Window(0, 0, dataset.width, dataset.height)
 
-    try:
-        # This will raise a WindowError if windows do not overlap
-        window = window.intersection(raster_window)
-    except WindowError:
-        # no overlap => no data
-        return False
+    with rasterio.open(list(datasets.values())[0]) as src:
+        window = get_window(src, bounds)
+        raster_window = Window(0, 0, src.width, src.height)
 
-    data = dataset.read(1, window=window)
-    nodata = int(dataset.nodata)
+        try:
+            # This will raise a WindowError if windows do not overlap
+            window = window.intersection(raster_window)
+        except WindowError:
+            # no overlap => no data for any of datasets
+            return False
 
-    if not np.any(data != nodata):
-        # entire window is nodata
-        return False
+        # create mask
+        # note: this intentionally uses all_touched=True
+        mask = geometry_mask(
+            shapes,
+            transform=src.window_transform(window),
+            out_shape=(window.height, window.width),
+            all_touched=True,
+        )
 
-    # create mask
-    # note: this intentionally uses all_touched=True
-    mask = geometry_mask(
-        shapes,
-        transform=dataset.window_transform(window),
-        out_shape=data.shape,
-        all_touched=True,
-    ) | (data == nodata)
+    available_datasets = {}
+    for id, filename in datasets.items():
+        with rasterio.open(filename) as src:
+            data = src.read(1, window=window)
+            available_datasets[id] = np.any(data[~(mask | (data == int(src.nodata)))])
 
-    if np.any(data[~mask]):
-        return True
-
-    return False
+    return available_datasets
 
 
-def create_lowres_mask(filename, outfilename, factor, ignore_zero=False):
-    """Create a resampled mask based on dimensions of raster / factor.
+def create_lowres_mask(filename, outfilename, resolution, ignore_zero=False):
+    """Create a resampled lower resolution mask.
 
     This is used to pre-screen areas where data are present for higher-resolution
     analysis.
@@ -201,18 +200,19 @@ def create_lowres_mask(filename, outfilename, factor, ignore_zero=False):
     ----------
     filename : str
     outfilename : str
-    factor : int
+    resolution : int
+        target resolution
     ignore_zero : bool, optional (default: False)
         if True, 0 values are treated as nodata
     """
     with rasterio.open(filename) as src:
-
         nodata = src.nodatavals[0]
-        width = math.ceil(src.width / factor)
-        height = math.ceil(src.height / factor)
-        dst_transform = src.transform * Affine.scale(
-            src.width / width, src.height / height
+        # output is still precisely aligned to same upper left coordinate
+        dst_transform = Affine(
+            resolution, 0, src.transform.c, 0, -resolution, src.transform.f
         )
+        width = math.ceil((src.width * src.transform.a) / resolution)
+        height = math.ceil((src.height * (-src.transform.e)) / resolution)
 
         with WarpedVRT(
             src,

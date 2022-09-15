@@ -9,7 +9,7 @@ from analysis.constants import (
 from analysis.lib.raster import extract_count_in_geometry
 
 
-src_dir = Path("data/inputs/threats/urban")
+src_dir = Path("../secas-blueprint/data/inputs/threats/urban")
 
 
 def extract_urban_by_mask(shape_mask, window, cellsize):
