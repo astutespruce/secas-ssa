@@ -2,26 +2,21 @@ import logging
 from pathlib import Path
 import secrets
 import shutil
-from tkinter import E
-from typing import Optional
-
 
 import arq
-
 from fastapi import (
     APIRouter,
     File,
     UploadFile,
-    Form,
     HTTPException,
     Depends,
 )
 from fastapi.security.api_key import APIKey
+
 from api.errors import DataError
-
 from api.settings import REDIS, REDIS_QUEUE, TEMP_DIR, MAX_FILE_SIZE
-
 from api.validation import validate_token, validate_content_type
+
 
 log = logging.getLogger("api")
 
@@ -68,7 +63,6 @@ def save_file(file: UploadFile, uuid: str) -> Path:
 @router.post("/api/upload")
 async def report_upload_endpoint(
     file: UploadFile = File(...),
-    name: Optional[str] = Form(None),
     token: APIKey = Depends(validate_token),
 ):
     validate_content_type(file)
@@ -90,7 +84,6 @@ async def report_upload_endpoint(
             "inspect",
             filename,
             uuid=uuid,
-            name=name,
             _queue_name=REDIS_QUEUE,
         )
         return {"job": job.job_id}

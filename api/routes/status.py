@@ -75,7 +75,7 @@ async def job_status_endpoint(job_id: str):
                 return {
                     "task": info.function,
                     "status": "success",
-                    "result": result,
+                    "result": result.get("payload", None),
                     "errors": errors,
                 }
 

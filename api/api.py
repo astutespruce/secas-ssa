@@ -14,7 +14,7 @@ from api.settings import (
 )
 from api.routes.health import router as health_router
 
-from api.routes.results import router as results_router
+from api.routes.report import router as report_router
 from api.routes.status import router as status_router
 from api.routes.upload import router as upload_router
 
@@ -49,7 +49,7 @@ log = logging.getLogger("api")
 ### Create the main API app and routes
 app = FastAPI()
 app.include_router(health_router)
-app.include_router(results_router)
+app.include_router(report_router)
 app.include_router(status_router)
 app.include_router(upload_router)
 

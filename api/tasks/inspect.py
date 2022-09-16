@@ -11,7 +11,7 @@ from api.errors import DataError
 from api.progress import set_progress
 
 
-log = logging.getLogger(__name__)
+log = logging.getLogger("api")
 
 # valid data types for fields that can be used to identify groups of data within a dataset
 VALID_DTYPES = {
@@ -93,7 +93,7 @@ def get_dataset(zip_filename):
     return filename, layers[0, 0]
 
 
-async def inspect(ctx, zip_filename, uuid, name):
+async def inspect(ctx, zip_filename, uuid):
     await set_progress(ctx["redis"], ctx["job_id"], 0, "Inspecting data files")
 
     ### get dataset and layer, and validate that only one polygon layer is present
@@ -104,10 +104,9 @@ async def inspect(ctx, zip_filename, uuid, name):
 
     info = read_info(path, layer=layer)
 
-    # pass along uuid and name from task context
+    # pass along uuid from task context
     results = {
         "uuid": uuid,
-        "name": name,
         "count": info["features"],
         "fields": dict(),
         "available_datasets": {},
@@ -177,4 +176,4 @@ async def inspect(ctx, zip_filename, uuid, name):
 
     await set_progress(ctx["redis"], ctx["job_id"], 100, "All done!")
 
-    return results, []
+    return {"payload": results}, []

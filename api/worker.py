@@ -6,6 +6,7 @@ from arq import cron
 import sentry_sdk
 
 from api.tasks.inspect import inspect
+from api.tasks.report import create_report
 from api.settings import (
     TEMP_DIR,
     JOB_TIMEOUT,
@@ -55,7 +56,7 @@ class WorkerSettings:
     queue_name = REDIS_QUEUE
     # run cleanup every 60 minutes
     cron_jobs = [cron(cleanup_files, run_at_startup=True, minute=0, second=0)]
-    functions = [inspect]
+    functions = [inspect, create_report]
 
     on_startup = startup
     on_shutdown = shutdown
