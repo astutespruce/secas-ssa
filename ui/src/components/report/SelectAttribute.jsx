@@ -1,6 +1,5 @@
-import React from 'react'
+import React, { useCallback } from 'react'
 import PropTypes from 'prop-types'
-
 import {
   Box,
   Button,
@@ -10,54 +9,95 @@ import {
   Paragraph,
   Heading,
   Select,
+  Text,
 } from 'theme-ui'
 
-const SelectAttribute = ({ attributes }) => (
-  <Grid columns={2} gap={5}>
-    <Box>
-      <Flex sx={{ alignItems: 'center', mb: '1rem' }}>
-        <Box variant="boxes.step">2</Box>
-        <Heading as="h3" sx={{ m: 0 }}>
-          Select population attribute
+import { OutboundLink } from 'components/link'
+import { siteMetadata } from '../../../gatsby-config'
+
+const SelectAttribute = ({ attributes, selectedAttribute, onSelect }) => {
+  const handleSelect = useCallback(
+    ({ target: { value } }) => {
+      onSelect(value)
+    },
+    [onSelect]
+  )
+
+  const attributeIds = Object.keys(attributes)
+  attributeIds.sort()
+
+  const hasAttributes = attributeIds.length > 0
+
+  return (
+    <Grid columns={2} gap={5}>
+      <Box>
+        <Flex sx={{ alignItems: 'center', mb: '1rem' }}>
+          <Box variant="boxes.step">2</Box>
+          <Heading as="h3" sx={{ m: 0 }}>
+            Select population attribute
+          </Heading>
+        </Flex>
+        <Paragraph>
+          If your dataset has an attribute that identifies unique populations,
+          please choose that attribute from the list to the right.
+          <br />
+          <br />
+          If you do not select an attribute, or if one isn&apos;t available in
+          the dataset, all boundaries will be combined and analyzed as a single
+          unit.
+        </Paragraph>
+      </Box>
+      <Box>
+        <Heading as="h4" sx={{ mb: '0.5rem' }}>
+          Population attribute:
         </Heading>
-      </Flex>
-      <Paragraph>
-        If your dataset has an attribute that identifies unique populations,
-        please choose that attribute from the list to the right.
-        <br />
-        <br />
-        If you do not select an attribute, or if one isn&apos;t available in the
-        dataset, all boundaries will be combined and analyzed as a single unit.
-      </Paragraph>
-    </Box>
-    <Box>
-      <Heading as="h4" sx={{ mb: '0.5rem' }}>
-        Population attribute:
-      </Heading>
 
-      <Select>
-        <option value="">-- Group everything together --</option>
-        {attributes.map((att) => (
-          <option value={att}>{att}</option>
-        ))}
-      </Select>
+        <Select
+          onChange={handleSelect}
+          disabled={!hasAttributes}
+          defaultValue={selectedAttribute}
+        >
+          <option value="">-- Group everything together --</option>
+          {attributeIds.map((id) => (
+            <option key={id} value={id}>
+              {id} ({attributes[id]} unique values)
+            </option>
+          ))}
+        </Select>
 
-      <Divider />
-      <Flex sx={{ justifyContent: 'flex-end' }}>
-        <Button as="button" variant="primary">
-          Continue
-        </Button>
-      </Flex>
-    </Box>
-  </Grid>
-)
+        {!hasAttributes ? (
+          <Text sx={{ mt: '1rem', color: 'grey.7' }}>
+            We did not find any attributes that appear to identify unique
+            population units in this dataset (limited to text or integer
+            fields). If there is an attribute present that we did not detect,
+            please{' '}
+            <OutboundLink to={`mailto:${siteMetadata.contactEmail}`}>
+              let us know
+            </OutboundLink>
+            .
+          </Text>
+        ) : null}
+
+        <Divider />
+        <Flex sx={{ justifyContent: 'flex-end' }}>
+          <Button as="button" variant="primary">
+            Continue
+          </Button>
+        </Flex>
+      </Box>
+    </Grid>
+  )
+}
 
 SelectAttribute.propTypes = {
-  attributes: PropTypes.arrayOf(PropTypes.string),
+  attributes: PropTypes.objectOf(PropTypes.number),
+  selectedAttribute: PropTypes.string,
+  onSelect: PropTypes.func.isRequired,
 }
 
 SelectAttribute.defaultProps = {
-  attributes: [],
+  attributes: {},
+  selectedAttribute: null,
 }
 
 export default SelectAttribute

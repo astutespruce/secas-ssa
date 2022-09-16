@@ -54,7 +54,7 @@ class WorkerSettings:
     job_timeout = JOB_TIMEOUT
     max_jobs = MAX_JOBS
     queue_name = REDIS_QUEUE
-    # run cleanup every 60 minutes
+    # run cleanup every 60 minutes (files are retained for 24 hours)
     cron_jobs = [cron(cleanup_files, run_at_startup=True, minute=0, second=0)]
     functions = [inspect, create_report]
 

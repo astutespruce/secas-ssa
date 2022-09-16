@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react'
 import PropTypes from 'prop-types'
 
-import { Box, Checkbox, Label, Flex } from 'theme-ui'
+import { Box } from 'theme-ui'
 
 import CategoryHeader from './CategoryHeader'
 import Dataset from './Dataset'
@@ -14,7 +14,7 @@ const Category = ({
   datasets,
   isOpen,
   onToggle,
-  onChange,
+  onToggleDatasets,
 }) => {
   const handleToggle = useCallback(() => {
     onToggle(id)
@@ -33,7 +33,11 @@ const Category = ({
       {isOpen ? (
         <Box sx={{ pt: '0.5rem', pb: '2rem' }}>
           {datasets.map((dataset) => (
-            <Dataset key={dataset.id} {...dataset} onChange={onChange} />
+            <Dataset
+              key={dataset.id}
+              {...dataset}
+              onToggle={onToggleDatasets}
+            />
           ))}
         </Box>
       ) : null}
@@ -43,7 +47,6 @@ const Category = ({
 
 Category.propTypes = {
   id: PropTypes.string.isRequired,
-
   label: PropTypes.string.isRequired,
   color: PropTypes.string.isRequired,
   borderColor: PropTypes.string.isRequired,
@@ -57,7 +60,7 @@ Category.propTypes = {
   ).isRequired,
   isOpen: PropTypes.bool,
   onToggle: PropTypes.func.isRequired,
-  onChange: PropTypes.func.isRequired,
+  onToggleDatasets: PropTypes.func.isRequired,
 }
 
 Category.defaultProps = {

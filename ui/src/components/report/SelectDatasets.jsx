@@ -1,88 +1,47 @@
-import React, { useState, useCallback } from 'react'
+import React, { useCallback } from 'react'
 import PropTypes from 'prop-types'
 import {
   Box,
   Flex,
   Grid,
   Paragraph,
-  Checkbox,
   Heading,
   Divider,
   Button,
   Text,
 } from 'theme-ui'
 
-import { useDatasets } from 'components/data'
-
 import Category from './Category'
 
-const SelectDatasets = ({ availableDatasets }) => {
-  const { categories, datasets } = useDatasets()
-
-  // FIXME
-  window.datasets = datasets
-
-  const [selectedDatasets, setSelectedDatasets] = useState(
-    Object.keys(datasets).reduce(
-      (prev, id) => Object.assign(prev, { [id]: true }),
-      {}
-    )
-  )
-
-  // set all categories open by default
-  const [openCategories, setOpenCategories] = useState(
-    categories.reduce((prev, { id }) => Object.assign(prev, { [id]: true }), {})
-  )
-
-  const handleCategoryToggle = useCallback((id) => {
-    setOpenCategories((prevOpen) => ({
-      ...prevOpen,
-      [id]: !prevOpen[id],
-    }))
-  }, [])
-
-  const onDatasetChange = useCallback(
-    (id) => {
-      console.log('toggle dataset', id)
-      setSelectedDatasets((prevState) => ({
-        ...prevState,
-        [id]: !prevState[id],
-      }))
-    },
-
-    []
-  )
-
-  const handleSelectAll = useCallback(
-    () => {
-      console.log('selectAll')
-      // only available datasets can be toggled on
-      setSelectedDatasets(() =>
-        Object.keys(datasets).reduce(
-          (prev, id) => Object.assign(prev, { [id]: availableDatasets[id] }),
-          {}
-        )
+const SelectDatasets = ({
+  categories,
+  openCategories,
+  availableDatasets,
+  selectedDatasets,
+  onToggleCategory,
+  onToggleDatasets,
+}) => {
+  const handleSelectAll = useCallback(() => {
+    onToggleDatasets(
+      Object.keys(availableDatasets).reduce(
+        (prev, id) => Object.assign(prev, { [id]: availableDatasets[id] }),
+        {}
       )
-    },
-    // deliberately ignoring datasets since those don't change after mount
-    [availableDatasets]
-  )
+    )
+  }, [availableDatasets, onToggleDatasets])
 
   const handleSelectNone = useCallback(
     () => {
-      console.log('selectNone')
-      setSelectedDatasets(() =>
-        Object.keys(datasets).reduce(
+      onToggleDatasets(
+        Object.keys(selectedDatasets).reduce(
           (prev, id) => Object.assign(prev, { [id]: false }),
           {}
         )
       )
     },
     // deliberately ignoring datasets since those don't change after mount
-    [availableDatasets]
+    [selectedDatasets, onToggleDatasets]
   )
-
-  console.log('dataset state', selectedDatasets)
 
   return (
     <Grid columns={[0, 0, '1fr 2fr']} gap={5}>
@@ -135,8 +94,8 @@ const SelectDatasets = ({ availableDatasets }) => {
               disabled: !availableDatasets[id],
             }))}
             isOpen={openCategories[category.id]}
-            onToggle={handleCategoryToggle}
-            onChange={onDatasetChange}
+            onToggle={onToggleCategory}
+            onToggleDatasets={onToggleDatasets}
           />
         ))}
 
@@ -152,27 +111,20 @@ const SelectDatasets = ({ availableDatasets }) => {
 }
 
 SelectDatasets.propTypes = {
-  availableDatasets: PropTypes.objectOf(PropTypes.bool),
-}
-
-SelectDatasets.defaultProps = {
-  // FIXME: remove and require
-  availableDatasets: {
-    nlcd_landcover: true,
-    nlcd_impervious: true,
-    urban: true,
-    slr_depth: true,
-    slr_proj: true,
-    se_blueprint_coastalshorelinecondition: true,
-    se_blueprint_resilientcoastalsites: true,
-    se_blueprint_stablecoastalwetlands: true,
-    se_blueprint_naturallandcoverinfloodplains: true,
-    se_blueprint_networkcomplexity: true,
-    se_blueprint_permeablesurface: true,
-    se_blueprint_firefrequency: true,
-    se_blueprint_intacthabitatcores: true,
-    se_blueprint_resilientterrestrialsites: true,
-  },
+  categories: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.string.isRequired,
+      label: PropTypes.string.isRequired,
+      color: PropTypes.string.isRequired,
+      borderColor: PropTypes.string.isRequired,
+      datasets: PropTypes.arrayOf(PropTypes.object).isRequired,
+    })
+  ).isRequired,
+  openCategories: PropTypes.objectOf(PropTypes.bool).isRequired,
+  availableDatasets: PropTypes.objectOf(PropTypes.bool).isRequired,
+  selectedDatasets: PropTypes.objectOf(PropTypes.bool).isRequired,
+  onToggleCategory: PropTypes.func.isRequired,
+  onToggleDatasets: PropTypes.func.isRequired,
 }
 
 export default SelectDatasets

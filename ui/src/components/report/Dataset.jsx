@@ -1,13 +1,13 @@
-import React, { useCallback } from 'react'
+import React from 'react'
 import PropTypes from 'prop-types'
 import { Box, Flex, Checkbox, Label } from 'theme-ui'
 
 import { InfoTooltip } from 'components/tooltip'
 
-const Dataset = ({ id, name, description, selected, disabled, onChange }) => {
-  const handleToggle = useCallback(() => {
-    onChange(id)
-  }, [id, onChange])
+const Dataset = ({ id, name, description, selected, disabled, onToggle }) => {
+  const handleToggle = () => {
+    onToggle({ [id]: !selected })
+  }
 
   return (
     <Flex sx={{ alignItems: 'center' }}>
@@ -49,7 +49,7 @@ Dataset.propTypes = {
   description: PropTypes.string.isRequired,
   selected: PropTypes.bool,
   disabled: PropTypes.bool,
-  onChange: PropTypes.func.isRequired,
+  onToggle: PropTypes.func.isRequired,
 }
 
 Dataset.defaultProps = {

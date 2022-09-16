@@ -90,3 +90,9 @@ http :5000/admin/jobs/status -a admin
 ```
 
 Username is admin, password is `API_SECRET` in `.env`
+
+To clear out the Redis queue (e.g., if there are stuck jobs):
+
+```bash
+redis-cli FLUSHALL
+```

@@ -1,8 +1,8 @@
 import React, { useState, useCallback } from 'react'
-import PropTypes from 'prop-types'
 
-import { Box, Container, Flex } from 'theme-ui'
+import { Box, Container } from 'theme-ui'
 
+import { useDatasets } from 'components/data'
 import UploadContainer from './UploadContainer'
 import SelectAttribute from './SelectAttribute'
 import SelectDatasets from './SelectDatasets'
@@ -23,13 +23,78 @@ const steps = [
 ]
 
 const ReportWorkflow = () => {
-  const [{ stepIndex }, setState] = useState({ stepIndex: 0 })
+  const { categories, datasets } = useDatasets()
 
-  const handleStepClick = useCallback(
-    (newIndex) => {
-      setState((prevState) => ({ ...prevState, stepIndex: newIndex }))
+  const [
+    {
+      stepIndex,
+      attributes,
+      selectedAttribute,
+      openCategories,
+      availableDatasets,
+      selectedDatasets,
     },
-    [setState]
+    setState,
+  ] = useState(() => {
+    const allDatasets = Object.keys(datasets).reduce(
+      (prev, id) => Object.assign(prev, { [id]: true }),
+      {}
+    )
+
+    return {
+      stepIndex: 0,
+      attributes: {
+        // FIXME:
+        Foo: 3,
+        Bar: 20,
+      }, // set via API
+      selectedAttribute: '', // blank indicates null
+      openCategories: categories.reduce(
+        (prev, { id }) => Object.assign(prev, { [id]: true }),
+        {}
+      ),
+      // by default assume all are available and selected (as separate copies)
+      availableDatasets: allDatasets, // set via API
+      selectedDatasets: { ...allDatasets },
+    }
+  })
+
+  const handleStepClick = useCallback((newIndex) => {
+    setState((prevState) => ({ ...prevState, stepIndex: newIndex }))
+  }, [])
+
+  const handleToggleCategory = useCallback((id) => {
+    setState(({ openCategories: prevOpenCategories, ...prevState }) => ({
+      ...prevState,
+      openCategories: {
+        ...prevOpenCategories,
+        [id]: !prevOpenCategories[id],
+      },
+    }))
+  }, [])
+
+  const handleToggleDatasets = useCallback((updatedDatasets) => {
+    setState(({ selectedDatasets: prevSelectedDatasets, ...prevState }) => ({
+      ...prevState,
+      selectedDatasets: {
+        ...prevSelectedDatasets,
+        ...updatedDatasets,
+      },
+    }))
+  }, [])
+
+  const handleSelectAttribute = useCallback((attribute) => {
+    setState((prevState) => ({
+      ...prevState,
+      selectedAttribute: attribute,
+    }))
+  }, [])
+
+  // FIXME: remove
+  console.log(
+    `step=${steps[stepIndex].id}\nattributes=${JSON.stringify(
+      attributes
+    )}\nselectedAttribute=${selectedAttribute}`
   )
 
   let stepContent = null
@@ -41,12 +106,26 @@ const ReportWorkflow = () => {
     }
     case 'selectAttribute': {
       // TODO: pass attributes from API
-      stepContent = <SelectAttribute />
+      stepContent = (
+        <SelectAttribute
+          attributes={attributes}
+          selectedAttribute={selectedAttribute}
+          onSelect={handleSelectAttribute}
+        />
+      )
       break
     }
     case 'selectDatasets': {
-      // TODO: pass dataset state from API
-      stepContent = <SelectDatasets />
+      stepContent = (
+        <SelectDatasets
+          categories={categories}
+          openCategories={openCategories}
+          availableDatasets={availableDatasets}
+          selectedDatasets={selectedDatasets}
+          onToggleCategory={handleToggleCategory}
+          onToggleDatasets={handleToggleDatasets}
+        />
+      )
       break
     }
     case 'download': {
