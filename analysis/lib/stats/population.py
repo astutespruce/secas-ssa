@@ -27,7 +27,7 @@ extent_filename = bnd_dir / "nonmarine_mask.tif"
 states_filename = bnd_dir / "states.feather"
 
 
-def get_population_results(df, datasets, progress_callback=None):
+async def get_population_results(df, datasets, progress_callback=None):
     """Calculate statistics for each population unit
 
     Parameters
@@ -99,7 +99,7 @@ def get_population_results(df, datasets, progress_callback=None):
                 results.append(result)
 
                 if progress_callback is not None:
-                    progress_callback(100 * count / len(df))
+                    await progress_callback(100 * count / len(df))
 
                 count += 1
                 continue
@@ -140,7 +140,7 @@ def get_population_results(df, datasets, progress_callback=None):
             results.append(result)
 
             if progress_callback is not None:
-                progress_callback(100 * count / len(df))
+                await progress_callback(100 * count / len(df))
 
             count += 1
 

@@ -1,3 +1,4 @@
+import asyncio
 from pathlib import Path
 import subprocess
 from time import time
@@ -77,7 +78,7 @@ for aoi in aois:
 
     ### calculate results, data must be in DATA_CRS
     print("Calculating results...")
-    results = get_population_results(df, datasets)
+    results = asyncio.run(get_population_results(df, datasets))
 
     # FIXME:
     results.reset_index().to_feather("/tmp/test.feather")

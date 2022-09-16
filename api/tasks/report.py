@@ -1,4 +1,5 @@
 import logging
+import math
 import tempfile
 
 import geopandas as gp
@@ -14,9 +15,19 @@ from api.settings import TEMP_DIR
 log = logging.getLogger("api")
 
 
-async def create_report(ctx, uuid, datasets, field=None, name=None):
-    # print(f"uuid={uuid}, name={name}, field={field}, datasets={datasets}")
+async def record_progress_callback(
+    ctx, percent, min_progress=0, max_progress=100, message=""
+):
+    progress = math.ceil(min_progress + (max_progress - min_progress) * (percent / 100))
+    await set_progress(
+        ctx["redis"],
+        ctx["job_id"],
+        progress,
+        message,
+    )
 
+
+async def create_report(ctx, uuid, datasets, field=None, name=None):
     await set_progress(ctx["redis"], ctx["job_id"], 0, "Reading dataset")
 
     filename = TEMP_DIR / f"{uuid}.feather"
@@ -48,15 +59,29 @@ async def create_report(ctx, uuid, datasets, field=None, name=None):
     else:
         df = df.set_index(field)
 
-    # TODO: progress callback
-    await set_progress(
-        ctx["redis"], ctx["job_id"], 10, "Calculating statistics (may take a while)"
+    progress_scale = [10, 75]
+    message = "Calculating statistics (may take a while)"
+
+    async def progress_callback(percent):
+        await record_progress_callback(
+            ctx,
+            percent,
+            min_progress=progress_scale[0],
+            max_progress=progress_scale[1],
+            message=message,
+        )
+
+    await set_progress(ctx["redis"], ctx["job_id"], progress_scale[0], message)
+
+    results = await get_population_results(
+        df, datasets, progress_callback=progress_callback
     )
-    results = get_population_results(df, datasets)
     if results is None:
         raise DataError("Dataset does not overlap Southeast states")
 
-    await set_progress(ctx["redis"], ctx["job_id"], 75, "Creating XLSX file")
+    await set_progress(
+        ctx["redis"], ctx["job_id"], progress_scale[1], "Creating XLSX file"
+    )
     xlsx = create_xlsx(results, datasets)
 
     await set_progress(ctx["redis"], ctx["job_id"], 95, "Nearly done")

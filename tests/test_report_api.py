@@ -11,7 +11,8 @@ from api.settings import API_TOKEN
 
 # this assumes API server is running at :5000 and that worker is also running
 
-DELAY = 0.5  # seconds
+DELAY = 1  # seconds
+MAX_RETRIES = 240
 
 API_URL = "http://localhost:5000"
 # API_URL = "http://localhost:8080"
@@ -23,7 +24,7 @@ if not OUT_DIR.exists():
     os.makedirs(OUT_DIR)
 
 
-def poll_until_done(job_id, current=0, max=100):
+def poll_until_done(job_id, current=0, max=MAX_RETRIES):
     r = httpx.get(f"{API_URL}/api/reports/status/{job_id}?token={API_TOKEN}")
 
     if r.status_code != 200:
@@ -108,9 +109,15 @@ def download_file(url):
 
 if __name__ == "__main__":
 
-    # name, filename = ["Balduina atropurpurea", "examples/Balduina_pop_resiliency_final.zip"]
-    # name, filename = ["Rabbitsfoot", "examples/Rabbitsfott_resilience_final_SECAS_only.zip"]
-    name, filename = ["Test species", "examples/SingleTest.zip"]
+    # name, filename = [
+    #     "Balduina atropurpurea",
+    #     "examples/Balduina_pop_resiliency_final.zip",
+    # ]
+    name, filename = [
+        "Rabbitsfoot",
+        "examples/Rabbitsfott_resilience_final_SECAS_only.zip",
+    ]
+    # name, filename = ["Test species", "examples/SingleTest.zip"]
 
     task, result, errors = test_upload_file(filename)
     print(f"----------------\ntask: {task}\nresult: {result}\nerrors: {errors}\n")
@@ -122,7 +129,7 @@ if __name__ == "__main__":
             field = None
         else:
             # arbitrarily pick first field available
-            field = result["fields"].keys()[0]
+            field = list(result["fields"].keys())[0]
 
         # include all present datasets in analysis
         datasets = ",".join(
@@ -133,14 +140,6 @@ if __name__ == "__main__":
 
     task, result, errors = test_create_report(uuid, datasets, field, name)
     print(f"----------------\ntask: {task}\nresult: {result}\nerrors: {errors}\n")
-
-    # task, result, errors = test_create_report(
-    #     "2xqkIWOUtvA0S77PA_Ff0Q",
-    #     datasets="nlcd_landcover",
-    #     field=None,
-    #     name="test species",
-    # )
-    # print(f"----------------\ntask: {task}\nresult: {result}\nerrors: {errors}\n")
 
     outfilename = download_file(result)
 
