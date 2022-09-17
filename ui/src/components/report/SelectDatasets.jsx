@@ -20,6 +20,8 @@ const SelectDatasets = ({
   selectedDatasets,
   onToggleCategory,
   onToggleDatasets,
+  onBack,
+  onNext,
 }) => {
   const handleSelectAll = useCallback(() => {
     onToggleDatasets(
@@ -42,6 +44,9 @@ const SelectDatasets = ({
     // deliberately ignoring datasets since those don't change after mount
     [selectedDatasets, onToggleDatasets]
   )
+
+  const hasDatasets =
+    Object.values(selectedDatasets).filter((v) => v).length > 0
 
   return (
     <Grid columns={[0, 0, '1fr 2fr']} gap={5}>
@@ -100,10 +105,20 @@ const SelectDatasets = ({
         ))}
 
         <Divider />
-        <Flex sx={{ justifyContent: 'flex-end' }}>
-          <Button as="button" variant="primary">
-            Create report
+        <Flex sx={{ justifyContent: 'space-between' }}>
+          <Button as="button" variant="secondary" onClick={onBack}>
+            Back
           </Button>
+
+          {hasDatasets ? (
+            <Button as="button" variant="primary" onClick={onNext}>
+              Create report
+            </Button>
+          ) : (
+            <Button as="button" variant="disabled" disabled>
+              Create report
+            </Button>
+          )}
         </Flex>
       </Box>
     </Grid>
@@ -125,6 +140,8 @@ SelectDatasets.propTypes = {
   selectedDatasets: PropTypes.objectOf(PropTypes.bool).isRequired,
   onToggleCategory: PropTypes.func.isRequired,
   onToggleDatasets: PropTypes.func.isRequired,
+  onBack: PropTypes.func.isRequired,
+  onNext: PropTypes.func.isRequired,
 }
 
 export default SelectDatasets

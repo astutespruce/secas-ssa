@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { Box, Flex, Checkbox, Label, Text } from 'theme-ui'
+import { Box, Flex, Checkbox, Label } from 'theme-ui'
 
 import { InfoTooltip } from 'components/tooltip'
 
@@ -12,11 +12,6 @@ const Dataset = ({ id, name, description, selected, disabled, onToggle }) => {
   return (
     <Flex sx={{ alignItems: 'center' }}>
       <Box sx={{ flex: '0 0 auto' }}>
-        {/* {disabled ? (
-          <Text sx={{ fontStyle: 'italic', color: 'grey.7' }}>
-            {name} (does not overlap analysis units)
-          </Text>
-        ) : ( */}
         <Label
           sx={{
             cursor: 'pointer',
@@ -43,7 +38,6 @@ const Dataset = ({ id, name, description, selected, disabled, onToggle }) => {
           {name}
           {disabled ? ' (not present)' : null}
         </Label>
-        {/* )} */}
       </Box>
       <Box>
         <InfoTooltip content={description} />

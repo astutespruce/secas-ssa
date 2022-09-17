@@ -3,12 +3,11 @@ import React, { useState, useCallback } from 'react'
 import { Box, Container } from 'theme-ui'
 
 import { useDatasets } from 'components/data'
-// import UploadContainer from './UploadContainer'
+import Steps from './Steps'
 import Upload from './Upload'
 import SelectAttribute from './SelectAttribute'
 import SelectDatasets from './SelectDatasets'
 import Download from './Download'
-import Steps from './Steps'
 
 const steps = [
   { id: 'upload', label: 'Upload' },
@@ -105,7 +104,7 @@ const ReportWorkflow = () => {
     }))
   }, [])
 
-  const handleSelectAttributeBack = useCallback(() => {
+  const handleStartOver = useCallback(() => {
     setState((prevState) => ({
       ...prevState,
       stepIndex: 0,
@@ -121,6 +120,20 @@ const ReportWorkflow = () => {
     setState((prevState) => ({
       ...prevState,
       stepIndex: 2,
+    }))
+  }, [])
+
+  const handleSelectDatasetsBack = useCallback(() => {
+    setState((prevState) => ({
+      ...prevState,
+      stepIndex: 1,
+    }))
+  }, [])
+
+  const handleCreateReport = useCallback(() => {
+    setState((prevState) => ({
+      ...prevState,
+      stepIndex: 3,
     }))
   }, [])
 
@@ -151,7 +164,7 @@ const ReportWorkflow = () => {
           attributes={attributes}
           selectedAttribute={selectedAttribute}
           onSelect={handleSelectAttribute}
-          onBack={handleSelectAttributeBack}
+          onBack={handleStartOver}
           onNext={handleSelectAttributeNext}
         />
       )
@@ -166,12 +179,21 @@ const ReportWorkflow = () => {
           selectedDatasets={selectedDatasets}
           onToggleCategory={handleToggleCategory}
           onToggleDatasets={handleToggleDatasets}
+          onBack={handleSelectDatasetsBack}
+          onNext={handleCreateReport}
         />
       )
       break
     }
     case 'download': {
-      stepContent = <Download />
+      stepContent = (
+        <Download
+          uuid={uuid}
+          selectedAttribute={selectedAttribute}
+          selectedDatasets={selectedDatasets}
+          onCancel={handleStartOver}
+        />
+      )
       break
     }
     default: {
