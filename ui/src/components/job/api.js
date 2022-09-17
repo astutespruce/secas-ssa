@@ -14,15 +14,13 @@ if (hasWindow && !apiHost) {
   apiHost = `//${window.location.host}`
 }
 
-const API = `${apiHost}/api/reports`
-
-export const uploadFile = async (file, name, onProgress) => {
-  // NOTE: both file and name are required by API
+export const submitJob = async (path, data, onProgress) => {
   const formData = new FormData()
-  formData.append('file', file)
-  formData.append('name', name)
+  Object.entries(data).forEach(([key, value]) => {
+    formData.append(key, value)
+  })
 
-  const response = await fetch(`${API}/custom?token=${apiToken}`, {
+  const response = await fetch(`${apiHost}/api/${path}?token=${apiToken}`, {
     method: 'POST',
     body: formData,
   })
@@ -34,53 +32,15 @@ export const uploadFile = async (file, name, onProgress) => {
     // indicates error with user request, show error to user
 
     // just for logging
-    console.error('Bad upload request', json)
-    captureException('Bad upload request', json)
+    console.error('Bad job submit request', json)
+    captureException('Bad job submit request', json)
 
     return { error: detail }
   }
 
   if (response.status !== 200) {
     console.error('Bad response', json)
-
-    captureException('Bad upload response', json)
-
-    throw new Error(response.statusText)
-  }
-
-  const result = await pollJob(job, onProgress)
-  return result
-}
-
-export const createSummaryUnitReport = async (id, type, onProgress) => {
-  let unitType = null
-
-  if (type === 'subwatershed') {
-    unitType = 'huc12'
-  } else if (type === 'marine lease block') {
-    unitType = 'marine_blocks'
-  }
-
-  const response = await fetch(`${API}/${unitType}/${id}?token=${apiToken}`, {
-    method: 'POST',
-  })
-
-  const json = await response.json()
-  const { job, detail } = json
-
-  if (response.status === 400) {
-    // indicates error with user request, show error to user
-
-    // just for logging
-    console.error('Bad create summary report request', json)
-    captureException('Bad create summary report request', json)
-
-    return { error: detail }
-  }
-
-  if (response.status !== 200) {
-    console.error('Bad response', json)
-    captureException('Bad upload response', json)
+    captureException('Bad job submit response', json)
 
     throw new Error(response.statusText)
   }
@@ -97,7 +57,7 @@ const pollJob = async (jobId, onProgress) => {
 
   while (time < jobTimeout && failedRequests < failedFetchLimit) {
     try {
-      response = await fetch(`${API}/status/${jobId}`, {
+      response = await fetch(`${apiHost}/api/reports/status/${jobId}`, {
         cache: 'no-cache',
       })
     } catch (ex) {
@@ -121,7 +81,7 @@ const pollJob = async (jobId, onProgress) => {
     } = json
 
     if (response.status !== 200 || status === 'failed') {
-      captureException('Report job failed', json)
+      captureException('Job failed', json)
       if (error) {
         return { error }
       }
@@ -130,7 +90,7 @@ const pollJob = async (jobId, onProgress) => {
     }
 
     if (status === 'success') {
-      return { result: `${apiHost}${result}`, errors }
+      return { result, errors }
     }
 
     if (progress != null) {
@@ -144,11 +104,11 @@ const pollJob = async (jobId, onProgress) => {
 
   // if we got here, it meant that we hit a timeout error or a fetch error
   if (failedRequests) {
-    captureException(`Report job encountered ${failedRequests} fetch errors`)
+    captureException(`Job encountered ${failedRequests} fetch errors`)
 
     return {
       error:
-        'network errors were encountered while creating report.  The server may be too busy or your network connection may be having problems.  Please try again in a few minutes.',
+        'network errors were encountered.  The server may be too busy or your network connection may be having problems.  Please try again in a few minutes.',
     }
   }
 
@@ -156,13 +116,13 @@ const pollJob = async (jobId, onProgress) => {
     captureException('Report job timed out')
     return {
       error:
-        'timeout while creating report.  Your area of interest may be too big.',
+        'timeout while running job.  Your areas may be too big or complex.',
     }
   }
 
-  captureException('Report job had an unexpected error')
+  captureException('Job had an unexpected error')
   return {
     error:
-      'unexpected errors prevented your report from completing successfully.  Please try again.',
+      'unexpected errors prevented your job from completing successfully.  Please try again.',
   }
 }

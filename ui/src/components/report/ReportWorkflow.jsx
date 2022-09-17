@@ -3,7 +3,8 @@ import React, { useState, useCallback } from 'react'
 import { Box, Container } from 'theme-ui'
 
 import { useDatasets } from 'components/data'
-import UploadContainer from './UploadContainer'
+// import UploadContainer from './UploadContainer'
+import Upload from './Upload'
 import SelectAttribute from './SelectAttribute'
 import SelectDatasets from './SelectDatasets'
 import Download from './Download'
@@ -28,6 +29,7 @@ const ReportWorkflow = () => {
   const [
     {
       stepIndex,
+      uuid, // for tracking unique upload
       attributes,
       selectedAttribute,
       openCategories,
@@ -43,12 +45,9 @@ const ReportWorkflow = () => {
 
     return {
       stepIndex: 0,
-      attributes: {
-        // FIXME:
-        Foo: 3,
-        Bar: 20,
-      }, // set via API
-      selectedAttribute: '', // blank indicates null
+      uuid: null,
+      attributes: {}, // set via API
+      selectedAttribute: '', // blank indicates no selected attribute
       openCategories: categories.reduce(
         (prev, { id }) => Object.assign(prev, { [id]: true }),
         {}
@@ -59,9 +58,25 @@ const ReportWorkflow = () => {
     }
   })
 
+  // TODO: depending on step, may need to reset state
   const handleStepClick = useCallback((newIndex) => {
     setState((prevState) => ({ ...prevState, stepIndex: newIndex }))
   }, [])
+
+  const handleUploadFileSuccess = useCallback(
+    ({ uuid: uploadUuid, fields = {}, available_datasets = {} }) => {
+      console.log('uploaded file', uploadUuid, fields, available_datasets)
+      setState((prevState) => ({
+        ...prevState,
+        stepIndex: 1,
+        uuid: uploadUuid,
+        attributes: fields,
+        availableDatasets: available_datasets,
+        selectedDatasets: { ...available_datasets },
+      }))
+    },
+    []
+  )
 
   const handleToggleCategory = useCallback((id) => {
     setState(({ openCategories: prevOpenCategories, ...prevState }) => ({
@@ -90,18 +105,43 @@ const ReportWorkflow = () => {
     }))
   }, [])
 
+  const handleSelectAttributeBack = useCallback(() => {
+    setState((prevState) => ({
+      ...prevState,
+      stepIndex: 0,
+      uuid: null,
+      selectedAttribute: '',
+      attributes: {},
+      availableDatasets: {},
+      selectedDatasets: {},
+    }))
+  }, [])
+
+  const handleSelectAttributeNext = useCallback(() => {
+    setState((prevState) => ({
+      ...prevState,
+      stepIndex: 2,
+    }))
+  }, [])
+
   // FIXME: remove
   console.log(
-    `step=${steps[stepIndex].id}\nattributes=${JSON.stringify(
+    `step=${steps[stepIndex].id}\nuuid=${uuid}\nattributes=${JSON.stringify(
       attributes
-    )}\nselectedAttribute=${selectedAttribute}`
+    )}\nselectedAttribute=${selectedAttribute}\navailableDatasets=${Object.entries(
+      availableDatasets
+    )
+      .filter(([k, v]) => v)
+      .map(([k, _]) => k)}\nselectedDatasets=${Object.entries(selectedDatasets)
+      .filter(([k, v]) => v)
+      .map(([k, _]) => k)}`
   )
 
   let stepContent = null
 
   switch (steps[stepIndex].id) {
     case 'upload': {
-      stepContent = <UploadContainer />
+      stepContent = <Upload onSuccess={handleUploadFileSuccess} />
       break
     }
     case 'selectAttribute': {
@@ -111,6 +151,8 @@ const ReportWorkflow = () => {
           attributes={attributes}
           selectedAttribute={selectedAttribute}
           onSelect={handleSelectAttribute}
+          onBack={handleSelectAttributeBack}
+          onNext={handleSelectAttributeNext}
         />
       )
       break
@@ -143,7 +185,7 @@ const ReportWorkflow = () => {
         <Steps steps={steps} index={stepIndex} onClick={handleStepClick} />
       </Box>
 
-      {stepContent}
+      <Box sx={{ pt: '2rem' }}>{stepContent}</Box>
     </Container>
   )
 }

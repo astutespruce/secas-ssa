@@ -115,10 +115,19 @@ const DropZone = ({ name }) => {
       >
         <input name={name} {...getInputProps()} />
         <Download size="32px" style={{ marginBottom: '1rem' }} />
-        <Heading as="h3" sx={{ mb: '1rem' }}>
+        <Heading as="h3" sx={{ mb: '0.5rem' }}>
           Drop your zip file here
         </Heading>
-        <Text as="p" sx={{ color: 'grey.7', textAlign: 'center', fontSize: 1 }}>
+        <Text>(or click on this area to show a file browser)</Text>
+        <Text
+          as="p"
+          sx={{
+            color: 'grey.7',
+            textAlign: 'center',
+            fontSize: 1,
+            mt: '0.5rem',
+          }}
+        >
           Zip file must contain all associated files for a shapefile (at least
           .shp, .prj, .shx) or file geodatabase (.gdb).
           <br />

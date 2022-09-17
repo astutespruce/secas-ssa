@@ -5,7 +5,6 @@ import {
   Button,
   Flex,
   Heading,
-  Input,
   Text,
   Divider,
   Grid,
@@ -15,14 +14,13 @@ import { FormProvider, useForm } from 'react-hook-form'
 
 import DropZone from './DropZone'
 
-const UploadForm = ({ onFileChange, onCreateReport }) => {
+const UploadForm = ({ onReset, onSubmit }) => {
   const methods = useForm({
     mode: 'onBlur',
   })
 
   const {
     formState: { isValid },
-    register,
     watch,
     setValue,
   } = methods
@@ -31,16 +29,16 @@ const UploadForm = ({ onFileChange, onCreateReport }) => {
 
   const handleSubmit = useCallback(
     (values) => {
-      const { speciesName, file: fileProp } = values
+      const { file: fileProp } = values
 
-      onCreateReport(fileProp, speciesName)
+      onSubmit({ file: fileProp })
     },
-    [onCreateReport]
+    [onSubmit]
   )
 
   const handleResetFile = () => {
     setValue('file', null)
-    onFileChange()
+    onReset()
   }
 
   return (
@@ -66,24 +64,14 @@ const UploadForm = ({ onFileChange, onCreateReport }) => {
               </Paragraph>
             </Box>
             <Box>
-              <Heading as="h4" sx={{ mb: '0.5rem' }}>
-                Species name (optional):
-              </Heading>
-              <Input
-                type="text"
-                name="speciesName"
-                {...register('speciesName', { required: false })}
-              />
-
               <Flex
                 sx={{
-                  mt: '2rem',
                   mb: '0.5em',
                   justifyContent: 'space-between',
                   alignItems: 'center',
                 }}
               >
-                <div>
+                <Box>
                   <Heading
                     as="h4"
                     sx={{
@@ -92,8 +80,8 @@ const UploadForm = ({ onFileChange, onCreateReport }) => {
                   >
                     Population unit boundaries:
                   </Heading>
-                  <div>{file && <Text>{file.name}</Text>}</div>
-                </div>
+                  <Box>{file && <Text>{file.name}</Text>}</Box>
+                </Box>
               </Flex>
 
               <Box sx={{ display: file ? 'none' : 'block' }}>
@@ -120,7 +108,7 @@ const UploadForm = ({ onFileChange, onCreateReport }) => {
                   variant={isValid ? 'primary' : 'disabled'}
                   disabled={!isValid}
                 >
-                  Submit
+                  Upload file
                 </Button>
               </Flex>
             </Box>
@@ -132,8 +120,8 @@ const UploadForm = ({ onFileChange, onCreateReport }) => {
 }
 
 UploadForm.propTypes = {
-  onFileChange: PropTypes.func.isRequired,
-  onCreateReport: PropTypes.func.isRequired,
+  onReset: PropTypes.func.isRequired,
+  onSubmit: PropTypes.func.isRequired,
 }
 
 export default UploadForm

@@ -15,7 +15,13 @@ import {
 import { OutboundLink } from 'components/link'
 import { siteMetadata } from '../../../gatsby-config'
 
-const SelectAttribute = ({ attributes, selectedAttribute, onSelect }) => {
+const SelectAttribute = ({
+  attributes,
+  selectedAttribute,
+  onBack,
+  onNext,
+  onSelect,
+}) => {
   const handleSelect = useCallback(
     ({ target: { value } }) => {
       onSelect(value)
@@ -79,9 +85,12 @@ const SelectAttribute = ({ attributes, selectedAttribute, onSelect }) => {
         ) : null}
 
         <Divider />
-        <Flex sx={{ justifyContent: 'flex-end' }}>
-          <Button as="button" variant="primary">
-            Continue
+        <Flex sx={{ justifyContent: 'space-between' }}>
+          <Button as="button" variant="secondary" onClick={onBack}>
+            Back
+          </Button>
+          <Button as="button" variant="primary" onClick={onNext}>
+            Next
           </Button>
         </Flex>
       </Box>
@@ -92,6 +101,8 @@ const SelectAttribute = ({ attributes, selectedAttribute, onSelect }) => {
 SelectAttribute.propTypes = {
   attributes: PropTypes.objectOf(PropTypes.number),
   selectedAttribute: PropTypes.string,
+  onBack: PropTypes.func.isRequired,
+  onNext: PropTypes.func.isRequired,
   onSelect: PropTypes.func.isRequired,
 }
 

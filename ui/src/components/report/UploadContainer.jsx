@@ -17,10 +17,12 @@ import {
 } from '@emotion-icons/fa-solid'
 
 import { OutboundLink } from 'components/link'
+import UploadError from 'components/job/JobError'
+// import { uploadFile } from 'components/job/api'
 import { captureException } from 'util/log'
-import { uploadFile } from './api'
+
 import UploadForm from './UploadForm'
-import UploadError from './UploadError'
+
 import config from '../../../gatsby-config'
 
 const { contactEmail } = config.siteMetadata
@@ -50,71 +52,71 @@ const UploadContainer = () => {
       reportURL: null,
     }))
 
-    try {
-      // upload file and update progress
-      const {
-        error: uploadError,
-        result,
-        errors: finalErrors,
-      } = await uploadFile(
-        file,
-        name,
-        ({
-          progress: nextProgress,
-          message: nextMessage = null,
-          errors: nextErrors = null,
-        }) => {
-          setState(
-            ({ message: prevMessage, errors: prevErrors, ...prevState }) => ({
-              ...prevState,
-              progress: nextProgress,
-              message: nextMessage || prevMessage,
-              errors: nextErrors || prevErrors,
-            })
-          )
-        }
-      )
+    // try {
+    //   // upload file and update progress
+    //   const {
+    //     error: uploadError,
+    //     result,
+    //     errors: finalErrors,
+    //   } = await uploadFile(
+    //     file,
+    //     name,
+    //     ({
+    //       progress: nextProgress,
+    //       message: nextMessage = null,
+    //       errors: nextErrors = null,
+    //     }) => {
+    //       setState(
+    //         ({ message: prevMessage, errors: prevErrors, ...prevState }) => ({
+    //           ...prevState,
+    //           progress: nextProgress,
+    //           message: nextMessage || prevMessage,
+    //           errors: nextErrors || prevErrors,
+    //         })
+    //       )
+    //     }
+    //   )
 
-      if (uploadError) {
-        // eslint-disable-next-line no-console
-        console.error(uploadError)
+    //   if (uploadError) {
+    //     // eslint-disable-next-line no-console
+    //     console.error(uploadError)
 
-        setState((prevState) => ({
-          ...prevState,
-          inProgress: false,
-          progress: 0,
-          message: null,
-          errors: null,
-          error: uploadError,
-        }))
-        return
-      }
+    //     setState((prevState) => ({
+    //       ...prevState,
+    //       inProgress: false,
+    //       progress: 0,
+    //       message: null,
+    //       errors: null,
+    //       error: uploadError,
+    //     }))
+    //     return
+    //   }
 
-      // upload and processing completed successfully
-      setState((prevState) => ({
-        ...prevState,
-        progress: 100,
-        message: null,
-        errors: finalErrors, // there may be non-fatal errors (e.g., errors rendering maps)
-        inProgress: false,
-        reportURL: result,
-      }))
+    //   // upload and processing completed successfully
+    //   setState((prevState) => ({
+    //     ...prevState,
+    //     progress: 100,
+    //     message: null,
+    //     errors: finalErrors, // there may be non-fatal errors (e.g., errors rendering maps)
+    //     inProgress: false,
+    //     reportURL: result,
+    //   }))
 
-      window.location.href = result
-    } catch (ex) {
-      captureException('File upload failed', ex)
-      // eslint-disable-next-line no-console
-      console.error('Caught unhandled error from uploadFile', ex)
+    //   window.location.href = result
+    // } catch (ex) {
+    //   captureException('File upload failed', ex)
+    //   // eslint-disable-next-line no-console
+    //   console.error('Caught unhandled error from uploadFile', ex)
 
-      setState((prevState) => ({
-        ...prevState,
-        inProgress: false,
-        progress: 0,
-        message: null,
-        errors: null,
-        error: '', // no meaningful error to show to user, but needs to be non-null
-      }))
-    }
+    //   setState((prevState) => ({
+    //     ...prevState,
+    //     inProgress: false,
+    //     progress: 0,
+    //     message: null,
+    //     errors: null,
+    //     error: '', // no meaningful error to show to user, but needs to be non-null
+    //   }))
+    // }
   }, [])
 
   const handleReset = useCallback(() => {
@@ -235,7 +237,7 @@ const UploadContainer = () => {
               ) : (
                 <UploadForm
                   onFileChange={handleReset}
-                  onCreateReport={handleCreateReport}
+                  onSubmit={handleCreateReport}
                 />
               )}
             </>

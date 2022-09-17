@@ -83,12 +83,6 @@ module.exports = {
     body: 1.4,
     heading: 1.2,
   },
-  alerts: {
-    error: {
-      color: '#FFF',
-      bg: 'error',
-    },
-  },
   boxes: {
     step: {
       display: 'flex',
@@ -126,14 +120,6 @@ module.exports = {
       background: 'none',
       color: 'grey.5',
       '&:hover': { color: 'grey.9' },
-    },
-    alertClose: {
-      cursor: 'pointer',
-      outline: 'none',
-      background: 'none',
-      border: '1px solid',
-      borderRadius: '1rem',
-      color: '#FFF',
     },
     header: {
       cursor: 'pointer',

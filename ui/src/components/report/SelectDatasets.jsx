@@ -47,7 +47,7 @@ const SelectDatasets = ({
     <Grid columns={[0, 0, '1fr 2fr']} gap={5}>
       <Box>
         <Flex sx={{ alignItems: 'center', mb: '1rem' }}>
-          <Box variant="boxes.step">2</Box>
+          <Box variant="boxes.step">3</Box>
           <Heading as="h3" sx={{ m: 0 }}>
             Select factors to include in report
           </Heading>
