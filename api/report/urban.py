@@ -13,7 +13,7 @@ def add_urbanization_sheet(xlsx, df, name_col_width, area_col_width, area_label)
     sheet_name = dataset["sheet_name"]
     description = dataset["description"]
 
-    # transform data into one row for high and low urbanization per population
+    # transform data into one row for high and low urbanization per analysis unit
     years = [2019] + URBAN_YEARS
     urban = []
     breaks = []

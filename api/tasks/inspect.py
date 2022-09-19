@@ -126,7 +126,7 @@ async def inspect(ctx, zip_filename, uuid):
         log.error(ex)
         raise DataError("Could not read dataset")
 
-    ### Get attributes that might identify populations
+    ### Get attributes that might identify analysis units
     # not needed if there is only 1 feature
     # calculate the number of unique values per field
     if info["features"] > 1:

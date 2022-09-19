@@ -50,7 +50,7 @@ value_style = NamedStyle(
 
 even_row_bg = PatternFill("solid", fgColor="00F6F6F6")
 
-population_divider = Border(
+analysis_unit_divider = Border(
     bottom=Side(border_style="medium", color="AAAAAA"),
     left=Side(border_style="thin", color="DDDDDD"),
     right=Side(border_style="thin", color="DDDDDD"),
@@ -88,10 +88,10 @@ def set_cell_styles(ws, breaks=None, area_columns=None, percent_columns=None):
     ws["A1"].style = left_header_style
 
     if breaks is not None:
-        # add a stronger line between populations
+        # add a stronger line between analysis units
         for col in ws.columns:
             for line in breaks:
-                col[line].border = population_divider
+                col[line].border = analysis_unit_divider
 
 
 def set_column_widths(ws, widths):

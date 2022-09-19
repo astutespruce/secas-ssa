@@ -5,7 +5,7 @@ import tempfile
 import geopandas as gp
 
 from analysis.lib.geometry import to_dict_all, dissolve
-from analysis.lib.stats.population import get_population_results
+from analysis.lib.stats.analysis_units import get_analysis_unit_results
 from api.errors import DataError
 from api.progress import set_progress
 from api.report.xlsx import create_xlsx
@@ -42,7 +42,7 @@ async def create_report(ctx, uuid, datasets, field=None, name=None):
     df = gp.read_feather(filename, columns=["geometry"] + columns)
 
     if not field:
-        field = "__pop"
+        field = "__analysis_unit"
         df[field] = "all areas"
 
     if len(df) > 1:
@@ -73,7 +73,7 @@ async def create_report(ctx, uuid, datasets, field=None, name=None):
 
     await set_progress(ctx["redis"], ctx["job_id"], progress_scale[0], message)
 
-    results = await get_population_results(
+    results = await get_analysis_unit_results(
         df, datasets, progress_callback=progress_callback
     )
     if results is None:

@@ -69,9 +69,9 @@ const IndexPage = ({
           <br />
           This tool creates reports that help SSA analysts evaluate the
           potential influences of landscape-level factors. These reports include
-          population-level summaries of standardized landscape-level data,
-          including indicators of habitat quality and projections of future
-          urbanization and sea-level rise.
+          summaries of standardized landscape-level data for user-uploaded
+          analysis units, including indicators of habitat quality and
+          projections of future urbanization and sea-level rise.
         </Paragraph>
         <Flex sx={{ justifyContent: 'center', my: '2rem' }}>
           <Link to="/report">
@@ -95,12 +95,13 @@ const IndexPage = ({
               <Flex sx={{ alignItems: 'center' }}>
                 <Box variant="boxes.step">1</Box>
                 <Heading as="h3" sx={{ m: 0 }}>
-                  Upload a shapefile with population units
+                  Upload a shapefile with analysis units
                 </Heading>
               </Flex>
               <Paragraph sx={{ ml: '3.9rem' }}>
-                The shapefile should contain one record for each population unit
-                to be analyzed.
+                The shapefile should contain one record for each analysis unit
+                to be analyzed. Analysis units can be species population units,
+                representation units, or ranges.
               </Paragraph>
             </Box>
 
@@ -108,12 +109,12 @@ const IndexPage = ({
               <Flex sx={{ alignItems: 'center' }}>
                 <Box variant="boxes.step">2</Box>
                 <Heading as="h3" sx={{ m: 0 }}>
-                  Identify population unit attribute
+                  Identify analysis unit attribute
                 </Heading>
               </Flex>
               <Paragraph sx={{ ml: '3.9rem' }}>
                 You will need to identify the attribute (data column) that
-                uniquely identifies each population unit.
+                uniquely identifies each analysis unit.
               </Paragraph>
             </Box>
 

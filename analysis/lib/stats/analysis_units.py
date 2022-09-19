@@ -27,17 +27,17 @@ extent_filename = bnd_dir / "nonmarine_mask.tif"
 states_filename = bnd_dir / "states.feather"
 
 
-async def get_population_results(df, datasets, progress_callback=None):
-    """Calculate statistics for each population unit
+async def get_analysis_unit_results(df, datasets, progress_callback=None):
+    """Calculate statistics for each analysis unit
 
     Parameters
     ----------
     df : GeoDataFrame
-        each row is a separate population unit
+        each row is a separate analysis unit
     datasets : list-like
         list of dataset IDs to query
     progress_callback : function, optional (default: None)
-        function to call each after each population unit is processed
+        function to call each after each analysis unit is processed
 
     Returns
     -------

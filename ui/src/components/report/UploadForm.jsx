@@ -50,17 +50,17 @@ const UploadForm = ({ onReset, onSubmit }) => {
               <Flex sx={{ alignItems: 'center', mb: '1rem' }}>
                 <Box variant="boxes.step">1</Box>
                 <Heading as="h3" sx={{ m: 0 }}>
-                  Upload population boundaries
+                  Upload analysis unit boundaries
                 </Heading>
               </Flex>
               <Paragraph>
                 Upload a shapefile or ESRI File Geodatabase Feature Class with
-                the boundaries of the population units you want to use for your
-                report. Each population unit will be analyzed independently.
+                the boundaries of the analysis units you want to use for your
+                report. Each analysis unit will be analyzed independently.
                 <br />
                 <br />
                 You will be able to select the attribute that identifies the
-                population units in the next step.
+                analysis units in the next step.
               </Paragraph>
             </Box>
             <Box>
@@ -78,7 +78,7 @@ const UploadForm = ({ onReset, onSubmit }) => {
                       mb: 0,
                     }}
                   >
-                    Population unit boundaries:
+                    Analysis unit boundaries:
                   </Heading>
                   <Box>{file && <Text>{file.name}</Text>}</Box>
                 </Box>

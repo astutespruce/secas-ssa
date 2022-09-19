@@ -40,12 +40,12 @@ const SelectAttribute = ({
         <Flex sx={{ alignItems: 'center', mb: '1rem' }}>
           <Box variant="boxes.step">2</Box>
           <Heading as="h3" sx={{ m: 0 }}>
-            Select population attribute
+            Select analysis unit attribute
           </Heading>
         </Flex>
         <Paragraph>
-          If your dataset has an attribute that identifies unique populations,
-          please choose that attribute from the list to the right.
+          If your dataset has an attribute that identifies unique analysis
+          units, please choose that attribute from the list to the right.
           <br />
           <br />
           If you do not select an attribute, or if one isn&apos;t available in
@@ -55,7 +55,7 @@ const SelectAttribute = ({
       </Box>
       <Box>
         <Heading as="h4" sx={{ mb: '0.5rem' }}>
-          Population attribute:
+          Analysis unit attribute:
         </Heading>
 
         <Select
@@ -74,9 +74,8 @@ const SelectAttribute = ({
         {!hasAttributes ? (
           <Text sx={{ mt: '1rem', color: 'grey.7' }}>
             We did not find any attributes that appear to identify unique
-            population units in this dataset (limited to text or integer
-            fields). If there is an attribute present that we did not detect,
-            please{' '}
+            analysis units in this dataset (limited to text or integer fields).
+            If there is an attribute present that we did not detect, please{' '}
             <OutboundLink to={`mailto:${siteMetadata.contactEmail}`}>
               let us know
             </OutboundLink>

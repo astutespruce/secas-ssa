@@ -12,7 +12,7 @@ def add_ncld_landcover_sheet(xlsx, df, name_col_width, area_col_width, area_labe
     sheet_name = dataset["sheet_name"]
     description = dataset["description"]
 
-    # transform data into one row per land cover type per population
+    # transform data into one row per land cover type per analysis unit
     nlcd = []
     breaks = []
     counter = 0

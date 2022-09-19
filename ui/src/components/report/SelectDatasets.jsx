@@ -60,9 +60,9 @@ const SelectDatasets = ({
         <Paragraph>
           This tool includes several standardized landscape-level datasets that
           help characterize different aspects of current and potential future
-          conditions. Only those datasets that overlap with any of your
-          population units are available for your analysis. Select any or all of
-          these datasets on the right.
+          conditions. Only those datasets that overlap with any of your analyis
+          units are available for your analysis. Select any or all of these
+          datasets on the right.
         </Paragraph>
       </Box>
       <Box>

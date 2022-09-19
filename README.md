@@ -3,8 +3,9 @@
 This pilot application is intended to support
 [Species Status Assessments](https://www.fws.gov/project/species-status-assessment)
 conducted by the U.S. Fish and Wildlife Service in the Southeastern U.S. by
-providing summaries of standardized landscape-level indicators for each population
-unit of a given species.
+providing summaries of standardized landscape-level indicators for each analysis
+unit of a given species, which may be population units, representation units, or
+other areas.
 
 It directly leverages related work on the
 [SECAS Southeast Conservation Blueprint Explorer](https://github.com/astutespruce/secas-blueprint)

@@ -12,14 +12,14 @@ from api.report.style import set_cell_styles, set_column_widths
 
 
 def add_slr_projection_sheet(xlsx, df, name_col_width, area_col_width, area_label):
-    """Add sheet with decadal projections for each population unit, only if
-    there is SLR at 10ft within the population unit.
+    """Add sheet with decadal projections for each analysis unit, only if
+    there is SLR at 10ft within the analysis unit.
     """
     dataset = DATASETS["slr_proj"]
     sheet_name = dataset["sheet_name"]
     description = dataset["description"]
 
-    # transform data into one row per SLR scenario per population
+    # transform data into one row per SLR scenario per analysis unit
     slr = []
     breaks = []
     counter = 0

@@ -113,11 +113,11 @@ if __name__ == "__main__":
     #     "Balduina atropurpurea",
     #     "examples/Balduina_pop_resiliency_final.zip",
     # ]
-    name, filename = [
-        "Rabbitsfoot",
-        "examples/Rabbitsfott_resilience_final_SECAS_only.zip",
-    ]
-    # name, filename = ["Test species", "examples/SingleTest.zip"]
+    # name, filename = [
+    #     "Rabbitsfoot",
+    #     "examples/Rabbitsfott_resilience_final_SECAS_only.zip",
+    # ]
+    name, filename = ["Test species", "examples/SingleTest.zip"]
 
     task, result, errors = test_upload_file(filename)
     print(f"----------------\ntask: {task}\nresult: {result}\nerrors: {errors}\n")

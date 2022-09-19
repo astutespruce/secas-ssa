@@ -2,9 +2,9 @@
 
 ## Overview
 
-Use case: user uploads shapefile containing one or more population units, indicated
-by values in a field. User identifies the population unit ID field and chooses
-datasets to analyze from datasets that overlap with the population units.
+Use case: user uploads shapefile containing one or more analysis units, indicated
+by values in a field. User identifies the analysis unit ID field and chooses
+datasets to analyze from datasets that overlap with the analysis units.
 
 ## Starting background jobs and API server
 

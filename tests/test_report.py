@@ -9,7 +9,7 @@ from pyogrio.geopandas import read_dataframe
 
 from analysis.constants import DATA_CRS, DATASETS
 from analysis.lib.geometry import dissolve, make_valid, to_dict_all
-from analysis.lib.stats.population import get_population_results
+from analysis.lib.stats.analysis_units import get_analysis_unit_results
 from analysis.lib.stats.prescreen import get_available_datasets
 from api.report.xlsx import create_xlsx
 
@@ -31,7 +31,7 @@ aois = [
         "name": "Test single area",
         "path": "SingleTest",
         "field": None,
-        "population_label": "Pop A",
+        "analysis_unit_label": "Pop A",
     },
 ]
 
@@ -40,23 +40,23 @@ for aoi in aois:
     name = aoi["name"]
     path = aoi["path"]
 
-    # if field is missing, population must be present and will be added
-    field = aoi.get("field", None) or "__pop"
-    population_label = aoi.get("population_label", None)
+    # if field is missing, analysis unit column must be present and will be added
+    field = aoi.get("field", None) or "__analysis_unit"
+    analysis_unit_label = aoi.get("analysis_unit_label", None)
 
     print(f"Creating report for {name}...")
 
     start = time()
 
-    columns = [field] if population_label is None else []
+    columns = [field] if analysis_unit_label is None else []
     df = read_dataframe(f"examples/{path}.shp", columns=columns).to_crs(DATA_CRS)
 
     # FIXME:
     # df = df.head(2)
     # df = df.tail(15)
 
-    if population_label is not None:
-        df[field] = population_label
+    if analysis_unit_label is not None:
+        df[field] = analysis_unit_label
 
     # make valid and only keep polygon parts
     df["geometry"] = make_valid(df.geometry.values.data)
@@ -78,7 +78,7 @@ for aoi in aois:
 
     ### calculate results, data must be in DATA_CRS
     print("Calculating results...")
-    results = asyncio.run(get_population_results(df, datasets))
+    results = asyncio.run(get_analysis_unit_results(df, datasets))
 
     # FIXME:
     results.reset_index().to_feather("/tmp/test.feather")

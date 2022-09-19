@@ -20,7 +20,7 @@ def add_summary_sheet(xlsx, df, name_col_width, area_col_width, area_label, outs
             "acres": "GIS acres",
             "overlap": area_label + " (rasterized to 30m pixels)",
             "outside_se": "Acres outside Southeast data extent (rasterized to 30m pixels)",
-            "count": "Number of areas in population unit",
+            "count": "Number of areas in analysis unit",
             "states": "State(s)",
         }
     ).to_excel(xlsx, sheet_name=sheet_name, index=False)

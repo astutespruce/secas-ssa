@@ -33,7 +33,7 @@ from api.report.urban import add_urbanization_sheet
 
 
 def create_xlsx(df, datasets):
-    df.index.name = "Population unit"
+    df.index.name = "Analysis unit"
     outside_se = df.outside_se.sum() > 1e-2
 
     name_col_width = max(
