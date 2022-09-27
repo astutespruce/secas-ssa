@@ -11,18 +11,9 @@ It directly leverages related work on the
 [SECAS Southeast Conservation Blueprint Explorer](https://github.com/astutespruce/secas-blueprint)
 which is available online at https://blueprint.geoplatform.gov/southeast/
 
-## Architecture
+## Developing
 
-This uses a data processing pipeline in Python to prepare all spatial data for use in this application.
-
-The user interface is creating using GatsbyJS as a static web application.
-
-The API is implemented in Python and provides summary reports for pre-defined summary units and user-defined areas.
-
-## Development
-
-Python dependencies are managed using `poetry`. First, install poetry, then
-`poetry install` to install most of them.
+See [local development instructions](./Developing.md) for more information.
 
 ## Credits
 

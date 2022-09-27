@@ -135,7 +135,7 @@
           "color": "#A300A3"
         }
       ],
-      "description": "TODO:",
+      "description": "This indicator assesses shoreline condition based on the presence of hardened structures like jetties, groins, and riprap, as well as other human development. By restricting the natural movement of sediment, shoreline armoring increases erosion, prevents the inland migration of coastal ecosystems in response to sea-level rise, and degrades habitat for birds, sea turtles, fish, plants, and other species both on and offshore. Natural shorelines in harder-to-develop coastal areas receive the highest shoreline condition scores, while hardened shorelines receive the lowest scores. This indicator originates from the National Oceanic and Atmospheric Administration's Environmental Sensitivity Index dataset.",
       "url": ""
     },
     {
@@ -183,7 +183,7 @@
           "color": "#205905"
         }
       ],
-      "description": "TODO: description",
+      "description": "This indicator depicts the capacity of coastal habitats to migrate to adjacent lowlands in order to sustain biodiversity and natural services under increasing inundation from sea-level rise. It is based on the physical and condition characteristics of current tidal complexes, their predicted migration space, and surrounding buffer areas. These characteristics include marsh complex size, shared edge with migration space, sediment balance, water quality, natural landcover, landform diversity, and many others. This indicator originates from The Nature Conservancy's Resilient Coastal Sites project.",
       "url": ""
     },
     {
@@ -202,7 +202,7 @@
         }
       ],
       "nodata_label": "Not within a stable coastal wetland",
-      "description": "TODO: description",
+      "description": "This indicator uses remote sensing to calculate the unvegetated-vegetated ratio of tidal wetlands, which compares how much of a wetland is not covered by plants (e.g., sediment, rocks, open water) to how much is covered by plants. This ratio, and how it changes over time, is a good surrogate for salt marsh degradation processes like sediment loss and conversion to open water. It helps differentiate between stable marshes that are more resilient, and declining marshes that are more vulnerable to threats like sea-level rise, erosion, and coastal development. This indicator originates from a U.S. Geological Survey project on an unvegetated to vegetated ratio for coastal wetlands.",
       "url": ""
     },
     {
@@ -241,7 +241,7 @@
         }
       ],
       "nodata_label": "Not within an estimated floodplain or outside floodplain natural landcover data extent",
-      "description": "TODO: within estimated floodplain, by catchment",
+      "description": "This indicator measures the amount of natural landcover in the estimated floodplain of rivers and streams within each catchment. It assesses the stream channel and its surrounding riparian buffer, measuring the percent of unaltered habitat like forests, wetlands, or open water (rather than agriculture or development). Intact vegetated buffers within the floodplain of rivers and streams provide aquatic habitat, improve water quality, reduce erosion and flooding, recharge groundwater, and more. This indicator originates from the 2019 National Land Cover Database and applies to the Environmental Protection Agency's estimated floodplain, which spatially defines areas estimated to be inundated by a 100-year flood, also known as the 1% annual chance flood.",
       "url": ""
     },
     {
@@ -290,7 +290,7 @@
         }
       ],
       "nodata_label": "Not within an estimated floodplain or outside aquatic network complexity data extent",
-      "description": "Network complexity depicts the number of different stream size classes in a river network not separated by dams or waterfalls. River networks with a variety of connected stream classes help retain aquatic biodiversity in a changing climate by allowing species to access climate refugia and move between habitats. This indicator applies only to the estimated floodplain, which spatially defines areas estimated to be inundated by a 100-year flood, also known as the 1% annual chance flood.",
+      "description": "This indicator depicts the number of different stream size classes in a river network not separated by dams or waterfalls. River networks with a variety of connected stream classes help retain aquatic biodiversity in a changing climate by allowing species to access climate refugia and move between habitats. This indicator originates from the Southeast Aquatic Resources Partnership and applies to the Environmental Protection Agency's estimated floodplain, which spatially defines areas estimated to be inundated by a 100-year flood, also known as the 1% annual chance flood.",
       "url": ""
     },
     {
@@ -323,7 +323,7 @@
           "color": "#0000E0"
         }
       ],
-      "description": "Permeable surface measures the percent of non-impervious cover by catchment. High levels of impervious surface degrade water quality and alter freshwater flow, impacting both aquatic species communities and ecosystem services for people, like the availability of clean drinking water.",
+      "description": "This indicator measures the average percent of non-impervious cover within each catchment. High levels of impervious surface degrade water quality and alter freshwater flow, impacting both aquatic species communities and ecosystem services for people, like the availability of clean drinking water. This indicator originates from the 2019 National Land Cover Database percent developed impervious layer.",
       "url": ""
     },
     {
@@ -356,7 +356,7 @@
           "color": "#E6550D"
         }
       ],
-      "description": "Fire frequency uses remote sensing to estimate the number of times an area has been burned from 2010-2019. Many Southeastern ecosystems rely on regular, low intensity fires to maintain habitat, encourage native plant growth, and reduce wildfire risk.",
+      "description": "This indicator uses remote sensing to estimate the number of times an area has been burned from 2013 to 2021. Many Southeastern ecosystems rely on regular, low-intensity fires to maintain habitat, encourage native plant growth, and reduce wildfire risk. This indicator combines burned area layers from both U.S. Geological Survey Landsat data and the inter-agency Monitoring Trends in Burn Severity program. Landsat-based fire predictions within the range of longleaf pine are also available through Southeast FireMap.",
       "url": ""
     },
     {
@@ -389,7 +389,7 @@
           "color": "#00441B"
         }
       ],
-      "description": "This indicator represents the size of large, unfragmented patches of natural habitat. It identifies minimally disturbed natural areas at least 100 acres in size and greater than 200 meters wide. Large areas of intact natural habitat benefit numerous species, including reptiles and amphibians, birds, and large mammals.",
+      "description": "This indicator represents the size of large, unfragmented patches of natural habitat. It identifies minimally disturbed natural areas at least 100 acres in size and greater than 200 meters wide. Large areas of intact natural habitat are important for many wildlife species, including reptiles and amphibians, birds, and large mammals. This indicator originates from Esri's green infrastructure data.",
       "url": ""
     },
     {
@@ -442,7 +442,7 @@
           "color": "#205905"
         }
       ],
-      "description": "Resilient sites depicts an area's capacity to continue supporting species diversity and ecosystem function in the face of climate change. It evaluates the ability of coastal habitats to migrate to adjacent lowlands in response to sea-level rise, based on the physical and condition characteristics of current tidal complexes, their predicted migration space, and surrounding buffer areas—characteristics like marsh complex size, sediment balance, water quality, and many others. In inland terrestrial areas, this indicator measures landscape diversity and local connectedness to identify resilient sites that contain many different microclimates and allow species to move to adjust to changing conditions.",
+      "description": "This indicator depicts an area's capacity to maintain species diversity and ecosystem function in the face of climate change. It measures two factors that influence resilience. The first, landscape diversity, reflects the number of microhabitats and climatic gradients created by topography, elevation, and hydrology. The second, local connectedness, reflects the degree of habitat fragmentation and strength of barriers to species movement. Highly resilient sites contain many different habitat niches that support biodiversity, and allow species to move freely through the landscape to find suitable microclimates as the climate changes. This indicator originates from The Nature Conservancy's Resilient Land data.",
       "url": ""
     }
   ]
