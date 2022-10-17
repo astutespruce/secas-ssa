@@ -11,7 +11,7 @@ from api.report.style import set_cell_styles, set_column_widths
 def add_urbanization_sheet(xlsx, df, name_col_width, area_col_width, area_label):
     dataset = DATASETS["urban"]
     sheet_name = dataset["sheet_name"]
-    description = dataset["description"]
+    description = dataset["valueDescription"]
 
     # transform data into one row for high and low urbanization per analysis unit
     years = [2019] + URBAN_YEARS

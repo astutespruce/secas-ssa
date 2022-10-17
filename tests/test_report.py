@@ -27,12 +27,18 @@ aois = [
     #     "path": "Rabbitsfott_resilience_final_SECAS_only",
     #     "field": "HUC10",
     # },
+    # {
+    #     "name": "Test single area",
+    #     "path": "SingleTest",
+    #     "field": None,
+    #     "analysis_unit_label": "Pop A",
+    # },
     {
-        "name": "Test single area",
-        "path": "SingleTest",
+        "name": "fl_slr_test",
+        "path": "fl_slr_test",
         "field": None,
-        "analysis_unit_label": "Pop A",
-    },
+        "analysis_unit_label": "Test population",
+    }
 ]
 
 

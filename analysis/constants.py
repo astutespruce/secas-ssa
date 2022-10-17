@@ -41,6 +41,28 @@ SECAS_STATES = [
 
 NLCD_YEARS = [2001, 2004, 2006, 2008, 2011, 2013, 2016, 2019]
 
+# Original codes
+NLCD_CODES = {
+    11: {"label": "Open water", "color": "#466B9F"},
+    12: {"label": "Perennial ice/snow", "color": "#D1DEF8"},
+    21: {"label": "Developed (open space)", "color": "#DEC5C5"},
+    22: {"label": "Developed (low intensity)", "color": "#D99282"},
+    23: {"label": "Developed (medium intensity)", "color": "#EB0000"},
+    24: {"label": "Developed (high intensity)", "color": "#AB0000"},
+    31: {"label": "Barren land", "color": "#B3AC9F"},
+    41: {"label": "Deciduous forest", "color": "#68AB5F"},
+    42: {"label": "Evergreen forest", "color": "#1C5F2C"},
+    43: {"label": "Mixed forest", "color": "#B5C58F"},
+    52: {"label": "Shrub/scrub", "color": "#CCB879"},
+    71: {"label": "Grassland/herbaceous", "color": "#DFDFC2"},
+    81: {"label": "Pasture/hay", "color": "#DCD939"},
+    82: {"label": "Cultivated crops", "color": "#AB6C28"},
+    90: {"label": "Woody wetlands", "color": "#B8D9EB"},
+    95: {"label": "Emergent herbaceous wetlands", "color": "#6C9FB8"},
+}
+
+NLCD_INDEXES = {i: e for i, e in enumerate(NLCD_CODES.values())}
+
 
 URBAN_YEARS = [2020, 2030, 2040, 2050, 2060, 2070, 2080, 2090, 2100]
 # values are number of runs out of 50 that are predicted to urbanize
@@ -52,6 +74,19 @@ URBAN_THRESHOLD = 25  # >= 50% probability
 
 # depth in feet
 SLR_DEPTHS = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+SLR_NODATA_VALUES = [
+    {
+        "value": 11,
+        "key": "not_inundated",
+        "label": "Not projected to be inundated by up to 10 feet",
+    },
+    {"value": 12, "key": "not_available", "label": "Sea-level rise data unavailable"},
+    {
+        "value": 13,
+        "key": "not_applicable",
+        "label": "Sea-level rise unlikely to be a threat (inland counties)",
+    },
+]
 SLR_YEARS = [2020, 2030, 2040, 2050, 2060, 2070, 2080, 2090, 2100]
 SLR_PROJ_SCENARIOS = {
     "l": "Low",
@@ -79,30 +114,6 @@ SLR_COLORS = [
     "#B3FEF7",
 ]
 
-
-# color are (R,G,B) tuples
-# Original codes
-NLCD_CODES = {
-    # 0: NODATA,
-    11: {"label": "Open water", "color": (70, 107, 159)},
-    12: {"label": "Perennial ice/snow", "color": (209, 222, 248)},
-    21: {"label": "Developed (open space)", "color": (222, 197, 197)},
-    22: {"label": "Developed (low intensity)", "color": (217, 146, 130)},
-    23: {"label": "Developed (medium intensity)", "color": (235, 0, 0)},
-    24: {"label": "Developed (high intensity)", "color": (171, 0, 0)},
-    31: {"label": "Barren land", "color": (179, 172, 159)},
-    41: {"label": "Deciduous forest", "color": (104, 171, 95)},
-    42: {"label": "Evergreen forest", "color": (28, 95, 44)},
-    43: {"label": "Mixed forest", "color": (181, 197, 143)},
-    52: {"label": "Shrub/scrub", "color": (204, 184, 121)},
-    71: {"label": "Grassland/herbaceous", "color": (223, 223, 194)},
-    81: {"label": "Pasture/hay", "color": (220, 217, 57)},
-    82: {"label": "Cultivated crops", "color": (171, 108, 40)},
-    90: {"label": "Woody wetlands", "color": (184, 217, 235)},
-    95: {"label": "Emergent herbaceous wetlands", "color": (108, 159, 184)},
-}
-
-NLCD_INDEXES = {i: e for i, e in enumerate(NLCD_CODES.values())}
 
 json_dir = Path("constants")
 datasets_json = json.loads(open(json_dir / "datasets.json").read())

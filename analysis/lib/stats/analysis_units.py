@@ -83,18 +83,18 @@ async def get_analysis_unit_results(df, datasets, progress_callback=None):
             shapes = [row.__geo__]
 
             # calculate main mask; if 0 bail out
-            shape_mask, transform, window = boundless_raster_geometry_mask(
+            shape_mask, _, window = boundless_raster_geometry_mask(
                 extent_raster, shapes, row.bounds, all_touched=False
             )
 
-            result["shape_mask"] = (~shape_mask).sum() * cellsize
+            result["rasterized_acres"] = (~shape_mask).sum() * cellsize
 
             data = extent_raster.read(1, window=window, boundless=True)
             mask = (data == nodata) | shape_mask
 
             # slice out flattened array of values that are not masked
             result["overlap"] = data[~mask].sum() * cellsize
-            result["outside_se"] = result["shape_mask"] - result["overlap"]
+            result["outside_se"] = result["rasterized_acres"] - result["overlap"]
             if result["overlap"] == 0:
                 results.append(result)
 
@@ -107,7 +107,11 @@ async def get_analysis_unit_results(df, datasets, progress_callback=None):
             # Extract SLR
             if "slr_depth" in datasets:
                 result["slr_depth"] = extract_slr_depth_by_mask(
-                    shape_mask, window, cellsize
+                    shape_mask,
+                    window,
+                    cellsize,
+                    result["rasterized_acres"],
+                    result["outside_se"],
                 )
 
             if "slr_proj" in datasets:

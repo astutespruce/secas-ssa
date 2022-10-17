@@ -6,7 +6,7 @@ from analysis.constants import NLCD_YEARS, NLCD_INDEXES
 from analysis.lib.raster import extract_count_in_geometry
 
 
-src_dir = Path("data/inputs/nlcd")
+src_dir = Path("../secas-blueprint/data/inputs/nlcd")
 
 PERCENTS = np.arange(0, 1.01, 0.01)
 

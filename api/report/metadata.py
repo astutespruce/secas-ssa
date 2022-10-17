@@ -37,6 +37,7 @@ def add_data_details_sheet(xlsx, datasets):
             "source",
             "date",
             "description",
+            "methods",
             "citation",
             "url",
         ]
@@ -47,6 +48,7 @@ def add_data_details_sheet(xlsx, datasets):
             "source": "Data source",
             "date": "Date",
             "description": "Description",
+            "methods": "Data Preparation Methods",
             "citation": "Citation",
             "url": "URL",
         }
@@ -54,7 +56,7 @@ def add_data_details_sheet(xlsx, datasets):
         xlsx, sheet_name="Data details", index=False
     )
     ws = xlsx.sheets["Data details"]
-    set_column_widths(ws, [16, 16, 18, 8, 48, 32, 40])
+    set_column_widths(ws, [16, 16, 18, 8, 48, 48, 32, 40])
     set_cell_styles(ws)
     for cell in list(ws.columns)[-1][1:]:
         cell.hyperlink = cell.value

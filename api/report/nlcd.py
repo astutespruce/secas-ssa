@@ -10,7 +10,7 @@ from api.report.style import set_cell_styles, set_column_widths
 def add_ncld_landcover_sheet(xlsx, df, name_col_width, area_col_width, area_label):
     dataset = DATASETS["nlcd_landcover"]
     sheet_name = dataset["sheet_name"]
-    description = dataset["description"]
+    description = dataset["valueDescription"]
 
     # transform data into one row per land cover type per analysis unit
     nlcd = []
@@ -49,7 +49,7 @@ def add_ncld_landcover_sheet(xlsx, df, name_col_width, area_col_width, area_labe
 def add_ncld_impervious_sheet(xlsx, df, name_col_width, area_col_width, area_label):
     dataset = DATASETS["nlcd_impervious"]
     sheet_name = dataset["sheet_name"]
-    description = dataset["description"]
+    description = dataset["valueDescription"]
 
     nlcd = df.nlcd_impervious.apply(pd.Series)
     nlcd.columns = NLCD_YEARS

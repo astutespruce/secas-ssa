@@ -5,22 +5,28 @@ import pygeos as pg
 import geopandas as gp
 
 from analysis.constants import (
-    SLR_PROJ_COLUMNS,
+    SLR_DEPTHS,
+    SLR_NODATA_VALUES,
     SLR_YEARS,
+    SLR_PROJ_COLUMNS,
     SLR_PROJ_SCENARIOS,
 )
 from analysis.lib.raster import (
     extract_count_in_geometry,
 )
 
+SLR_BINS = SLR_DEPTHS + [v["value"] for v in SLR_NODATA_VALUES]
 
-src_dir = Path("data/inputs/threats/slr")
+
+src_dir = Path("../secas-blueprint/data/inputs/threats/slr")
 slr_mask_filename = src_dir / "slr_mask.tif"
 depth_filename = src_dir / "slr.tif"
 proj_filename = src_dir / "noaa_1deg_cells.feather"
 
 
-def extract_slr_depth_by_mask(shape_mask, window, cellsize):
+def extract_slr_depth_by_mask(
+    shape_mask, window, cellsize, rasterized_acres, outside_se_acres
+):
     """Calculate the area of overlap between geometries and each level of SLR
     between 0 (currently inundated) and 6 meters.
 
@@ -32,9 +38,14 @@ def extract_slr_depth_by_mask(shape_mask, window, cellsize):
     Parameters
     ----------
     shape_mask : ndarray, True outside shapes
-    window : rasterio.windows.Window for extracting area of shape_mask from raster
-    cellsize : area of each pixel
-
+    window : rasterio.windows.Window
+        for extracting area of shape_mask from raster
+    cellsize : float
+        area of each pixel
+    rasterized_acres : float
+        area of shape_mask in acres
+    outside_se_acres : float
+        area outside of Southeast Blueprint within shape_mask
 
     Returns
     -------
@@ -42,19 +53,34 @@ def extract_slr_depth_by_mask(shape_mask, window, cellsize):
         [area for 0ft inundation, area for 1ft, ..., area for 10f]
     """
 
-    bins = np.arange(11)
-    counts = extract_count_in_geometry(
-        depth_filename, shape_mask, window, bins=bins, boundless=True
+    acres = (
+        extract_count_in_geometry(
+            depth_filename, shape_mask, window, bins=SLR_BINS, boundless=True
+        )
+        * cellsize
     )
 
-    if counts.sum() == 0:
-        return None
+    nodata_acres = rasterized_acres - outside_se_acres - acres.sum()
+    # combine areas not modeled with SLR nodata areas
+    acres[12] += nodata_acres
 
-    # accumulate values
-    for bin in bins[1:]:
-        counts[bin] = counts[bin] + counts[bin - 1]
+    # if all areas in the polygon have no inundation but have data, return
+    # not inundated
+    if np.allclose(acres[11], rasterized_acres):
+        return "not_inundated"
 
-    return counts * cellsize
+    # if all areas in the polygon have no SLR data, return None
+    if np.allclose(acres[12], rasterized_acres):
+        return "not_available"
+
+    # if all areas are in inland counties, return not applicable
+    if np.allclose(acres[13], rasterized_acres):
+        return "not_applicable"
+
+    # accumulate values for depths 0-10ft
+    acres[:11] = np.cumsum(acres[:11])
+
+    return acres.round(2)
 
 
 def extract_slr_projections_by_geometry(geometry):
