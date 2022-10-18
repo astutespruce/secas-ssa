@@ -26,9 +26,9 @@ const Dataset = ({ id, name, description, selected, disabled, onToggle }) => {
           }}
         >
           <Checkbox
-            readOnly={false}
+            readOnly={!disabled}
             checked={selected}
-            onChange={handleToggle}
+            onChange={disabled ? null : handleToggle}
             sx={{
               'input:focus ~ &': {
                 backgroundColor: 'transparent',
@@ -36,7 +36,7 @@ const Dataset = ({ id, name, description, selected, disabled, onToggle }) => {
             }}
           />
           {name}
-          {disabled ? ' (not present)' : null}
+          {disabled ? ' (no data available)' : null}
         </Label>
       </Box>
       <Box>

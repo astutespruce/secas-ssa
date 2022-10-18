@@ -87,7 +87,8 @@ async def get_analysis_unit_results(df, datasets, progress_callback=None):
                 extent_raster, shapes, row.bounds, all_touched=False
             )
 
-            result["rasterized_acres"] = (~shape_mask).sum() * cellsize
+            result["pixels"] = (~shape_mask).sum()
+            result["rasterized_acres"] = result["pixels"] * cellsize
 
             data = extent_raster.read(1, window=window, boundless=True)
             mask = (data == nodata) | shape_mask

@@ -1,26 +1,6 @@
 from io import BytesIO
-from copy import copy
 
-import numpy as np
 import pandas as pd
-from openpyxl.styles import (
-    Alignment,
-    Font,
-    NamedStyle,
-    Border,
-    Side,
-    PatternFill,
-    Color,
-)
-from openpyxl.utils.cell import get_column_letter
-
-from analysis.constants import (
-    DATASETS,
-    NLCD_YEARS,
-    URBAN_YEARS,
-    SLR_DEPTHS,
-    SLR_YEARS,
-)
 
 
 from api.report.metadata import add_data_details_sheet
@@ -40,7 +20,7 @@ def create_xlsx(df, datasets):
         min(pd.Series(df.index).apply(len).max() * CHAR_PER_WIDTH_UNIT, 28), 14
     )
     area_col_width = max(
-        df.overlap.astype("str").apply(len).max() * CHAR_PER_WIDTH_UNIT, 10
+        df.overlap.apply(lambda x: len("{x:,.2f}")).max() * CHAR_PER_WIDTH_UNIT, 10
     )
 
     area_label = (

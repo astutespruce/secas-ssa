@@ -170,7 +170,7 @@ const MethodsPage = ({
                           fontStyle: 'italic',
                         }}
                       >
-                        {citation}
+                        Citation: {citation}
                       </Box>
                     ) : null}
                   </Box>

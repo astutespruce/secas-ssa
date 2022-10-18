@@ -17,7 +17,7 @@ def add_indicator_sheet(
         "nodata_label", f"Area outside {sheet_name.lower()} data extent"
     )
 
-    columns = [v["label"] for v in values]
+    columns = [f"{v['label']} (acres)" for v in values]
     col_width = min(max([len(c) for c in columns]) * CHAR_PER_WIDTH_UNIT, 16)
 
     # split list into columns
@@ -36,16 +36,11 @@ def add_indicator_sheet(
     if not has_area_outside:
         tmp = tmp.drop(columns=["outside"])
 
-    # convert to percent
-    cols = [c for c in tmp.columns if not c == "overlap"]
-    for col in cols:
-        tmp[col] = tmp[col].values / tmp.overlap.values
-
     tmp.rename(
         columns={"overlap": area_label, "outside": nodata_label}
     ).reset_index().to_excel(xlsx, sheet_name=sheet_name, index=False)
 
     ws = xlsx.sheets[sheet_name]
-    set_column_widths(ws, [name_col_width, area_col_width] + ([col_width] * len(cols)))
-    set_cell_styles(ws, area_columns=[1], percent_columns=list(range(2, len(cols) + 3)))
+    set_column_widths(ws, [name_col_width] + ([col_width] * len(tmp.columns)))
+    set_cell_styles(ws, area_columns=range(1, len(tmp.columns) + 3))
     add_data_note(ws, description)

@@ -86,7 +86,7 @@ def add_slr_inundation_sheet(xlsx, df, name_col_width, area_col_width, area_labe
     slr.to_excel(xlsx, sheet_name=sheet_name, index=False)
     ws = xlsx.sheets[sheet_name]
     set_column_widths(
-        ws, [name_col_width, area_col_width, 10] + ([10] * num_value_cols)
+        ws, [name_col_width, area_col_width, 12] + ([12] * num_value_cols)
     )
     set_cell_styles(
         ws,

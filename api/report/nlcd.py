@@ -18,29 +18,26 @@ def add_ncld_landcover_sheet(xlsx, df, name_col_width, area_col_width, area_labe
     counter = 0
     for id, row in df.iterrows():
         for landcover, values in row.nlcd_landcover.items():
-            # convert to proportion, displayed as percent
-            nlcd.append(
-                [id, row.overlap, landcover] + list((np.asarray(values) / row.overlap))
-            )
+            nlcd.append([id, row.overlap, landcover] + list(values))
 
             counter += 1
         breaks.append(counter)
 
     nlcd = pd.DataFrame(
         nlcd,
-        columns=[df.index.name, area_label, "Land cover type"] + NLCD_YEARS,
+        columns=[df.index.name, area_label, "Land cover type"]
+        + [f"{year} (acres)" for year in NLCD_YEARS],
     )
 
     nlcd.to_excel(xlsx, sheet_name=sheet_name, index=False)
     ws = xlsx.sheets[sheet_name]
     set_column_widths(
-        ws, [name_col_width, area_col_width, 30] + ([8] * len(NLCD_YEARS))
+        ws, [name_col_width, area_col_width, 30] + ([12] * len(NLCD_YEARS))
     )
     set_cell_styles(
         ws,
         breaks=breaks,
-        area_columns=[1],
-        percent_columns=list(range(3, len(NLCD_YEARS) + 4)),
+        area_columns=[1] + list(range(3, len(NLCD_YEARS) + 4)),
     )
 
     add_data_note(ws, description)
@@ -52,18 +49,15 @@ def add_ncld_impervious_sheet(xlsx, df, name_col_width, area_col_width, area_lab
     description = dataset["valueDescription"]
 
     nlcd = df.nlcd_impervious.apply(pd.Series)
-    nlcd.columns = NLCD_YEARS
+    nlcd.columns = [f"{year} (acres)" for year in NLCD_YEARS]
     nlcd = df[["overlap"]].join(nlcd)
-    for col in NLCD_YEARS:
-        nlcd[col] = nlcd[col] / nlcd.overlap
 
     nlcd.reset_index().to_excel(xlsx, sheet_name=sheet_name, index=False)
     ws = xlsx.sheets[sheet_name]
-    set_column_widths(ws, [name_col_width, area_col_width] + ([8] * len(NLCD_YEARS)))
+    set_column_widths(ws, [name_col_width, area_col_width] + ([12] * len(NLCD_YEARS)))
     set_cell_styles(
         ws,
-        area_columns=[1],
-        percent_columns=list(range(2, len(NLCD_YEARS) + 3)),
+        area_columns=[1] + list(range(2, len(NLCD_YEARS) + 3)),
     )
 
     add_data_note(ws, description)
