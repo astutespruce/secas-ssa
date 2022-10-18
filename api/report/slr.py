@@ -7,7 +7,7 @@ from api.report.metadata import add_data_note
 from api.report.style import set_cell_styles, set_column_widths
 
 
-SLR_NODATA_LABELS = {v["key"]: v["label"] for v in SLR_NODATA_VALUES}
+SLR_BINS = SLR_DEPTHS + [v["value"] for v in SLR_NODATA_VALUES]
 
 
 def add_slr_projection_sheet(xlsx, df, name_col_width, area_col_width, area_label):
@@ -23,22 +23,15 @@ def add_slr_projection_sheet(xlsx, df, name_col_width, area_col_width, area_labe
     breaks = []
     counter = 0
     for id, row in df.iterrows():
-        # must have depth to show projection data
-        if (
-            "slr_depth" in row
-            and isinstance(row["slr_depth"], str)
-            and row["slr_depth"] in SLR_NODATA_LABELS
-        ):
-            slr.append(
-                [id, row.overlap, SLR_NODATA_LABELS[row["slr_depth"]]]
-                + [""] * (len(SLR_YEARS) + 1)
-            )
+        # must also have depth to show projection data
+        if row.get("slr_depth", None) is None or row.get("slr_proj") is None:
+            slr.append([id, row.overlap, "no", ""] + [""] * len(SLR_YEARS))
             counter += 1
         else:
             for scenario, values in row.slr_proj.items():
                 slr.append([id, row.overlap, "yes", scenario] + list(values))
-
                 counter += 1
+
         breaks.append(counter)
 
     slr = pd.DataFrame(
@@ -68,24 +61,19 @@ def add_slr_inundation_sheet(xlsx, df, name_col_width, area_col_width, area_labe
 
     slr = []
     for id, row in df.iterrows():
-        if isinstance(row["slr_depth"], str) and row["slr_depth"] in SLR_NODATA_LABELS:
-            slr.append(
-                [id, row.overlap, SLR_NODATA_LABELS[row["slr_depth"]]]
-                + [""] * len(SLR_DEPTHS)
-            )
-        else:
-            # calculate proportion
-            slr.append(
-                [id, row.overlap, "yes"] + list(np.array(row.slr_depth) / row.overlap)
-            )
+        slr.append([id, row.overlap] + list(row.slr_depth))
 
+    first_cols = [df.index.name, area_label]
+    depth_cols = [f"Inundated at {depth} feet (acres)" for depth in SLR_DEPTHS]
     nodata_cols = [f"{v['label']} (acres)" for v in SLR_NODATA_VALUES]
+
     slr = pd.DataFrame(
         slr,
-        columns=[df.index.name, area_label, "Has SLR up to 10ft?"]
-        + [f"Inundated at {depth} feet" for depth in SLR_DEPTHS]
-        + nodata_cols,
+        columns=first_cols + depth_cols + nodata_cols,
     )
+    # reorder to put NODATA cols to the left
+    slr = slr[first_cols + nodata_cols[1:] + depth_cols + nodata_cols[:1]]
+
     remove_cols = []
     for col in nodata_cols:
         if slr[col].sum() == 0:
@@ -93,14 +81,15 @@ def add_slr_inundation_sheet(xlsx, df, name_col_width, area_col_width, area_labe
     if remove_cols:
         slr = slr.drop(columns=remove_cols)
 
-    num_percent_columns = len(slr.columns) - 3
+    num_value_cols = len(slr.columns) - 2
 
     slr.to_excel(xlsx, sheet_name=sheet_name, index=False)
     ws = xlsx.sheets[sheet_name]
     set_column_widths(
-        ws, [name_col_width, area_col_width, 10] + ([10] * num_percent_columns)
+        ws, [name_col_width, area_col_width, 10] + ([10] * num_value_cols)
     )
     set_cell_styles(
-        ws, area_columns=[1], percent_columns=list(range(3, num_percent_columns + 4))
+        ws,
+        area_columns=[1] + list(range(2, num_value_cols + 3)),
     )
     add_data_note(ws, description)

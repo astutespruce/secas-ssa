@@ -105,7 +105,7 @@ async def get_analysis_unit_results(df, datasets, progress_callback=None):
                 continue
 
             # Extract SLR
-            if "slr_depth" in datasets:
+            if "slr_depth" in datasets or "slr_proj" in datasets:
                 result["slr_depth"] = extract_slr_depth_by_mask(
                     shape_mask,
                     window,

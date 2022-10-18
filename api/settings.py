@@ -9,6 +9,8 @@ load_dotenv()
 TEMP_DIR = Path(os.getenv("TEMP_DIR", "/tmp/ssa-reports"))
 TEMP_DIR.mkdir(exist_ok=True, parents=True)
 
+SHARED_DATA_DIR = Path(os.getenv("SHARED_DATA_DIR", "data"))
+
 SITE_URL = f'{os.getenv("ROOT_URL", "http://localhost")}/southeastssa'
 API_TOKEN = os.getenv("API_TOKEN")
 API_SECRET = os.getenv("API_SECRET")

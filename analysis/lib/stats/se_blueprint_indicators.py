@@ -4,9 +4,9 @@ import numpy as np
 
 from analysis.constants import DATASETS
 from analysis.lib.raster import extract_count_in_geometry
+from api.settings import SHARED_DATA_DIR
 
-
-src_dir = Path("../secas-blueprint/data/inputs/indicators/base")
+src_dir = SHARED_DATA_DIR / "inputs/indicators/base"
 
 
 def extract_indicator_by_mask(id, shape_mask, window, cellsize):

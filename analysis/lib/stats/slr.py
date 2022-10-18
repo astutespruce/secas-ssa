@@ -14,11 +14,12 @@ from analysis.constants import (
 from analysis.lib.raster import (
     extract_count_in_geometry,
 )
+from api.settings import SHARED_DATA_DIR
 
 SLR_BINS = SLR_DEPTHS + [v["value"] for v in SLR_NODATA_VALUES]
 
 
-src_dir = Path("../secas-blueprint/data/inputs/threats/slr")
+src_dir = SHARED_DATA_DIR / "inputs/threats/slr"
 slr_mask_filename = src_dir / "slr_mask.tif"
 depth_filename = src_dir / "slr.tif"
 proj_filename = src_dir / "noaa_1deg_cells.feather"
@@ -63,19 +64,6 @@ def extract_slr_depth_by_mask(
     nodata_acres = rasterized_acres - outside_se_acres - acres.sum()
     # combine areas not modeled with SLR nodata areas
     acres[12] += nodata_acres
-
-    # if all areas in the polygon have no inundation but have data, return
-    # not inundated
-    if np.allclose(acres[11], rasterized_acres):
-        return "not_inundated"
-
-    # if all areas in the polygon have no SLR data, return None
-    if np.allclose(acres[12], rasterized_acres):
-        return "not_available"
-
-    # if all areas are in inland counties, return not applicable
-    if np.allclose(acres[13], rasterized_acres):
-        return "not_applicable"
 
     # accumulate values for depths 0-10ft
     acres[:11] = np.cumsum(acres[:11])

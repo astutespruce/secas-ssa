@@ -7,9 +7,9 @@ from analysis.constants import (
     URBAN_THRESHOLD,
 )
 from analysis.lib.raster import extract_count_in_geometry
+from api.settings import SHARED_DATA_DIR
 
-
-src_dir = Path("../secas-blueprint/data/inputs/threats/urban")
+src_dir = SHARED_DATA_DIR / "inputs/threats/urban"
 
 
 def extract_urban_by_mask(shape_mask, window, cellsize):

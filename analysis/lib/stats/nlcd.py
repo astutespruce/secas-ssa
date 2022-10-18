@@ -4,9 +4,9 @@ import numpy as np
 
 from analysis.constants import NLCD_YEARS, NLCD_INDEXES
 from analysis.lib.raster import extract_count_in_geometry
+from api.settings import SHARED_DATA_DIR
 
-
-src_dir = Path("../secas-blueprint/data/inputs/nlcd")
+src_dir = SHARED_DATA_DIR / "inputs/nlcd"
 
 PERCENTS = np.arange(0, 1.01, 0.01)
 
