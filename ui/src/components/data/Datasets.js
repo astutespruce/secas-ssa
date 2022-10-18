@@ -18,7 +18,11 @@ export const useDatasets = () => {
           id
           name
           description
+          methods
           url
+          source
+          date
+          citation
           values {
             value
             label

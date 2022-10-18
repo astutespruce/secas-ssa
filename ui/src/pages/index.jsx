@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import { graphql } from 'gatsby'
 import { GatsbyImage as Image } from 'gatsby-plugin-image'
 import {
+  Alert,
   Box,
   Flex,
   Grid,
@@ -14,6 +15,7 @@ import {
   Text,
 } from 'theme-ui'
 import { FileAlt } from '@emotion-icons/fa-regular'
+import { ExclamationTriangle } from '@emotion-icons/fa-solid'
 
 import { Credits, HeaderImage } from 'components/image'
 import { SEO, Layout } from 'components/layout'
@@ -83,6 +85,20 @@ const IndexPage = ({
             </Button>
           </Link>
         </Flex>
+
+        <Alert sx={{ p: '1rem', bg: 'accent', mt: '6rem' }}>
+          <Flex>
+            <Box sx={{ flex: '0 0 auto', mr: '1rem' }}>
+              <ExclamationTriangle size="3rem" />
+            </Box>
+
+            <Paragraph sx={{ flex: '1 1 auto', color: '#FFF' }}>
+              WARNING: This is an early development version of this application
+              that is being used to test this approach for supporting Species
+              Status Assessments. This has not yet been officially released.
+            </Paragraph>
+          </Flex>
+        </Alert>
       </Box>
 
       <Divider />
@@ -155,7 +171,7 @@ const IndexPage = ({
           </Box>
         </Grid>
 
-        <Box sx={{ mt: '2rem' }}>TODO: screenshots showing example reports</Box>
+        {/* TODO: screenshots showing example reports */}
       </Box>
 
       <Divider />
@@ -263,8 +279,9 @@ const IndexPage = ({
         </Grid>
 
         <Paragraph sx={{ mt: '1rem' }}>
-          To learn more about how datasets were prepared for use in this tool,
-          please see the <Link to="/methods">Methods</Link> page.
+          To learn more about these datasets, including how they were prepared
+          for use in this tool, please see the{' '}
+          <Link to="/datasets">dataset details</Link> page.
         </Paragraph>
       </Box>
 

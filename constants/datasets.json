@@ -57,7 +57,9 @@
       "date": "2019",
       "citation": "Yang, L., et al. (2018). 'A new generation of the United States National Land Cover Database: Requirements, research priorities, design, and implementation strategies.' ISPRS Journal of Photogrammetry and Remote Sensing 146: 108-123.",
       "url": "https://www.usgs.gov/centers/eros/science/national-land-cover-database",
-      "description": "Values show the amount of each land cover class that is present within each analysis area for each year data are available from NLCD.  Only those land cover classes that are present within a given analysis area are shown."
+      "description": "This dataset shows the amount of area in each major land cover class for 2001, 2004, 2006, 2008, 2011, 2013, 2016, 2019.  Land cover classes include open water, perennial ice/snow, developed (multiple intensities), barren land, deciduous forest, evergreen forest, mixed forest, shrub/scrub, grassland/herbaceous, pasture/hay, cultivated crops, woody wetlands, and emergent herbaceous wetlands.  Data are only available for Southeastern states within the contiguous U.S.",
+      "valueDescription": "Values show the amount of each land cover class that is present within each analysis area for each year data are available from NLCD.  Only those land cover classes that are present within a given analysis area are shown.",
+      "methods": "Land cover data for each year were reprojected to match the standard grid used in this tool and clipped to Southeastern states."
     },
     {
       "id": "nlcd_impervious",
@@ -67,7 +69,9 @@
       "date": "2019",
       "citation": "Yang, L., et al. (2018). 'A new generation of the United States National Land Cover Database: Requirements, research priorities, design, and implementation strategies.' ISPRS Journal of Photogrammetry and Remote Sensing 146: 108-123.",
       "url": "https://www.usgs.gov/centers/eros/science/national-land-cover-database",
-      "description": "Values show the total amount of impervious surface each analysis area for each year data are available from NLCD.  These are calculated as the sum of the amount of area in each percent level of impervious surface times the percent."
+      "description": "This dataset shows percent impervious surface for 2001, 2004, 2006, 2008, 2011, 2013, 2016, 2019.",
+      "valueDescription": "Values show the total amount of impervious surface each analysis area for each year data are available from NLCD.  These are calculated as the sum of the amount of area in each percent level of impervious surface times the percent.",
+      "methods": ""
     },
     {
       "id": "urban",
@@ -75,19 +79,23 @@
       "sheet_name": "Urbanization",
       "source": "FUTURES",
       "date": "2022",
-      "citation": "TODO:",
-      "url": "TODO:",
-      "description": "Current urbanization is derived from NLCD 2019.  Projected urbanization for 2020 through 2100 is based on the proportion of stochastic simulations out of 50 that predicted a given pixel will convert to urban.  The Low level of urbanization includes areas where at least 50% of the runs predicted that a pixel will convert to urban, and the High level of urbanization corresponds to areas where any of the runs predicted that a pixel will urbanize.  To calculate the total amount of urbanization within each analysis area, the proportion of stochastic urbanization simulations that predict urbanization for a given pixel is multiplied by the area associated with each proportion."
+      "citation": "Center for Geospatial Analytics, NC State University (June 2022)",
+      "url": "https://cnr.ncsu.edu/geospatial/",
+      "description": "The FUTURES urban growth model predicts the likelihood that an area will urbanize at every decade from 2020 to 2100. Developed areas from the 2019 National Land Cover Database serve as the baseline for current urban areas. The model simulates landscape change based on demand for development, local development suitability factors, and a random urban patch-growing algorithm. It considers trends in population growth and building footprints, environmental drivers like distance to floodplain, slope, and available amenities, and even social factors like reluctance to sell in certain areas. The probability of urbanization for each area reflects how many times it urbanized out of 50 model runs.  Darker reds indicate higher probability of urbanization.",
+      "valueDescription": "Current urbanization is derived from NLCD 2019.  Projected urbanization for 2020 through 2100 is based on the proportion of stochastic simulations out of 50 that predicted a given pixel will convert to urban.  The Low level of urbanization includes areas where at least 50% of the runs predicted that a pixel will convert to urban, and the High level of urbanization corresponds to areas where any of the runs predicted that a pixel will urbanize.  To calculate the total amount of urbanization within each analysis area, the proportion of stochastic urbanization simulations that predict urbanization for a given pixel is multiplied by the area associated with each proportion.",
+      "methods": ""
     },
     {
       "id": "slr_depth",
       "name": "Sea-level rise inundation area",
       "sheet_name": "SLR inundation area",
       "source": "National Oceanic and Atmospheric Administration",
-      "citation": "TODO:",
+      "citation": "NOAA Office for Coastal Management Sea Level Rise Data: 1-10 ft Sea Level Rise Inundation Extent (2017)",
       "url": "https://coast.noaa.gov/slrdata/",
       "date": "2022",
-      "description": "Sea-level rise inundation depth data are provided by NOAA in 1 foot increments, based on available digital elevation model data.  Values show the amount of area that would be inundated by that amount of sea-level rise depth based on the number of 15-meter pixels rasterized from NOAA inundation depth polygons that overlap with each analysis unit."
+      "description": "Sea-level rise inundation depth data are provided by NOAA in 1 foot increments, based on available digital elevation model data.  Values show the amount of area that would be inundated by that amount of sea-level rise depth based on the number of 30-meter pixels rasterized from NOAA inundation depth polygons that overlap with each analysis unit.",
+      "valueDescription": "Sea-level rise inundation depth data are provided by NOAA in 1 foot increments, based on available digital elevation model data.  Values show the amount of area that would be inundated by that amount of sea-level rise depth based on the number of 30-meter pixels rasterized from NOAA inundation depth polygons that overlap with each analysis unit.",
+      "methods": ""
     },
     {
       "id": "slr_proj",
@@ -97,7 +105,9 @@
       "citation": "Sweet, W.V., B.D. Hamlington, R.E. Kopp, C.P. Weaver, P.L.Barnard, D. Bekaert, W. Brooks, M. Craghan, G. Dusek, T. Frederikse, G.Garner, A.S. Genz, J.P. Krasting, E. Larour, D. Marcy,J.J. Marra, J.Obeysekera, M. Osler, M. Pendleton, D. Roman, L. Schmied, W. Veatch, K.D.White, and C. Zuzak, 2022: Global and Regional Sea Level Rise Scenarios for the United States: Updated Mean Projections and Extreme Water Level Probabilities Along U.S. Coastlines. NOAA Technical Report NOS 01. National Oceanic and Atmospheric Administration, National Ocean Service, Silver Spring, MD",
       "url": "https://oceanservice.noaa.gov/hazards/sealevelrise/sealevelrise-tech-report.html",
       "date": "2022",
-      "description": "Sea-level rise projections are derived from 1-degree grid cells that accompany the 2022 Sea Level Rise Technical Report by NOAA.  Values show the area-weighted mean of 1-degree grid cells that overlap each analysis unit based on a baseline of 2000.  Sea-level rise scenarios correspond to a global sea level rise of between 1, 1.64, 3.2, 4.9, and 6.56 feet."
+      "description": "Sea-level rise projections are derived from 1-degree grid cells that accompany the 2022 Sea Level Rise Technical Report by NOAA.  Values show the area-weighted mean of 1-degree grid cells that overlap each analysis unit based on a baseline of 2000.  Sea-level rise scenarios correspond to a global sea level rise of between 1, 1.64, 3.2, 4.9, and 6.56 feet.",
+      "valueDescription": "Sea-level rise projections are derived from 1-degree grid cells that accompany the 2022 Sea Level Rise Technical Report by NOAA.  Values show the area-weighted mean of 1-degree grid cells that overlap each analysis unit based on a baseline of 2000.  Sea-level rise scenarios correspond to a global sea level rise of between 1, 1.64, 3.2, 4.9, and 6.56 feet.",
+      "methods": ""
     },
 
     {
@@ -136,6 +146,7 @@
         }
       ],
       "description": "This indicator assesses shoreline condition based on the presence of hardened structures like jetties, groins, and riprap, as well as other human development. By restricting the natural movement of sediment, shoreline armoring increases erosion, prevents the inland migration of coastal ecosystems in response to sea-level rise, and degrades habitat for birds, sea turtles, fish, plants, and other species both on and offshore. Natural shorelines in harder-to-develop coastal areas receive the highest shoreline condition scores, while hardened shorelines receive the lowest scores. This indicator originates from the National Oceanic and Atmospheric Administration's Environmental Sensitivity Index dataset.",
+      "methods": "",
       "url": ""
     },
     {
@@ -184,6 +195,7 @@
         }
       ],
       "description": "This indicator depicts the capacity of coastal habitats to migrate to adjacent lowlands in order to sustain biodiversity and natural services under increasing inundation from sea-level rise. It is based on the physical and condition characteristics of current tidal complexes, their predicted migration space, and surrounding buffer areas. These characteristics include marsh complex size, shared edge with migration space, sediment balance, water quality, natural landcover, landform diversity, and many others. This indicator originates from The Nature Conservancy's Resilient Coastal Sites project.",
+      "methods": "",
       "url": ""
     },
     {
@@ -203,6 +215,7 @@
       ],
       "nodata_label": "Not within a stable coastal wetland",
       "description": "This indicator uses remote sensing to calculate the unvegetated-vegetated ratio of tidal wetlands, which compares how much of a wetland is not covered by plants (e.g., sediment, rocks, open water) to how much is covered by plants. This ratio, and how it changes over time, is a good surrogate for salt marsh degradation processes like sediment loss and conversion to open water. It helps differentiate between stable marshes that are more resilient, and declining marshes that are more vulnerable to threats like sea-level rise, erosion, and coastal development. This indicator originates from a U.S. Geological Survey project on an unvegetated to vegetated ratio for coastal wetlands.",
+      "methods": "",
       "url": ""
     },
     {
@@ -242,6 +255,7 @@
       ],
       "nodata_label": "Not within an estimated floodplain or outside floodplain natural landcover data extent",
       "description": "This indicator measures the amount of natural landcover in the estimated floodplain of rivers and streams within each catchment. It assesses the stream channel and its surrounding riparian buffer, measuring the percent of unaltered habitat like forests, wetlands, or open water (rather than agriculture or development). Intact vegetated buffers within the floodplain of rivers and streams provide aquatic habitat, improve water quality, reduce erosion and flooding, recharge groundwater, and more. This indicator originates from the 2019 National Land Cover Database and applies to the Environmental Protection Agency's estimated floodplain, which spatially defines areas estimated to be inundated by a 100-year flood, also known as the 1% annual chance flood.",
+      "methods": "",
       "url": ""
     },
     {
@@ -291,6 +305,7 @@
       ],
       "nodata_label": "Not within an estimated floodplain or outside aquatic network complexity data extent",
       "description": "This indicator depicts the number of different stream size classes in a river network not separated by dams or waterfalls. River networks with a variety of connected stream classes help retain aquatic biodiversity in a changing climate by allowing species to access climate refugia and move between habitats. This indicator originates from the Southeast Aquatic Resources Partnership and applies to the Environmental Protection Agency's estimated floodplain, which spatially defines areas estimated to be inundated by a 100-year flood, also known as the 1% annual chance flood.",
+      "methods": "",
       "url": ""
     },
     {
@@ -324,6 +339,7 @@
         }
       ],
       "description": "This indicator measures the average percent of non-impervious cover within each catchment. High levels of impervious surface degrade water quality and alter freshwater flow, impacting both aquatic species communities and ecosystem services for people, like the availability of clean drinking water. This indicator originates from the 2019 National Land Cover Database percent developed impervious layer.",
+      "methods": "",
       "url": ""
     },
     {
@@ -357,6 +373,7 @@
         }
       ],
       "description": "This indicator uses remote sensing to estimate the number of times an area has been burned from 2013 to 2021. Many Southeastern ecosystems rely on regular, low-intensity fires to maintain habitat, encourage native plant growth, and reduce wildfire risk. This indicator combines burned area layers from both U.S. Geological Survey Landsat data and the inter-agency Monitoring Trends in Burn Severity program. Landsat-based fire predictions within the range of longleaf pine are also available through Southeast FireMap.",
+      "methods": "",
       "url": ""
     },
     {
@@ -390,6 +407,7 @@
         }
       ],
       "description": "This indicator represents the size of large, unfragmented patches of natural habitat. It identifies minimally disturbed natural areas at least 100 acres in size and greater than 200 meters wide. Large areas of intact natural habitat are important for many wildlife species, including reptiles and amphibians, birds, and large mammals. This indicator originates from Esri's green infrastructure data.",
+      "methods": "",
       "url": ""
     },
     {
@@ -443,6 +461,7 @@
         }
       ],
       "description": "This indicator depicts an area's capacity to maintain species diversity and ecosystem function in the face of climate change. It measures two factors that influence resilience. The first, landscape diversity, reflects the number of microhabitats and climatic gradients created by topography, elevation, and hydrology. The second, local connectedness, reflects the degree of habitat fragmentation and strength of barriers to species movement. Highly resilient sites contain many different habitat niches that support biodiversity, and allow species to move freely through the landscape to find suitable microclimates as the climate changes. This indicator originates from The Nature Conservancy's Resilient Land data.",
+      "methods": "",
       "url": ""
     }
   ]
