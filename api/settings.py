@@ -11,6 +11,10 @@ TEMP_DIR.mkdir(exist_ok=True, parents=True)
 
 SHARED_DATA_DIR = Path(os.getenv("SHARED_DATA_DIR", "data"))
 
+# CORS is only set by API server when running in local development
+ENABLE_CORS = bool(os.getenv("ENABLE_CORS", False))
+ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS", "*").split(",")
+
 API_TOKEN = os.getenv("API_TOKEN")
 API_SECRET = os.getenv("API_SECRET")
 MAX_JOBS = int(os.getenv("MAX_JOBS", 2))
@@ -18,7 +22,6 @@ MAX_FILE_SIZE = float(os.getenv("MAX_FILE_SIZE", 100))  # MB
 LOGGING_LEVEL = os.getenv("LOGGING_LEVEL", "DEBUG")
 REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
 REDIS_PORT = os.getenv("REDIS_PORT", 6379)
-ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS", "*").split(",")
 SENTRY_DSN = os.getenv("SENTRY_DSN")
 SENTRY_ENV = os.getenv("SENTRY_ENV")
 

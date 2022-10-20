@@ -9,6 +9,7 @@ from sentry_sdk.integrations.asgi import SentryAsgiMiddleware
 
 from api.settings import (
     LOGGING_LEVEL,
+    ENABLE_CORS,
     ALLOWED_ORIGINS,
     SENTRY_DSN,
 )
@@ -82,12 +83,10 @@ async def catch_exceptions_middleware(request: Request, call_next):
         return Response("Internal server error", status_code=500)
 
 
-# Enable CORS
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=ALLOWED_ORIGINS,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-    expose_headers=["*"],
-)
+if ENABLE_CORS:
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=ALLOWED_ORIGINS,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
