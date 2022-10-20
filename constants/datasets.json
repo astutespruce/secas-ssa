@@ -81,7 +81,7 @@
       "date": "2022",
       "citation": "Center for Geospatial Analytics, NC State University (June 2022)",
       "url": "https://cnr.ncsu.edu/geospatial/",
-      "description": "The FUTURES urban growth model predicts the likelihood that an area will urbanize at every decade from 2020 to 2100. Developed areas from the 2019 National Land Cover Database serve as the baseline for current urban areas. The model simulates landscape change based on demand for development, local development suitability factors, and a random urban patch-growing algorithm. It considers trends in population growth and building footprints, environmental drivers like distance to floodplain, slope, and available amenities, and even social factors like reluctance to sell in certain areas.",
+      "description": "The FUTURES urban growth model predicts the likelihood that an area will urbanize at every decade from 2020 to 2100. Developed areas from the 2019 National Landcover Database serve as the baseline for current urban areas. The model simulates landscape change based on trends in population growth, local development suitability factors, and an urban patch-growing algorithm. It considers environmental drivers like distance to floodplain, slope, and available infrastructure, and even socio-economic status. The probability of urbanization for each area reflects how many times it urbanized out of 50 model runs.",
       "valueDescription": "Current urbanization is derived from NLCD 2019.  Projected urbanization for 2020 through 2100 is based on the proportion of stochastic simulations out of 50 that predicted a given pixel will convert to urban.  The Low level of urbanization includes areas where at least 50% of the runs predicted that a pixel will convert to urban, and the High level of urbanization corresponds to areas where any of the runs predicted that a pixel will urbanize.  To calculate the total amount of urbanization within each analysis area, the proportion of stochastic urbanization simulations that predict urbanization for a given pixel is multiplied by the area associated with each proportion.",
       "methods": "Urbanization data were converted from floating point probabilities provided by the Center for Geospatial Analytics to the count of stochastic simulations out of 50, and reprojected to match the standard grid used in this tool and clipped to Southeastern states."
     },
@@ -117,7 +117,7 @@
       "sheet_name": "Coastal shoreline condition",
       "date": "2022",
       "source": "Southeast Conservation Blueprint 2022",
-      "citation": "Southeast Conservation Blueprint (2022).",
+      "citation": "Southeast Conservation Adaptation Strategy (SECAS). 2022. Southeast Conservation Blueprint 2022. http://secassoutheast.org/blueprint",
       "values": [
         {
           "value": 0,
@@ -156,7 +156,7 @@
       "sheet_name": "Resilient coastal sites",
       "date": "2022",
       "source": "Southeast Conservation Blueprint 2022",
-      "citation": "Southeast Conservation Blueprint (2022).",
+      "citation": "Southeast Conservation Adaptation Strategy (SECAS). 2022. Southeast Conservation Blueprint 2022. http://secassoutheast.org/blueprint",
       "values": [
         {
           "value": 1,
@@ -205,7 +205,7 @@
       "sheet_name": "Stable coastal wetlands",
       "date": "2022",
       "source": "Southeast Conservation Blueprint 2022",
-      "citation": "Southeast Conservation Blueprint (2022).",
+      "citation": "Southeast Conservation Adaptation Strategy (SECAS). 2022. Southeast Conservation Blueprint 2022. http://secassoutheast.org/blueprint",
       "values": [
         {
           "value": 1,
@@ -225,7 +225,7 @@
       "sheet_name": "Floodplain natural landcover",
       "date": "2022",
       "source": "Southeast Conservation Blueprint 2022",
-      "citation": "Southeast Conservation Blueprint (2022).",
+      "citation": "Southeast Conservation Adaptation Strategy (SECAS). 2022. Southeast Conservation Blueprint 2022. http://secassoutheast.org/blueprint",
       "values": [
         {
           "value": 1,
@@ -265,7 +265,7 @@
       "sheet_name": "Aquatic network complexity",
       "date": "2022",
       "source": "Southeast Conservation Blueprint 2022",
-      "citation": "Southeast Conservation Blueprint (2022).",
+      "citation": "Southeast Conservation Adaptation Strategy (SECAS). 2022. Southeast Conservation Blueprint 2022. http://secassoutheast.org/blueprint",
       "values": [
         {
           "value": 1,
@@ -315,7 +315,7 @@
       "sheet_name": "Permeable surface",
       "date": "2022",
       "source": "Southeast Conservation Blueprint 2022",
-      "citation": "Southeast Conservation Blueprint (2022).",
+      "citation": "Southeast Conservation Adaptation Strategy (SECAS). 2022. Southeast Conservation Blueprint 2022. http://secassoutheast.org/blueprint",
       "values": [
         {
           "value": 1,
@@ -349,7 +349,7 @@
       "sheet_name": "Fire frequency",
       "date": "2022",
       "source": "Southeast Conservation Blueprint 2022",
-      "citation": "Southeast Conservation Blueprint (2022).",
+      "citation": "Southeast Conservation Adaptation Strategy (SECAS). 2022. Southeast Conservation Blueprint 2022. http://secassoutheast.org/blueprint",
       "values": [
         {
           "value": 0,
@@ -383,7 +383,7 @@
       "sheet_name": "Intact habitat cores",
       "date": "2022",
       "source": "Southeast Conservation Blueprint 2022",
-      "citation": "Southeast Conservation Blueprint (2022).",
+      "citation": "Southeast Conservation Adaptation Strategy (SECAS). 2022. Southeast Conservation Blueprint 2022. http://secassoutheast.org/blueprint",
       "values": [
         {
           "value": 0,
@@ -417,7 +417,7 @@
       "sheet_name": "Resilient terrestrial sites",
       "date": "2022",
       "source": "Southeast Conservation Blueprint 2022",
-      "citation": "Southeast Conservation Blueprint (2022).",
+      "citation": "Southeast Conservation Adaptation Strategy (SECAS). 2022. Southeast Conservation Blueprint 2022. http://secassoutheast.org/blueprint",
       "values": [
         {
           "value": 0,

@@ -62,8 +62,7 @@ const curStepCSS = {
 // disabled
 const nextStepCSS = {
   ...stepCSS,
-  // cursor: 'not-allowed', // FIXME:
-  cursor: 'pointer',
+  cursor: 'not-allowed',
   bg: 'grey.2',
   color: 'grey.7',
 }

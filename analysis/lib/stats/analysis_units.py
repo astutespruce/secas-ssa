@@ -19,9 +19,10 @@ from analysis.lib.stats.nlcd import (
     extract_nlcd_impervious_by_mask,
 )
 from analysis.lib.stats.se_blueprint_indicators import extract_indicator_by_mask
+from api.settings import SHARED_DATA_DIR
 
 
-data_dir = Path("data/inputs")
+data_dir = SHARED_DATA_DIR / "inputs"
 bnd_dir = data_dir / "boundaries"
 extent_filename = bnd_dir / "nonmarine_mask.tif"
 states_filename = bnd_dir / "states.feather"

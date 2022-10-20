@@ -1,15 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { graphql } from 'gatsby'
-import {
-  Container,
-  Flex,
-  Box,
-  Heading,
-  Paragraph,
-  Divider,
-  Text,
-} from 'theme-ui'
+import { Container, Flex, Box, Heading, Paragraph, Divider } from 'theme-ui'
 import { ExternalLinkAlt } from '@emotion-icons/fa-solid'
 
 import { Layout, SEO } from 'components/layout'
@@ -48,23 +40,23 @@ const MethodsPage = ({
             Table of contents
           </Heading>
           <Box>
-            <ul>
+            <Box as="ul" sx={{ fontSize: 2 }}>
               <li>
                 <a href="#GeneralInformation">General information</a>
               </li>
               {categories.map((category) => (
                 <li key={category.id}>
                   <a href={`#${category.id}Section`}>{category.label}</a>
-                  <ul>
+                  <Box as="ul" sx={{ fontSize: 2 }}>
                     {category.datasets.map(({ id, name }) => (
                       <li key={id}>
                         <a href={`#${id}Section`}>{name}</a>
                       </li>
                     ))}
-                  </ul>
+                  </Box>
                 </li>
               ))}
-            </ul>
+            </Box>
           </Box>
         </Box>
 
@@ -206,4 +198,4 @@ MethodsPage.propTypes = {
 
 export default MethodsPage
 
-export const Head = () => <SEO title="Methods" />
+export const Head = () => <SEO title="Dataset details" />

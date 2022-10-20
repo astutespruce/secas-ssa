@@ -64,7 +64,6 @@ const ReportWorkflow = () => {
 
   const handleUploadFileSuccess = useCallback(
     ({ uuid: uploadUuid, fields = {}, available_datasets = {} }) => {
-      console.log('uploaded file', uploadUuid, fields, available_datasets)
       setState((prevState) => ({
         ...prevState,
         stepIndex: 1,
@@ -136,19 +135,6 @@ const ReportWorkflow = () => {
       stepIndex: 3,
     }))
   }, [])
-
-  // FIXME: remove
-  console.log(
-    `step=${steps[stepIndex].id}\nuuid=${uuid}\nattributes=${JSON.stringify(
-      attributes
-    )}\nselectedAttribute=${selectedAttribute}\navailableDatasets=${Object.entries(
-      availableDatasets
-    )
-      .filter(([k, v]) => v)
-      .map(([k, _]) => k)}\nselectedDatasets=${Object.entries(selectedDatasets)
-      .filter(([k, v]) => v)
-      .map(([k, _]) => k)}`
-  )
 
   let stepContent = null
 
