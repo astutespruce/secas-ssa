@@ -26,7 +26,6 @@
     "gatsby-plugin-google-gtag": "^4.9.0",
     "gatsby-plugin-image": "^2.9.1",
     "gatsby-plugin-manifest": "^4.9.1",
-    "gatsby-plugin-react-helmet": "^5.9.0",
     "gatsby-plugin-robots-txt": "^1.7.0",
     "gatsby-plugin-sharp": "^4.9.1",
     "gatsby-plugin-theme-ui": "^0.14.7",
@@ -40,7 +39,6 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-dropzone": "^14.2.1",
-    "react-helmet": "^6.1.0",
     "react-hook-form": "^7.0.0",
     "react-minimal-pie-chart": "^8.1.0",
     "react-query": "^3.33.7",
@@ -75,7 +73,7 @@
     "start": "npm run develop",
     "serve": "gatsby serve",
     "clean": "gatsby clean",
-    "deploy": "npm ci --production --no-audit && npm install gatsby-cli@3.4 --no-audit --no-save && gatsby telemetry --disable && gatsby clean && gatsby build --prefix-paths"
+    "deploy": "npm ci --production --no-audit && npm install gatsby-cli@4.24 --no-audit --no-save && gatsby telemetry --disable && gatsby clean && gatsby build --prefix-paths"
   },
   "repository": {
     "type": "git",
