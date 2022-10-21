@@ -1,8 +1,10 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import PropTypes from 'prop-types'
 import { Box, Button, Flex, Heading } from 'theme-ui'
 import { TimesCircle } from '@emotion-icons/fa-regular'
+
+import { hasWindow } from 'util/dom'
 
 const absPostionCSS = {
   position: 'absolute',
@@ -16,6 +18,24 @@ const Modal = ({ children, title, width, onClose }) => {
   const handleClose = () => {
     onClose()
   }
+
+  useEffect(() => {
+    const handleEscape = ({ key }) => {
+      if (key === 'Escape') {
+        onClose()
+      }
+    }
+
+    if (hasWindow) {
+      document.addEventListener('keydown', handleEscape)
+    }
+
+    return () => {
+      if (hasWindow) {
+        document.removeEventListener('keydown', handleEscape)
+      }
+    }
+  })
 
   return createPortal(
     <Flex

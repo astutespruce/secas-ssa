@@ -10,7 +10,7 @@ const arrowCSS = {
   height: '1.5rem',
   right: '-0.8rem',
   top: '0.33rem',
-  bg: 'grey.2',
+  bg: 'grey.1',
   transform: 'rotate(45deg)',
   zIndex: 5,
   borderRight: '1px solid #FFF',

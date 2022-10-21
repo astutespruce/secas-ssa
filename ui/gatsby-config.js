@@ -72,9 +72,11 @@ module.exports = {
     {
       resolve: 'gatsby-plugin-robots-txt',
       options: {
-        policy: [{ userAgent: '*', disallow: ['/api'] }],
+        host: process.env.SITE_URL || `https://localhost`,
+        policy: [{ userAgent: '*', disallow: ['/services', '*/api/*'] }],
       },
     },
+    `gatsby-plugin-sitemap`,
     {
       resolve: `gatsby-plugin-manifest`,
       options: {
