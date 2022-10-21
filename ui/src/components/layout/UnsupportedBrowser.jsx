@@ -11,7 +11,7 @@ const UnsupportedBrowser = () => (
         background: 'primary',
       }}
     >
-      <Heading as="h2">
+      <Heading as="h1">
         <ExclamationTriangle size="32px" style={{ marginRight: '.5rem' }} />
         Unfortunately, you are using an unsupported version of Internet
         Explorer.

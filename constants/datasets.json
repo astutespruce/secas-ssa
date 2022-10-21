@@ -1,18 +1,17 @@
 {
   "categories": [
     {
-      "id": "trends",
-      "label": "Landscape trends",
-      "color": "#EEEEEE",
-      "borderColor": "#AAAAAA",
-      "datasets": ["nlcd_landcover", "nlcd_impervious"]
-    },
-    {
       "id": "threats",
-      "label": "Stressors",
+      "label": "Landscape trends & stressors",
       "color": "#ffffe9",
       "borderColor": "#f2f25f",
-      "datasets": ["slr_proj", "slr_depth", "urban"]
+      "datasets": [
+        "nlcd_landcover",
+        "nlcd_impervious",
+        "urban",
+        "slr_proj",
+        "slr_depth"
+      ]
     },
     {
       "id": "coastal",
@@ -51,7 +50,7 @@
   "datasets": [
     {
       "id": "nlcd_landcover",
-      "name": "National Land Cover Database - land cover trends (2001-2019)",
+      "name": "Land cover trends (2001-2019)",
       "sheet_name": "Landcover trends",
       "source": "U.S. Geological Survey",
       "date": "2019",
@@ -63,7 +62,7 @@
     },
     {
       "id": "nlcd_impervious",
-      "name": "National Land Cover Database - impervious surface trends (2001-2019)",
+      "name": "Impervious surface trends (2001-2019)",
       "sheet_name": "Impervious surface trends",
       "source": "U.S. Geological Survey",
       "date": "2019",

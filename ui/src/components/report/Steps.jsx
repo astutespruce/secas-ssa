@@ -63,8 +63,8 @@ const curStepCSS = {
 const nextStepCSS = {
   ...stepCSS,
   cursor: 'not-allowed',
-  bg: 'grey.2',
-  color: 'grey.7',
+  bg: 'grey.1',
+  color: 'grey.8',
 }
 
 const Steps = ({ steps, index, onClick }) => {
@@ -98,9 +98,7 @@ const Steps = ({ steps, index, onClick }) => {
       {steps.map(({ id, label }, i) => (
         <Flex
           key={id}
-          // TODO:
-          // onClick={i < index ? handleClick(i) : null}
-          onClick={i !== index ? handleClick(i) : null}
+          onClick={i < index ? handleClick(i) : null}
           sx={{
             alignItems: 'center',
             ...getStepCSS(i),
@@ -112,7 +110,7 @@ const Steps = ({ steps, index, onClick }) => {
               width: '1.5rem',
               height: '1.5rem',
               fontSize: '1rem',
-              bg: i <= index ? 'grey.9' : 'grey.4',
+              bg: i <= index ? 'grey.9' : 'grey.8',
             }}
           >
             {i + 1}

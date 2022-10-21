@@ -49,7 +49,7 @@ const UploadForm = ({ onReset, onSubmit }) => {
             <Box>
               <Flex sx={{ alignItems: 'center', mb: '1rem' }}>
                 <Box variant="boxes.step">1</Box>
-                <Heading as="h3" sx={{ m: 0 }}>
+                <Heading as="h1" sx={{ m: 0, fontSize: [3, 4] }}>
                   Upload analysis unit boundaries
                 </Heading>
               </Flex>

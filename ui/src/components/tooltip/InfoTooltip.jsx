@@ -92,7 +92,7 @@ const InfoTooltip = ({ content }) => {
             top: y ?? 0,
             left: x ?? 0,
             p: '0.75rem',
-            zIndex: 0,
+            zIndex: 10000,
           }}
         >
           <Box

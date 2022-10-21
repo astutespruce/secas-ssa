@@ -31,7 +31,7 @@ const Download = ({ uuid, selectedAttribute, selectedDatasets, onCancel }) => {
         <Divider />
 
         <Flex sx={{ justifyContent: 'space-between' }}>
-          <Button variant="primary" onClick={onCancel}>
+          <Button onClick={onCancel}>
             <Flex>
               <ReplyAll size="1.5em" style={{ marginRight: '0.5rem' }} />
               <Text>Start over</Text>

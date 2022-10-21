@@ -144,7 +144,6 @@ const ReportWorkflow = () => {
       break
     }
     case 'selectAttribute': {
-      // TODO: pass attributes from API
       stepContent = (
         <SelectAttribute
           attributes={attributes}
@@ -189,7 +188,7 @@ const ReportWorkflow = () => {
 
   return (
     <Container sx={{ px: ['1rem', '1rem', '1rem', 0], pb: '4rem' }}>
-      <Box sx={{ mt: '0.5rem', mb: '2rem' }}>
+      <Box sx={{ mt: '1.5rem', mb: '2rem' }}>
         <Steps steps={steps} index={stepIndex} onClick={handleStepClick} />
       </Box>
 

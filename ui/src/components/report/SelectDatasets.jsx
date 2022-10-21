@@ -53,7 +53,7 @@ const SelectDatasets = ({
       <Box>
         <Flex sx={{ alignItems: 'center', mb: '1rem' }}>
           <Box variant="boxes.step">3</Box>
-          <Heading as="h3" sx={{ m: 0 }}>
+          <Heading as="h1" sx={{ m: 0, fontSize: [3, 4] }}>
             Select factors to include in report
           </Heading>
         </Flex>
@@ -67,7 +67,7 @@ const SelectDatasets = ({
       </Box>
       <Box>
         <Flex sx={{ justifyContent: 'space-between', mb: '0.5rem' }}>
-          <Heading as="h4" sx={{ m: 0 }}>
+          <Heading as="h3" sx={{ m: 0 }}>
             Available landscape-level factors:
           </Heading>
           <Flex sx={{ alignItems: 'center', cursor: 'pointer', color: 'link' }}>

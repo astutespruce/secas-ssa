@@ -14,6 +14,8 @@ const CategoryHeader = ({ id, isOpen, label, color, borderColor, onClick }) => {
         bg: color,
         py: ['1rem', '0.5rem'],
         px: '1rem',
+        borderTop: '1px solid',
+        borderTopColor: borderColor,
         borderBottom: '1px solid',
         borderBottomColor: borderColor,
         cursor: 'pointer',

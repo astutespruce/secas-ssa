@@ -18,7 +18,7 @@ const Dataset = ({ id, name, description, selected, disabled, onToggle }) => {
             border: '2px solid transparent',
             pr: '0.25rem',
             fontStyle: disabled ? 'italic' : 'inherit',
-            color: disabled ? 'grey.7' : 'inherit',
+            color: disabled ? 'grey.8' : 'inherit',
             '&:focus-within': {
               border: '2px dashed',
               borderColor: 'highlight',
@@ -28,6 +28,7 @@ const Dataset = ({ id, name, description, selected, disabled, onToggle }) => {
           <Checkbox
             readOnly={!disabled}
             checked={selected}
+            disabled={disabled}
             onChange={disabled ? null : handleToggle}
             sx={{
               'input:focus ~ &': {
