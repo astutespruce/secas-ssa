@@ -75,5 +75,17 @@ module.exports = {
         policy: [{ userAgent: '*', disallow: ['/api'] }],
       },
     },
+    {
+      resolve: `gatsby-plugin-manifest`,
+      options: {
+        name: `Southeast Species Status Landscape Assessment Tool`,
+        short_name: `Southeast SSA Tool`,
+        icon: 'src/images/logo.svg',
+        start_url: `/`,
+        background_color: `#4279A6`,
+        theme_color: `#4279A6`,
+        display: `minimal-ui`,
+      },
+    },
   ],
 }
