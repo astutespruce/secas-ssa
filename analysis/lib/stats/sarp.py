@@ -1,9 +1,6 @@
-import numpy as np
 import pandas as pd
-import pygeos as pg
-import geopandas as gp
+import shapely
 
-from analysis.constants import GEO_CRS
 from analysis.lib.io import read_feather_by_bounds
 from api.settings import DATA_DIR
 
@@ -27,7 +24,7 @@ def extract_sarp_huc12_stats(df):
 
     huc12 = read_feather_by_bounds(
         huc12_filename,
-        pg.bounds(df.geometry.values.data),
+        shapely.bounds(df.geometry.values),
         columns=[
             "geometry",
             "HUC12",
@@ -37,8 +34,8 @@ def extract_sarp_huc12_stats(df):
             "total_miles",
         ],
     )
-    tree = pg.STRtree(huc12.geometry.values.data)
-    left, right = tree.query_bulk(df.geometry.values.data, predicate="intersects")
+    tree = shapely.STRtree(huc12.geometry.values)
+    left, right = tree.query(df.geometry.values, predicate="intersects")
 
     if len(df) == 0:
         return None

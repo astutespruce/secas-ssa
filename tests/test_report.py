@@ -3,9 +3,8 @@ from pathlib import Path
 import subprocess
 from time import time
 
-import numpy as np
-import pygeos as pg
 from pyogrio.geopandas import read_dataframe
+import shapely
 
 from analysis.constants import DATA_CRS, DATASETS
 from analysis.lib.geometry import dissolve, make_valid, to_dict_all
@@ -22,23 +21,23 @@ aois = [
     #     "path": "Balduina_pop_resiliency_final",
     #     "field": "Population",
     # },
-    # {
-    #     "name": "Rabbitsfoot",
-    #     "path": "Rabbitsfott_resilience_final_SECAS_only",
-    #     "field": "HUC10",
-    # },
+    {
+        "name": "Rabbitsfoot",
+        "path": "Rabbitsfott_resilience_final_SECAS_only",
+        "field": "HUC10",
+    },
     # {
     #     "name": "Test single area",
     #     "path": "SingleTest",
     #     "field": None,
     #     "analysis_unit_label": "Pop A",
     # },
-    {
-        "name": "fl_slr_test",
-        "path": "fl_slr_test",
-        "field": None,
-        "analysis_unit_label": "Test population",
-    }
+    # {
+    #     "name": "fl_slr_test",
+    #     "path": "fl_slr_test",
+    #     "field": None,
+    #     "analysis_unit_label": "Test population",
+    # }
 ]
 
 
@@ -65,16 +64,16 @@ for aoi in aois:
         df[field] = analysis_unit_label
 
     # make valid and only keep polygon parts
-    df["geometry"] = make_valid(df.geometry.values.data)
+    df["geometry"] = make_valid(df.geometry.values)
     df = df.explode(index_parts=False)
-    df = df.loc[pg.get_type_id(df.geometry.values.data) == 3]
+    df = df.loc[shapely.get_type_id(df.geometry.values) == 3]
 
     # find available datasets
     datasets = [
         id
         for id, present in get_available_datasets(
-            to_dict_all(df.geometry.values.data),
-            pg.total_bounds(df.geometry.values.data),
+            to_dict_all(df.geometry.values),
+            shapely.total_bounds(df.geometry.values),
         ).items()
         if present
     ]

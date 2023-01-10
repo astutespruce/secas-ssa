@@ -1,6 +1,6 @@
-import numpy as np
-import pygeos as pg
 import geopandas as gp
+import numpy as np
+import shapely
 
 from analysis.constants import (
     SLR_DEPTHS,
@@ -74,7 +74,7 @@ def extract_slr_projections_by_geometry(geometry):
 
     Parameters
     ----------
-    geometry : pygeos geometry
+    geometry : shapely geometry
         Geometry (unioned) that defines the boundary for analysis
 
     Returns
@@ -89,14 +89,14 @@ def extract_slr_projections_by_geometry(geometry):
     # intersect with 1-degree pixels; there should always be data available if
     # there are SLR depth data
     df = gp.read_feather(proj_filename)
-    tree = pg.STRtree(df.geometry.values.data)
+    tree = shapely.STRtree(df.geometry.values)
     df = df.iloc[tree.query(geometry, predicate="intersects")].copy()
 
     if len(df) == 0:
         return None
 
     # calculate area-weighted means
-    intersection_area = pg.area(pg.intersection(df.geometry.values.data, geometry))
+    intersection_area = shapely.area(shapely.intersection(df.geometry.values, geometry))
     area_factor = intersection_area / intersection_area.sum()
 
     projections = df[SLR_PROJ_COLUMNS].multiply(area_factor, axis=0).sum().round(2)

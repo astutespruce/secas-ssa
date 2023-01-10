@@ -2,7 +2,7 @@ from pathlib import Path
 
 import geopandas as gp
 import pandas as pd
-import pygeos as pg
+import shapely
 
 import rasterio
 
@@ -48,8 +48,8 @@ async def get_analysis_unit_results(df, datasets, progress_callback=None):
 
     states = gp.read_feather(states_filename, columns=["state", "id", "geometry"])
     states = states.loc[states.id.isin(SECAS_STATES)]
-    tree = pg.STRtree(df.geometry.values.data)
-    left, right = tree.query_bulk(states.geometry.values.data, predicate="intersects")
+    tree = shapely.STRtree(df.geometry.values)
+    left, right = tree.query(states.geometry.values, predicate="intersects")
     state_join = (
         pd.DataFrame(
             {"state": states.state.values.take(left)}, index=df.index.values.take(right)
@@ -61,17 +61,24 @@ async def get_analysis_unit_results(df, datasets, progress_callback=None):
         .rename("states")
     )
 
-    # convert to plain DataFrame with just pygeos geometries
+    # convert to plain DataFrame with just shapely geometries
     df = pd.DataFrame(df).join(state_join)
-    df["count"] = pg.get_num_geometries(df.geometry.values.data)
-    df["geometry"] = df.geometry.values.data
-    df["acres"] = pg.area(df.geometry.values) * M2_ACRES
+    df["count"] = shapely.get_num_geometries(df.geometry.values)
+    df["geometry"] = df.geometry.values
+    df["acres"] = shapely.area(df.geometry.values) * M2_ACRES
     df["__geo__"] = to_dict_all(df.geometry.values)
-    df["bounds"] = pg.bounds(df.geometry.values).tolist()
+    df["bounds"] = shapely.bounds(df.geometry.values).tolist()
 
     results = []
 
     # TODO: prefilter polygons to those that overlap boundary
+
+    sarp_huc12_stats = None
+    if (
+        "sarp_aquatic_barriers" in datasets
+        or "sarp_aquatic_network_alteration" in datasets
+    ):
+        sarp_huc12_stats = extract_sarp_huc12_stats(df)
 
     count = 0
     with rasterio.open(extent_filename) as extent_raster:
@@ -150,14 +157,6 @@ async def get_analysis_unit_results(df, datasets, progress_callback=None):
                 await progress_callback(100 * count / len(df))
 
             count += 1
-
-        sarp_huc12_stats = None
-
-        if (
-            "sarp_aquatic_barriers" in datasets
-            or "sarp_aquatic_network_alteration" in datasets
-        ):
-            sarp_huc12_stats = extract_sarp_huc12_stats(df)
 
         df = df[["states", "count", "acres"]].join(
             pd.DataFrame(results, index=df.index)

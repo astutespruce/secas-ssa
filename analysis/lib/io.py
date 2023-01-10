@@ -3,7 +3,7 @@ import json
 import geopandas as gp
 import numpy as np
 from pyarrow.dataset import dataset
-import pygeos as pg
+import shapely
 
 
 def read_feather_by_bounds(path, bounds, columns=None):
@@ -33,15 +33,15 @@ def read_feather_by_bounds(path, bounds, columns=None):
         table["maxx"].to_numpy(),
         table["maxy"].to_numpy(),
     )
-    boxes = pg.box(*np.vstack(src_bounds))
-    tree = pg.STRtree(boxes)
+    boxes = shapely.box(*np.vstack(src_bounds))
+    tree = shapely.STRtree(boxes)
 
-    query_boxes = pg.box(*bounds.T)
-    right = tree.query_bulk(query_boxes)[1]
+    query_boxes = shapely.box(*bounds.T)
+    right = tree.query(query_boxes)[1]
     ix = np.sort(np.unique(right))
 
     df = ds.take(ix, columns=columns).to_pandas()
-    df["geometry"] = pg.from_wkb(df.geometry.values)
+    df["geometry"] = shapely.from_wkb(df.geometry.values)
 
     meta = json.loads(ds.schema.metadata[b"geo"])
     crs = meta["columns"][meta["primary_column"]]["crs"]

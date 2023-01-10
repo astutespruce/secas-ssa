@@ -2,7 +2,7 @@ import logging
 from zipfile import ZipFile
 
 from pyogrio import list_layers, read_dataframe, read_info
-import pygeos as pg
+import shapely
 
 from analysis.constants import DATA_CRS
 from analysis.lib.geometry import make_valid, to_dict_all
@@ -151,10 +151,10 @@ async def inspect(ctx, zip_filename, uuid):
     await set_progress(ctx["redis"], ctx["job_id"], 10, "Making valid")
     # make valid and only keep polygon parts
     try:
-        df["geometry"] = make_valid(df.geometry.values.data)
+        df["geometry"] = make_valid(df.geometry.values)
         df = df.explode(index_parts=False)
         df = df.loc[
-            pg.get_type_id(df.geometry.values.data) == 3, keep_cols
+            shapely.get_type_id(df.geometry.values) == 3, keep_cols
         ].reset_index(drop=True)
     except Exception as ex:
         log.error(f"Failed to clean dataframe: {path}, layer={layer}")
@@ -171,7 +171,7 @@ async def inspect(ctx, zip_filename, uuid):
     ### prescreen datasets available
     await set_progress(ctx["redis"], ctx["job_id"], 50, "Checking available datasets")
     results["available_datasets"] = get_available_datasets(
-        to_dict_all(df.geometry.values.data), df.total_bounds
+        to_dict_all(df.geometry.values), df.total_bounds
     )
 
     await set_progress(ctx["redis"], ctx["job_id"], 100, "All done!")
