@@ -14,6 +14,8 @@ data/inputs/boundaries/*
 data/inputs/se_blueprint_indicators/*
 !data/inputs/se_blueprint_indicators/README.md
 data/inputs/nlcd/*
+data/inputs/sarp*
+!data/inputs/sarp/README.md
 data/inputs/threats/slr/*
 !data/inputs/threats/slr/README.md
 data/inputs/threats/urban/*
@@ -21,6 +23,8 @@ data/inputs/threats/urban/*
 
 /source_data/nlcd/*
 !/source_data/nlcd/README.md
+/source_data/sarp/*
+!/source_data/sarp/README.md
 /source_data/slr/*
 /source_data/urban/*
 

@@ -29,3 +29,10 @@ These datasets were prepared as part of the Southeast Blueprint Explorer data
 preparation process (`secas-blueprint/analysis/prep/prepare_nlcd.py`).
 
 These are 30 meter data aligned to the Base Blueprint extent used in this tool.
+
+## SARP Aquatic Barrier and Network Metrics
+
+These metrics are prepared as part of the Aquatic Barrier Prioritization Tool.
+See `source_data/sarp/README.md` for more information.
+
+Data are prepared using `analysis/prep/prep_sarp_huc12_stats.py`.

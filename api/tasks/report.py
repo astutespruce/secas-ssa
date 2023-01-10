@@ -4,7 +4,7 @@ import tempfile
 
 import geopandas as gp
 
-from analysis.lib.geometry import to_dict_all, dissolve
+from analysis.lib.geometry import dissolve
 from analysis.lib.stats.analysis_units import get_analysis_unit_results
 from api.errors import DataError
 from api.progress import set_progress

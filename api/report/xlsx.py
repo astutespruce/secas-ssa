@@ -6,6 +6,7 @@ import pandas as pd
 from api.report.metadata import add_data_details_sheet
 from api.report.slr import add_slr_inundation_sheet, add_slr_projection_sheet
 from api.report.nlcd import add_ncld_landcover_sheet, add_ncld_impervious_sheet
+from api.report.sarp import add_sarp_barriers_sheet, add_sarp_network_alteration_sheet
 from api.report.summary import add_summary_sheet
 from api.report.se_blueprint_indicators import add_indicator_sheet
 from api.report.style import CHAR_PER_WIDTH_UNIT
@@ -70,6 +71,12 @@ def create_xlsx(df, datasets):
             add_indicator_sheet(
                 xlsx, df, dataset, name_col_width, area_col_width, area_label
             )
+
+        if "sarp_aquatic_barriers" in datasets:
+            add_sarp_barriers_sheet(xlsx, df, name_col_width)
+
+        if "sarp_aquatic_network_alteration" in datasets:
+            add_sarp_network_alteration_sheet(xlsx, df, name_col_width)
 
         # Data details sheet
         add_data_details_sheet(xlsx, datasets)

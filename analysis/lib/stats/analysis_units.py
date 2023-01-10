@@ -9,6 +9,7 @@ import rasterio
 from analysis.constants import M2_ACRES, SECAS_STATES
 from analysis.lib.geometry import to_dict_all
 from analysis.lib.raster import boundless_raster_geometry_mask
+from analysis.lib.stats.sarp import extract_sarp_huc12_stats
 from analysis.lib.stats.slr import (
     extract_slr_depth_by_mask,
     extract_slr_projections_by_geometry,
@@ -150,6 +151,19 @@ async def get_analysis_unit_results(df, datasets, progress_callback=None):
 
             count += 1
 
-        return df[["states", "count", "acres"]].join(
+        sarp_huc12_stats = None
+
+        if (
+            "sarp_aquatic_barriers" in datasets
+            or "sarp_aquatic_network_alteration" in datasets
+        ):
+            sarp_huc12_stats = extract_sarp_huc12_stats(df)
+
+        df = df[["states", "count", "acres"]].join(
             pd.DataFrame(results, index=df.index)
         )
+
+        if sarp_huc12_stats is not None:
+            df = df.join(sarp_huc12_stats)
+
+        return df

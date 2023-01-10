@@ -10,7 +10,7 @@ from analysis.lib.stats.se_blueprint_indicators import src_dir as indicators_dir
 indicators = [d for d in DATASETS.values() if d["id"].startswith("se_")]
 
 # all datasets are pixel-aligned 30m
-datasets = {
+raster_datasets = {
     **{
         d["id"]: indicators_dir / d["filename"].replace(".tif", "_mask.tif")
         for d in indicators
@@ -23,7 +23,11 @@ datasets = {
 
 
 def get_available_datasets(shapes, bounds):
-    available_datasets = detect_data(datasets, shapes, bounds)
+    available_datasets = detect_data(raster_datasets, shapes, bounds)
     available_datasets["slr_proj"] = available_datasets["slr_depth"]
+
+    # HUC12 data are always available
+    available_datasets["sarp_aquatic_barriers"] = True
+    available_datasets["sarp_aquatic_network_alteration"] = True
 
     return available_datasets

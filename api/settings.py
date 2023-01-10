@@ -9,6 +9,7 @@ load_dotenv()
 TEMP_DIR = Path(os.getenv("TEMP_DIR", "/tmp/ssa-reports"))
 TEMP_DIR.mkdir(exist_ok=True, parents=True)
 
+DATA_DIR = Path(os.getenv("DATA_DIR", "data"))
 SHARED_DATA_DIR = Path(os.getenv("SHARED_DATA_DIR", "data"))
 
 # CORS is only set by API server when running in local development
