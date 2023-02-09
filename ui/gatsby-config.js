@@ -10,7 +10,7 @@ module.exports = {
     title: `Southeast Species Status Landscape Assessment Tool`,
     description: `Provides user interface to extract reports of standardized landscape indicators in the Southeast for Species Status Assessments`,
     author: `Southeast Conservation Adaptation Strategy`,
-    contactEmail: `bcward@astutespruce.com`,
+    contactEmail: `se_ssa_spatial_toolkit@fws.gov`,
     apiToken: process.env.GATSBY_API_TOKEN,
     apiHost: process.env.GATSBY_API_HOST,
     tileHost: process.env.GATSBY_TILE_HOST,

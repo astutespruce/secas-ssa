@@ -17,7 +17,7 @@ const ReportProblemModal = ({ children }) => (
       We want to hear from you!
       <br />
       <br />
-      <b>email</b>{' '}
+      <b>email</b>:{' '}
       <a
         href={`mailto:${contactEmail}?subject=${title} - report a problem`}
         target="_blank"
