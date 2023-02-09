@@ -80,12 +80,12 @@ SLR_NODATA_VALUES = [
         "key": "not_inundated",
         "label": "Not projected to be inundated by up to 10 feet",
     },
-    {"value": 12, "key": "not_available", "label": "Sea-level rise data unavailable"},
     {
-        "value": 13,
+        "value": 12,
         "key": "not_applicable",
         "label": "Sea-level rise unlikely to be a threat (inland counties)",
     },
+    {"value": 13, "key": "not_available", "label": "Sea-level rise data unavailable"},
 ]
 SLR_YEARS = [2020, 2030, 2040, 2050, 2060, 2070, 2080, 2090, 2100]
 SLR_PROJ_SCENARIOS = {

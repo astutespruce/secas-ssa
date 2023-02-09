@@ -60,8 +60,11 @@ def extract_slr_depth_by_mask(
     )
 
     nodata_acres = rasterized_acres - outside_se_acres - acres.sum()
+    if nodata_acres < 1e-6:
+        nodata_acres = 0
+
     # combine areas not modeled with SLR nodata areas
-    acres[12] += nodata_acres
+    acres[13] += nodata_acres
 
     # accumulate values for depths 0-10ft
     acres[:11] = np.cumsum(acres[:11])
