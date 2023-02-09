@@ -18,7 +18,10 @@ def create_xlsx(df, datasets):
     outside_se = df.outside_se.sum() > 1e-2
 
     name_col_width = max(
-        min(pd.Series(df.index).apply(len).max() * CHAR_PER_WIDTH_UNIT, 28), 14
+        min(
+            pd.Series(df.index).astype("str").apply(len).max() * CHAR_PER_WIDTH_UNIT, 28
+        ),
+        14,
     )
     area_col_width = max(
         df.overlap.apply(lambda x: len("{x:,.2f}")).max() * CHAR_PER_WIDTH_UNIT, 10
