@@ -21,11 +21,11 @@ aois = [
     #     "path": "Balduina_pop_resiliency_final",
     #     "field": "Population",
     # },
-    {
-        "name": "Rabbitsfoot",
-        "path": "Rabbitsfott_resilience_final_SECAS_only",
-        "field": "HUC10",
-    },
+    # {
+    #     "name": "Rabbitsfoot",
+    #     "path": "Rabbitsfott_resilience_final_SECAS_only",
+    #     "field": "HUC10",
+    # },
     # {
     #     "name": "Test single area",
     #     "path": "SingleTest",
@@ -38,6 +38,12 @@ aois = [
     #     "field": None,
     #     "analysis_unit_label": "Test population",
     # }
+    {
+        "name": "big_cypress",
+        "path": "big_cypress",
+        "field": None,
+        "analysis_unit_label": "Test population",
+    }
 ]
 
 
@@ -55,10 +61,6 @@ for aoi in aois:
 
     columns = [field] if analysis_unit_label is None else []
     df = read_dataframe(f"examples/{path}.shp", columns=columns).to_crs(DATA_CRS)
-
-    # FIXME:
-    # df = df.head(2)
-    # df = df.tail(15)
 
     if analysis_unit_label is not None:
         df[field] = analysis_unit_label

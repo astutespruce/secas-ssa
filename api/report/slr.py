@@ -71,8 +71,8 @@ def add_slr_inundation_sheet(xlsx, df, name_col_width, area_col_width, area_labe
         slr,
         columns=first_cols + depth_cols + nodata_cols,
     )
-    # reorder to put NODATA cols to the left
-    slr = slr[first_cols + nodata_cols[1:] + depth_cols + nodata_cols[:1]]
+    # reorder to put NODATA col to the left
+    slr = slr[first_cols + [nodata_cols[2]] + depth_cols + nodata_cols[:2]]
 
     remove_cols = []
     for col in nodata_cols:
