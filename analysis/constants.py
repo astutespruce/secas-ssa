@@ -63,6 +63,26 @@ NLCD_CODES = {
 
 NLCD_INDEXES = {i: e for i, e in enumerate(NLCD_CODES.values())}
 
+INUNDATION_FREQUENCY = [
+    {"label": "Very low"},  # <= 5
+    {"label": "Low"},  # 6-10
+    {"label": "Moderate"},  # 11-50
+    {"label": "High"},  # 51-90
+    {"label": "Highest"},  # >90
+]
+
+# combine inundation frequency and NLCD; each NLCD code gets a range of 5 values
+NLCD_INUNDATION_FREQUENCY = {
+    ((nlcd * 5) + inundation_frequency): {
+        "label": f"{NLCD_INDEXES[nlcd]['label']} - {INUNDATION_FREQUENCY[inundation_frequency]['label'].lower()} inundation frequency",
+        "inundation_frequency": inundation_frequency,
+        "nlcd": nlcd,
+    }
+    for nlcd, inundation_frequency in product(
+        NLCD_INDEXES.keys(), range(len(INUNDATION_FREQUENCY))
+    )
+}
+
 
 URBAN_YEARS = [2020, 2030, 2040, 2050, 2060, 2070, 2080, 2090, 2100]
 # values are number of runs out of 50 that are predicted to urbanize

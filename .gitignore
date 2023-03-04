@@ -20,13 +20,17 @@ data/inputs/threats/slr/*
 !data/inputs/threats/slr/README.md
 data/inputs/threats/urban/*
 !data/inputs/threats/urban/README.md
+data/inputs/inundation_frequency
 
+/source_data/inundation_frequency/*
+!/source_data/inundation_frequency/README.md
 /source_data/nlcd/*
 !/source_data/nlcd/README.md
 /source_data/sarp/*
 !/source_data/sarp/README.md
 /source_data/slr/*
 /source_data/urban/*
+
 
 /ui/node_modules
 /ui/.cache

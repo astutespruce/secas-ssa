@@ -2,7 +2,7 @@ from io import BytesIO
 
 import pandas as pd
 
-
+from api.report.inundation_frequency import add_nlcd_inundation_frequency_sheet
 from api.report.metadata import add_data_details_sheet
 from api.report.slr import add_slr_inundation_sheet, add_slr_projection_sheet
 from api.report.nlcd import add_ncld_landcover_sheet, add_ncld_impervious_sheet
@@ -80,6 +80,11 @@ def create_xlsx(df, datasets):
 
         if "sarp_aquatic_network_alteration" in datasets:
             add_sarp_network_alteration_sheet(xlsx, df, name_col_width)
+
+        if "nlcd_inundation_freq" in datasets:
+            add_nlcd_inundation_frequency_sheet(
+                xlsx, df, name_col_width, area_col_width, area_label
+            )
 
         # Data details sheet
         add_data_details_sheet(xlsx, datasets)

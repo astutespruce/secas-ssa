@@ -26,24 +26,25 @@ aois = [
     #     "path": "Rabbitsfott_resilience_final_SECAS_only",
     #     "field": "HUC10",
     # },
-    # {
-    #     "name": "Test single area",
-    #     "path": "SingleTest",
-    #     "field": None,
-    #     "analysis_unit_label": "Pop A",
-    # },
+    {
+        "name": "Test single area",
+        "path": "SingleTest",
+        "field": None,
+        # "analysis_unit_label": "Pop A",
+        "analysis_unit_label": 1,
+    },
     # {
     #     "name": "fl_slr_test",
     #     "path": "fl_slr_test",
     #     "field": None,
     #     "analysis_unit_label": "Test population",
     # }
-    {
-        "name": "big_cypress",
-        "path": "big_cypress",
-        "field": None,
-        "analysis_unit_label": "Test population",
-    }
+    # {
+    #     "name": "big_cypress",
+    #     "path": "big_cypress",
+    #     "field": None,
+    #     "analysis_unit_label": "Test population",
+    # }
 ]
 
 
@@ -71,6 +72,7 @@ for aoi in aois:
     df = df.loc[shapely.get_type_id(df.geometry.values) == 3]
 
     # find available datasets
+    # FIXME:
     datasets = [
         id
         for id, present in get_available_datasets(
@@ -79,6 +81,7 @@ for aoi in aois:
         ).items()
         if present
     ]
+    # datasets = ["nlcd_inundation_freq"]
 
     # dissolve by population
     df = dissolve(df, by=field).set_index(field)

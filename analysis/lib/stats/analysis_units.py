@@ -9,6 +9,9 @@ import rasterio
 from analysis.constants import M2_ACRES, SECAS_STATES
 from analysis.lib.geometry import to_dict_all
 from analysis.lib.raster import boundless_raster_geometry_mask
+from analysis.lib.stats.inundation_frequency import (
+    extract_nlcd_inundation_frequency_by_mask,
+)
 from analysis.lib.stats.sarp import extract_sarp_huc12_stats
 from analysis.lib.stats.slr import (
     extract_slr_depth_by_mask,
@@ -61,10 +64,8 @@ async def get_analysis_unit_results(df, datasets, progress_callback=None):
         .rename("states")
     )
 
-    # convert to plain DataFrame with just shapely geometries
-    df = pd.DataFrame(df).join(state_join)
+    df = df.join(state_join)
     df["count"] = shapely.get_num_geometries(df.geometry.values)
-    df["geometry"] = df.geometry.values
     df["acres"] = shapely.area(df.geometry.values) * M2_ACRES
     df["__geo__"] = to_dict_all(df.geometry.values)
     df["bounds"] = shapely.bounds(df.geometry.values).tolist()
@@ -149,6 +150,14 @@ async def get_analysis_unit_results(df, datasets, progress_callback=None):
             for dataset in se_blueprint_indicators:
                 result[dataset] = extract_indicator_by_mask(
                     dataset, shape_mask, window, cellsize
+                )
+
+            # Extract inundation frequency
+            if "nlcd_inundation_freq" in datasets:
+                result[
+                    "nlcd_inundation_freq"
+                ] = extract_nlcd_inundation_frequency_by_mask(
+                    shape_mask, window, cellsize
                 )
 
             results.append(result)

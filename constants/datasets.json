@@ -34,7 +34,8 @@
         "se_blueprint_networkcomplexity",
         "se_blueprint_permeablesurface",
         "sarp_aquatic_barriers",
-        "sarp_aquatic_network_alteration"
+        "sarp_aquatic_network_alteration",
+        "nlcd_inundation_freq"
       ]
     },
     {
@@ -488,6 +489,18 @@
       "description": "This dataset shows the amount of the aquatic network (rivers / streams) that is considered anthropogenically altered by one or more data sources.  The aquatic network is derived from the USGS National Hydrography Dataset (NHD) High Resolution dataset for use in the Aquatic Barrier Prioritization Tool (https://connectivity.sarpdata.com/) created by the Southeast Aquatic Resources Partnership.  Flowlines are considered altered if they are coded by NHD as canal / ditch or pipeline type, overlap with altered riverine areas in the National Wetlands inventory, or fall within a reservoir identified by NHD or state water body datasets.  Not all areas of aboveground flow are represented within this dataset, so it should be taken as an approximate measure of aquatic network alteration.  It is not intended to represent all anthropogenic alterations to aquatic ecosystems.",
       "valueDescription": "Values show the percent of the total length of the aquatic network that is considered altered.  Network lengths are combined across all HUC12 subwatersheds that overlap each analysis unit.",
       "methods": "The aquatic network is derived from the USGS National Hydrography Dataset (NHD) High Resolution flowlines dataset, excluding flowlines (rivers / streams) that represent coastlines, underground connections, long pipelines, or lack catchment drainage information.  Flowlines are considered altered if they are coded by NHD as canal / ditch or pipeline type, overlap with altered riverine areas in the National Wetlands inventory, or fall within a reservoir identified by NHD or state water body datasets."
+    },
+    {
+      "id": "nlcd_inundation_freq",
+      "name": "Inundation frequency by land cover class",
+      "sheet_name": "Inundation frequency by land cover class",
+      "source": "Yvonne Allen, USFWS",
+      "date": "2022",
+      "citation": "Allen, Y. 2016. Landscape Scale Assessment of Floodplain Inundation Frequency Using Landsat Imagery. River Research and Applications 32:1609-1620.",
+      "url": "",
+      "description": "This dataset characterizes the landscape-scale relative frequency that an area is inundated by water, which can help provide information about its ecological processes as well as hydrologic alteration.  Relative frequency is the number of times that a given pixel was detected as water out of all of the LANDSAT scenes collected for that area as part of this study.  Relative inundation frequency was combined with NLCD 2019 to depict inundation frequency by land cover type.",
+      "valueDescription": "Values show the amount of each land cover class that is in each inundation frequency class within each analysis area.  Only those land cover classes that are present within a given analysis area are shown.",
+      "methods": "Relative inundation frequency was binned into 5 classes and combined with NLCD 2019 land cover classes in order to describe inundation frequency by land cover class.  Data were reprojected from WGS 1984 to match the standard grid used in this tool and clipped to Southeastern states."
     }
   ]
 }

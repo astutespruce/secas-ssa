@@ -38,7 +38,7 @@ const Download = ({ uuid, selectedAttribute, selectedDatasets, onCancel }) => {
             </Flex>
           </Button>
           <Box>
-            <Link href={reportURL} target="_blank">
+            <Link to={reportURL}>
               <Button variant="primary">
                 <Flex>
                   <DownloadIcon

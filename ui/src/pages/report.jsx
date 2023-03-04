@@ -15,7 +15,7 @@ const ReportPage = ({
 }) => (
   <Layout>
     <HeaderImage
-      title="Create a Species Landscape Status Report"
+      title="Create a Species Status Landscape Assessment Report"
       image={headerImage}
       credits={{
         author: 'U.S. Fish and Wildlife Service Southeast Region',
@@ -54,4 +54,6 @@ ReportPage.propTypes = {
 
 export default ReportPage
 
-export const Head = () => <SEO title="Species Landscape Status Report" />
+export const Head = () => (
+  <SEO title="Species Status Landscape Assessment Report" />
+)
