@@ -57,9 +57,12 @@ const ReportWorkflow = () => {
     }
   })
 
-  // TODO: depending on step, may need to reset state
   const handleStepClick = useCallback((newIndex) => {
-    setState((prevState) => ({ ...prevState, stepIndex: newIndex }))
+    if (newIndex === 0) {
+      handleStartOver()
+    } else {
+      setState((prevState) => ({ ...prevState, stepIndex: newIndex }))
+    }
   }, [])
 
   const handleUploadFileSuccess = useCallback(
@@ -137,6 +140,8 @@ const ReportWorkflow = () => {
   }, [])
 
   let stepContent = null
+
+  console.log('selectedAttribute', selectedAttribute)
 
   switch (steps[stepIndex].id) {
     case 'upload': {
