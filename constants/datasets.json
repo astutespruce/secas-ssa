@@ -497,8 +497,8 @@
       "source": "Yvonne Allen, USFWS",
       "date": "2022",
       "citation": "Allen, Y. 2016. Landscape Scale Assessment of Floodplain Inundation Frequency Using Landsat Imagery. River Research and Applications 32:1609-1620.",
-      "url": "",
-      "description": "This dataset characterizes the landscape-scale relative frequency that an area is inundated by water, which can help provide information about its ecological processes as well as hydrologic alteration.  Relative frequency is the number of times that a given pixel was detected as water out of all of the LANDSAT scenes collected for that area as part of this study.  Relative inundation frequency was combined with NLCD 2019 to depict inundation frequency by land cover type.",
+      "url": "https://www.sciencebase.gov/catalog/item/64073c5fd34e76f5f75e379e",
+      "description": "This dataset characterizes the landscape-scale relative inundation frequency. These data can provide information about ecological processes as well as hydrologic alteration in the floodplain. Landsat imagery acquired from 1984-2002 were used to generate multiple observations of inundation extent under varying hydrologic conditions. These data were composited into a landscape mosaic to depict relative inundation frequency over the entire Southeast US. Relative inundation frequency was combined with NLCD 2019 to depict inundation frequency by land cover type.",
       "valueDescription": "Values show the amount of each land cover class that is in each inundation frequency class within each analysis area.  Only those land cover classes that are present within a given analysis area are shown.",
       "methods": "Relative inundation frequency was binned into 5 classes and combined with NLCD 2019 land cover classes in order to describe inundation frequency by land cover class.  Data were reprojected from WGS 1984 to match the standard grid used in this tool and clipped to Southeastern states."
     }
