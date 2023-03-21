@@ -472,7 +472,7 @@
       "sheet_name": "Aquatic barriers",
       "source": "Southeast Aquatic Resources Partnership",
       "date": "2023",
-      "citation": "Southeast Aquatic Resources Partnership. 2023.  Aquatic Barrier Prioritization Tool (version 2.6.0).",
+      "citation": "Southeast Aquatic Resources Partnership. 2023.  Aquatic Barrier Prioritization Tool (version 2.7.0; March 2023).",
       "url": "https://connectivity.sarpdata.com/",
       "description": "This dataset includes the count of dams and potential road-related barriers within the HUC12 subwatersheds that overlap the analysis units.  Dams are derived from the Southeast Aquatic Resource Partnership's barrier inventory, which is compiled from multiple sources.  Potential road-related barriers are derived from the USGS Database of Stream Crossings in the U.S.  NOTE: potential road-related barriers include features such as bridges, which may not be barriers to aquatic organism dispersal, as well as culverts with high outlet drops, which are complete barriers to the passage of aquatic organisms.  The degree of impact of these barriers to aquatic organisms has only been surveyed for a very small number of these potential road-related barriers; please see the Aquatic Barrier Prioritization Tool for more details.",
       "valueDescription": "Values show the total number of dams and potential road-related barriers across all HUC12 subwatersheds that overlap each analysis unit.",
