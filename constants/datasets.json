@@ -458,7 +458,7 @@
     {
       "id": "nlcd_inundation_freq",
       "name": "Inundation frequency by land cover class",
-      "sheet_name": "Inundation frequency by land cover class",
+      "sheet_name": "Inundation frequency",
       "source": "Yvonne Allen, USFWS",
       "date": "2022",
       "citation": "Allen, Y. 2016. Landscape Scale Assessment of Floodplain Inundation Frequency Using Landsat Imagery. River Research and Applications 32:1609-1620.",
