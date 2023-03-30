@@ -30,6 +30,8 @@ async def record_progress_callback(
 
 
 async def create_report(ctx, uuid, datasets, field=None, name=None):
+    datasets = datasets.split(",") if datasets else []
+
     await set_progress(ctx["redis"], ctx["job_id"], 0, "Reading dataset")
 
     filename = TEMP_DIR / f"{uuid}.feather"
