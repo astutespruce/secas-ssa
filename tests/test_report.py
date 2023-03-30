@@ -26,13 +26,14 @@ aois = [
     #     "path": "Rabbitsfott_resilience_final_SECAS_only",
     #     "field": "HUC10",
     # },
-    {
-        "name": "Test single area",
-        "path": "SingleTest",
-        "field": None,
-        # "analysis_unit_label": "Pop A",
-        "analysis_unit_label": 1,
-    },
+    # {
+    #     "name": "Test single area",
+    #     "path": "SingleTest",
+    #     "field": None,
+    #     # "analysis_unit_label": "Pop A",
+    #     "analysis_unit_label": 1,
+    # },
+    {"name": "Lousiana COAs", "path": "Combined_COAsv1_dis", "field": "COAName"}
     # {
     #     "name": "fl_slr_test",
     #     "path": "fl_slr_test",

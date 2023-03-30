@@ -32,7 +32,6 @@
       "datasets": [
         "se_blueprint_naturallandcoverinfloodplains",
         "se_blueprint_networkcomplexity",
-        "se_blueprint_permeablesurface",
         "sarp_aquatic_barriers",
         "sarp_aquatic_network_alteration",
         "nlcd_inundation_freq"
@@ -309,40 +308,6 @@
       "description": "This indicator depicts the number of different stream size classes in a river network not separated by dams or waterfalls. River networks with a variety of connected stream classes help retain aquatic biodiversity in a changing climate by allowing species to access climate refugia and move between habitats. This indicator originates from the Southeast Aquatic Resources Partnership and applies to the Environmental Protection Agency's estimated floodplain, which spatially defines areas estimated to be inundated by a 100-year flood, also known as the 1% annual chance flood.",
       "methods": "Data were used without additional modification.",
       "url": "https://secas-fws.hub.arcgis.com/maps/2b4941e659c04a7ab130b5e583e5f72d/about"
-    },
-    {
-      "id": "se_blueprint_permeablesurface",
-      "filename": "PermeableSurface.tif",
-      "name": "Permeable surface",
-      "sheet_name": "Permeable surface",
-      "date": "2022",
-      "source": "Southeast Conservation Blueprint 2022",
-      "citation": "Southeast Conservation Adaptation Strategy (SECAS). 2022. Southeast Conservation Blueprint 2022. http://secassoutheast.org/blueprint",
-      "values": [
-        {
-          "value": 1,
-          "label": "≤70% of catchment permeable",
-          "color": "#CCCCFF"
-        },
-        {
-          "value": 2,
-          "label": "70-90% of catchment permeable",
-          "color": "#9783F7"
-        },
-        {
-          "value": 3,
-          "label": "90-95% of catchment permeable",
-          "color": "#6145ED"
-        },
-        {
-          "value": 4,
-          "label": ">95% of catchment permeable",
-          "color": "#0000E0"
-        }
-      ],
-      "description": "This indicator measures the average percent of non-impervious cover within each catchment. High levels of impervious surface degrade water quality and alter freshwater flow, impacting both aquatic species communities and ecosystem services for people, like the availability of clean drinking water. This indicator originates from the 2019 National Land Cover Database percent developed impervious layer.",
-      "methods": "Data were used without additional modification.",
-      "url": "https://secas-fws.hub.arcgis.com/maps/aa97cd14024b41eda478de9e59e6a79c/about"
     },
     {
       "id": "se_blueprint_firefrequency",

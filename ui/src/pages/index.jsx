@@ -214,7 +214,6 @@ const IndexPage = ({
                   <Box as="ul">
                     <li>aquatic network complexity</li>
                     <li>natural landcover in floodplains</li>
-                    <li>permeable surface</li>
                   </Box>
                 </Box>
                 <Box
@@ -256,12 +255,21 @@ const IndexPage = ({
                 National Oceanic & Atmospheric Administration
               </OutboundLink>
             </li>
+            <li>Floodplain inundation frequency by land cover class.</li>
             <li>
               Projected future sea-level rise depths by decade 2020 to 2100
               based on the National Oceanic & Atmospheric Administration&apos;s{' '}
               <OutboundLink to="https://oceanservice.noaa.gov/hazards/sealevelrise/sealevelrise-tech-report.html">
                 2022 Sea Level Rise Technical Report
               </OutboundLink>
+            </li>
+            <li>
+              Dams, potential road-related barriers, and aquatic network
+              alteration based on the Southeast Aquatic Resource Partnership's{' '}
+              <OutboundLink to="https://connectivity.sarpdata.com/">
+                Aquatic Barrier Prioritization Tool
+              </OutboundLink>
+              .
             </li>
           </Box>
 
