@@ -9,7 +9,7 @@ from fastapi import (
     HTTPException,
     Depends,
 )
-from fastapi.responses import Response, FileResponse
+from fastapi.responses import FileResponse
 from fastapi.security.api_key import APIKey
 
 from api.settings import REDIS, REDIS_QUEUE, TEMP_DIR
@@ -29,7 +29,6 @@ async def create_report_endpoint(
     name: Optional[str] = Form(None),
     token: APIKey = Depends(validate_token),
 ):
-
     filename = TEMP_DIR / f"{uuid}.feather"
 
     # verify that file exists in temp directory, otherwise return 404;

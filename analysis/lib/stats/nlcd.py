@@ -1,5 +1,3 @@
-from pathlib import Path
-
 import numpy as np
 
 from analysis.constants import NLCD_YEARS, NLCD_INDEXES

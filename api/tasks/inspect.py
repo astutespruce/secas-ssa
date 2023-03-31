@@ -33,7 +33,8 @@ def get_dataset(zip_filename):
     Validates rules:
     - There must be only one data source (.shp or .gdb) in the zip file.
     - There must be only one data layer in that data source.
-    - The data source must contain the required files (.prj for shapefile; .dbf is not used so not required)
+    - The data source must contain the required files (.prj for shapefile; .
+      dbf is not used so not required)
 
     Parameters
     ----------
@@ -72,7 +73,7 @@ def get_dataset(zip_filename):
     if filename.endswith(".shp"):
         missing = []
         for ext in (".prj", ".shx"):
-            if not (filename.replace(".shp", ext) in files):
+            if filename.replace(".shp", ext) not in files:
                 missing.append(ext)
 
         if missing:
@@ -120,7 +121,7 @@ async def inspect(ctx, zip_filename, uuid):
     ]
 
     try:
-        df = read_dataframe(path, layer=layer, columns=[columns])
+        df = read_dataframe(path, layer=layer, columns=columns)
     except Exception as ex:
         log.error(f"Failed to read dataframe: {path}, layer={layer}")
         log.error(ex)
@@ -143,7 +144,7 @@ async def inspect(ctx, zip_filename, uuid):
     )
     try:
         df = df.to_crs(DATA_CRS)
-    except Exception as ex:
+    except Exception:
         log.error(f"Failed to reproject dataframe: {path}, layer={layer}")
         raise DataError("Could not reproject dataset to standard projection")
 

@@ -1,4 +1,3 @@
-import numpy as np
 import pandas as pd
 
 from analysis.constants import DATASETS, SLR_DEPTHS, SLR_YEARS, SLR_NODATA_VALUES

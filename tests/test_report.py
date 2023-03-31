@@ -6,7 +6,7 @@ from time import time
 from pyogrio.geopandas import read_dataframe
 import shapely
 
-from analysis.constants import DATA_CRS, DATASETS
+from analysis.constants import DATA_CRS
 from analysis.lib.geometry import dissolve, make_valid, to_dict_all
 from analysis.lib.stats.analysis_units import get_analysis_unit_results
 from analysis.lib.stats.prescreen import get_available_datasets

@@ -2,12 +2,10 @@ import pandas as pd
 
 from analysis.constants import (
     DATASETS,
-    NLCD_INUNDATION_FREQUENCY,
-    NLCD_INDEXES,
     INUNDATION_FREQUENCY,
 )
 from api.report.metadata import add_data_note
-from api.report.style import CHAR_PER_WIDTH_UNIT, set_cell_styles, set_column_widths
+from api.report.style import set_cell_styles, set_column_widths
 
 
 def add_nlcd_inundation_frequency_sheet(

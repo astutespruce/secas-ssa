@@ -1,5 +1,3 @@
-from pathlib import Path
-
 from analysis.constants import (
     URBAN_YEARS,
     URBAN_PROBABILITIES,
@@ -49,10 +47,12 @@ def extract_urban_by_mask(shape_mask, window, cellsize):
             high.append(already_urban)
             low.append(already_urban)
 
-        # high urbanization is sum of pixel counts * probability for all urbanized pixels
+        # high urbanization is sum of pixel counts * probability for all
+        # urbanized pixels
         high.append(((counts * URBAN_PROBABILITIES).sum() * cellsize))
 
-        # low urbanization is sum of pixel counts * probability for probabilities >= 50% (25 of 50 runs)
+        # low urbanization is sum of pixel counts * probability for
+        # probabilities >= 50% (25 of 50 runs)
         low.append(
             (
                 (counts[URBAN_THRESHOLD:] * URBAN_PROBABILITIES[URBAN_THRESHOLD:]).sum()
