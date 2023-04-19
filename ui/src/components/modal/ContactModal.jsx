@@ -11,8 +11,8 @@ const { contactEmail, title } = siteMetadata
 
 const ContactModal = ({ children }) => (
   <BoundModal title="Contact Us" anchorNode={children}>
-    Do you have a question about how to use this tool or interpret results?
-    SECAS staff are here to support you! We really mean it. It is what we do!
+    Do you have a question about how to use this tool or interpret results? SSA
+    Geospatial Toolkit staff are here to help!
     <br />
     <br />
     Please reach out to user support:

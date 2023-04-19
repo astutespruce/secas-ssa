@@ -233,7 +233,7 @@ const IndexPage = ({
                   </Text>
                   <Box as="ul">
                     <li>coastal shoreline condition</li>
-                    <li>coastal resilient sites</li>
+                    <li>resilient coastal sites</li>
                     <li>stable coastal wetlands</li>
                   </Box>
                 </Box>
