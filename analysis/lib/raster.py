@@ -4,21 +4,30 @@ from affine import Affine
 import numpy as np
 import rasterio
 from rasterio.enums import Resampling
-from rasterio.errors import WindowError
 from rasterio.mask import geometry_mask
 from rasterio.vrt import WarpedVRT
 from rasterio.windows import Window
 
 from analysis.constants import OVERVIEW_FACTORS, DATA_CRS
+from api.settings import SHARED_DATA_DIR
+
+data_dir = SHARED_DATA_DIR / "inputs"
+extent_filename = data_dir / "boundaries/blueprint_extent.tif"
+extent_mask_filename = data_dir / "boundaries/blueprint_extent_mask.tif"
 
 
-def get_window(dataset, bounds):
+def get_window(dataset, bounds, boundless=True):
     """Calculate the window into dataset that contains bounds, for boundless reading.
+
+    If boundless is False and the window falls outside the bounds of the dataset,
+    one or both of the dimensions may be 0.
 
     Parameters
     ----------
     dataset : open rasterio dataset
     bounds : list-like of [xmin, ymin, xmax, ymax]
+    boundless : bool, optional (default: True)
+        if True, returned window may extend beyond the dataset
 
     Returns
     -------
@@ -26,11 +35,72 @@ def get_window(dataset, bounds):
     """
     window = dataset.window(*bounds)
     window_floored = window.round_offsets(op="floor", pixel_precision=3)
-    w = math.ceil(window.width + window.col_off - window_floored.col_off)
-    h = math.ceil(window.height + window.row_off - window_floored.row_off)
-    window = Window(window_floored.col_off, window_floored.row_off, w, h)
+    col_off = window_floored.col_off
+    row_off = window_floored.row_off
+    width = math.ceil(window.width + window.col_off - window_floored.col_off)
+    height = math.ceil(window.height + window.row_off - window_floored.row_off)
 
-    return window
+    window = Window(col_off, row_off, width, height)
+    if boundless:
+        return window
+
+    return clip_window(window, dataset.width, dataset.height)
+
+
+def clip_window(window, max_width, max_height):
+    """
+    Convert a boundless window to a bounded window where the col_off and
+    row_off are >= 0 and height and width fit within max_width and height.
+
+    Parameters
+    ----------
+    window : rasterio.windows.Window
+    max_width : int
+    max_height : int
+
+    Returns
+    -------
+    rasterio.windows.Window
+    """
+    col_off = window.col_off
+    row_off = window.row_off
+    width = window.width
+    height = window.height
+    if col_off < 0:
+        width = max(width + col_off, 0)
+        col_off = 0
+    if row_off < 0:
+        height = max(height + row_off, 0)
+        row_off = 0
+    if col_off + width > max_width:
+        width = max(max_width - col_off, 0)
+    if row_off + height > max_height:
+        height = max(max_height - row_off, 0)
+
+    return Window(col_off, row_off, width, height)
+
+
+def shift_window(window, window_transform, transform):
+    """Shift window based on one transform to a window appropriate for a different
+    transform.
+
+    Parameters
+    ----------
+    window : rasterio.windows.Window
+    window_transform : affine.Affine
+        transform upon which window is based
+    transform : affine.Affine
+        the transform to which to shift the window
+
+    Returns
+    -------
+    rasterio.windows.Window
+    """
+    col_off = int(round((window_transform.c - transform.c) / transform.a))
+    row_off = int(round((window_transform.f - transform.f) / transform.e))
+    return Window(
+        col_off=col_off, row_off=row_off, width=window.width, height=window.height
+    )
 
 
 def boundless_raster_geometry_mask(dataset, shapes, bounds, all_touched=False):
@@ -56,7 +126,7 @@ def boundless_raster_geometry_mask(dataset, shapes, bounds, all_touched=False):
     return mask, transform, window
 
 
-def extract_count_in_geometry(filename, geometry_mask, window, bins, boundless=False):
+def extract_count_in_geometry(filename, mask_config, bins, boundless=False):
     """Apply the geometry mask to values read from filename, and generate a list
     of pixel counts for each bin in bins.
 
@@ -64,10 +134,7 @@ def extract_count_in_geometry(filename, geometry_mask, window, bins, boundless=F
     ----------
     filename : str
         input GeoTIFF filename
-    geometry_mask : 2D boolean ndarray
-        True for all pixels outside geometry, False inside.
-    window : rasterio.windows.Window
-        Window that defines the footprint of the geometry_mask within the raster.
+    mask_config : AOIMaskConfig
     bins : list-like
         List-like of values ranging from 0 to max value (not sparse!).
         Counts will be generated that correspond to this list of bins.
@@ -82,10 +149,11 @@ def extract_count_in_geometry(filename, geometry_mask, window, bins, boundless=F
     """
 
     with rasterio.open(filename) as src:
+        window = mask_config.get_mask_window(src.transform)
         data = src.read(1, window=window, boundless=boundless)
         nodata = src.nodatavals[0]
 
-    mask = (data == nodata) | geometry_mask
+    mask = (data == nodata) | mask_config.shape_mask
 
     # slice out flattened array of values that are not masked
     values = data[~mask]
@@ -152,22 +220,21 @@ def detect_data(datasets, shapes, bounds):
         {<id>: True if there are data pixels present in shapes, otherwise False}
     """
 
-    with rasterio.open(list(datasets.values())[0]) as src:
+    with rasterio.open(extent_mask_filename) as src:
         window = get_window(src, bounds)
-        raster_window = Window(0, 0, src.width, src.height)
 
-        try:
-            # This will raise a WindowError if windows do not overlap
-            window = window.intersection(raster_window)
-        except WindowError:
-            # no overlap => no data for any of datasets
+        # fail fast if no overlap with data extent
+        clipped_window = clip_window(window, max_width=src.width, max_height=src.height)
+        if clipped_window.width == 0 or clipped_window.height==0:
             return False
+
+        transform = src.window_transform(window)
 
         # create mask
         # note: this intentionally uses all_touched=True
         mask = geometry_mask(
             shapes,
-            transform=src.window_transform(window),
+            transform=transform,
             out_shape=(window.height, window.width),
             all_touched=True,
         )
@@ -175,9 +242,14 @@ def detect_data(datasets, shapes, bounds):
     available_datasets = {}
     for id, filename in datasets.items():
         with rasterio.open(filename) as src:
-            data = src.read(1, window=window)
+            read_window = shift_window(window, transform, src.transform)
+            clipped_window = clip_window(read_window, max_width=src.width, max_height=src.height)
+            if clipped_window.width == 0 or clipped_window.height==0:
+                continue
+
+            data = src.read(1, window=read_window, boundless=True)
             available_datasets[id] = np.any(
-                data[~(mask | (data == int(src.nodata)))]
+                data[~(mask | (data == np.uint8(src.nodata)))]
             ).item()
 
     return available_datasets

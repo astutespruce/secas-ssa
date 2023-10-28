@@ -10,6 +10,9 @@
 .env
 .env.*
 
+/data/Archive*
+/source_data/Archive*
+
 data/inputs/boundaries/*
 data/inputs/se_blueprint_indicators/*
 !data/inputs/se_blueprint_indicators/README.md

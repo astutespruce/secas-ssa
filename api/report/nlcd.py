@@ -49,7 +49,8 @@ def add_ncld_impervious_sheet(xlsx, df, name_col_width, area_col_width, area_lab
 
     nlcd = df.nlcd_impervious.apply(pd.Series)
     nlcd.columns = [f"{year} (acres)" for year in NLCD_YEARS]
-    nlcd = df[["overlap"]].join(nlcd)
+
+    nlcd = df[["overlap"]].rename(columns={"overlap": area_label}).join(nlcd)
 
     nlcd.reset_index().to_excel(xlsx, sheet_name=sheet_name, index=False)
     ws = xlsx.sheets[sheet_name]

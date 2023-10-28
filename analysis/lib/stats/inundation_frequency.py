@@ -12,7 +12,7 @@ inundation_frequency_filename = (
 )
 
 
-def extract_nlcd_inundation_frequency_by_mask(shape_mask, window, cellsize):
+def extract_nlcd_inundation_frequency_by_mask(mask_config):
     """Calculate the area of overlap between shapes and inundation frequency
     by NLCD 2019 land cover class.
 
@@ -34,9 +34,9 @@ def extract_nlcd_inundation_frequency_by_mask(shape_mask, window, cellsize):
 
     acres = (
         extract_count_in_geometry(
-            inundation_frequency_filename, shape_mask, window, bins=BINS, boundless=True
+            inundation_frequency_filename, mask_config, bins=BINS, boundless=True
         )
-        * cellsize
+        * mask_config.cellsize
     ).round(2)
 
     results = defaultdict(list)

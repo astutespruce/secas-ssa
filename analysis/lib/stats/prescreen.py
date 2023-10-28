@@ -10,7 +10,7 @@ from analysis.lib.stats.inundation_frequency import inundation_frequency_dir
 
 indicators = [d for d in DATASETS.values() if d["id"].startswith("se_")]
 
-# all datasets are pixel-aligned 30m
+# all datasets are pixel-aligned 30m, but may have different origin points
 raster_datasets = {
     **{
         d["id"]: indicators_dir / d["filename"].replace(".tif", "_mask.tif")

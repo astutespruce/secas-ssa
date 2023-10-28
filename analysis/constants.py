@@ -30,16 +30,16 @@ SECAS_STATES = [
     "MS",
     "NC",
     "OK",
-    # "PR",  # no meaningful data available
+    "PR",
     "SC",
     "TN",
     "TX",
     "VA",
-    # "USVI",  # no meaningful data available
+    "USVI",
     "WV",
 ]
 
-NLCD_YEARS = [2001, 2004, 2006, 2008, 2011, 2013, 2016, 2019]
+NLCD_YEARS = [2001, 2004, 2006, 2008, 2011, 2013, 2016, 2019, 2021]
 
 # Original codes
 NLCD_CODES = {
@@ -84,9 +84,9 @@ NLCD_INUNDATION_FREQUENCY = {
 }
 
 
-URBAN_YEARS = [2020, 2030, 2040, 2050, 2060, 2070, 2080, 2090, 2100]
+URBAN_YEARS = [2030, 2040, 2050, 2060, 2070, 2080, 2090, 2100]
 # values are number of runs out of 50 that are predicted to urbanize
-# 51 = urban as of 2019 (NLCD)
+# 51 = urban as of 2021 (NLCD)
 # NOTE: index 0 = not predicted to urbanize
 URBAN_PROBABILITIES = np.append(np.arange(0, 51) / 50.0, np.array([1.0]))
 URBAN_BINS = np.arange(0, len(URBAN_PROBABILITIES))

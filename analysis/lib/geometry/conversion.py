@@ -61,6 +61,4 @@ def to_dict(geometry):
 
     return {"type": geom_type, "coordinates": coords}
 
-
-# TODO: reimplement in Cython?
 to_dict_all = np.vectorize(to_dict)

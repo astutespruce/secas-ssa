@@ -33,7 +33,8 @@ aois = [
     #     # "analysis_unit_label": "Pop A",
     #     "analysis_unit_label": 1,
     # },
-    {"name": "Lousiana COAs", "path": "Combined_COAsv1_dis", "field": "COAName"}
+    # {"name": "Lousiana COAs", "path": "Combined_COAsv1_dis", "field": "COAName"}
+    {"name": "San Juan area, PR", "path": "SanJuan", "field": None, "analysis_unit_label": 1,},
     # {
     #     "name": "fl_slr_test",
     #     "path": "fl_slr_test",
@@ -73,18 +74,17 @@ for aoi in aois:
     df = df.loc[shapely.get_type_id(df.geometry.values) == 3]
 
     # find available datasets
-    # FIXME:
     datasets = [
         id
         for id, present in get_available_datasets(
             to_dict_all(df.geometry.values),
-            shapely.total_bounds(df.geometry.values),
+            df.total_bounds,
         ).items()
         if present
     ]
     # datasets = ["nlcd_inundation_freq"]
 
-    # dissolve by population
+    # dissolve by analysis unit identifier
     df = dissolve(df, by=field).set_index(field)
 
     ### calculate results, data must be in DATA_CRS
@@ -92,7 +92,7 @@ for aoi in aois:
     results = asyncio.run(get_analysis_unit_results(df, datasets))
 
     # FIXME:
-    results.reset_index().to_feather("/tmp/test.feather")
+    # results.reset_index().to_feather("/tmp/test.feather")
 
     if results is None:
         print(f"AOI: {path} does not overlap SECAS states")

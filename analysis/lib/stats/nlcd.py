@@ -9,7 +9,7 @@ src_dir = SHARED_DATA_DIR / "inputs/nlcd"
 PERCENTS = np.arange(0, 1.01, 0.01)
 
 
-def extract_nlcd_landcover_by_mask(shape_mask, window, cellsize):
+def extract_nlcd_landcover_by_mask(mask_config):
     """Calculate the area of overlap between shapes and NLCD indexes (not codes)
     for each available year.
 
@@ -17,14 +17,11 @@ def extract_nlcd_landcover_by_mask(shape_mask, window, cellsize):
 
     Parameters
     ----------
-    shape_mask : ndarray, True outside shapes
-    window : rasterio.windows.Window for extracting area of shape_mask from raster
-    cellsize : area of each pixel
+    mask_config : AOIMaskConfig
 
     Returns
     -------
     dict
-
         {<NLCD index>: [<acres 2020>, <acres 2030>, ..., <acres 2100>], ...}
     """
 
@@ -34,10 +31,10 @@ def extract_nlcd_landcover_by_mask(shape_mask, window, cellsize):
     for year in NLCD_YEARS:
         filename = src_dir / f"landcover_{year}.tif"
         counts = extract_count_in_geometry(
-            filename, shape_mask, window, bins, boundless=True
+            filename, mask_config, bins, boundless=True
         )
 
-        areas.append(counts * cellsize)
+        areas.append(counts * mask_config.cellsize)
 
     # Transpose and convert to dict, only keep those that have areas
     areas = np.array(areas).T
@@ -51,7 +48,7 @@ def extract_nlcd_landcover_by_mask(shape_mask, window, cellsize):
     return results
 
 
-def extract_nlcd_impervious_by_mask(shape_mask, window, cellsize):
+def extract_nlcd_impervious_by_mask(mask_config):
     """Calculate total amount of impervious surface within shape_mask based on
     count per percent (0-100) * percent
 
@@ -59,9 +56,7 @@ def extract_nlcd_impervious_by_mask(shape_mask, window, cellsize):
 
     Parameters
     ----------
-    shape_mask : ndarray, True outside shapes
-    window : rasterio.windows.Window for extracting area of shape_mask from raster
-    cellsize : area of each pixel
+    mask_config : AOIMaskConfig
 
     Returns
     -------
@@ -75,10 +70,10 @@ def extract_nlcd_impervious_by_mask(shape_mask, window, cellsize):
     for year in NLCD_YEARS:
         filename = src_dir / f"impervious_{year}.tif"
         counts = extract_count_in_geometry(
-            filename, shape_mask, window, bins, boundless=True
+            filename, mask_config, bins, boundless=True
         )
 
-        areas.append((PERCENTS * counts * cellsize).sum())
+        areas.append((PERCENTS * counts * mask_config.cellsize).sum())
 
     # Transpose
     return np.array(areas).T.tolist()
