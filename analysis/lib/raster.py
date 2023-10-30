@@ -245,6 +245,7 @@ def detect_data(datasets, shapes, bounds):
             read_window = shift_window(window, transform, src.transform)
             clipped_window = clip_window(read_window, max_width=src.width, max_height=src.height)
             if clipped_window.width == 0 or clipped_window.height==0:
+                available_datasets[id] = False
                 continue
 
             data = src.read(1, window=read_window, boundless=True)

@@ -22,7 +22,7 @@ pyarrow = "^13.0.0"
 arq = "^0.25.0"
 openpyxl = "^3.1.2"
 shapely = "^2.0.2"
-pyogrio = "^0.7.1"
+pyogrio = "^0.7.2"
 hiredis = "^2.2.2"
 
 [tool.poetry.dev-dependencies]

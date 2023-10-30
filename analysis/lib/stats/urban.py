@@ -12,7 +12,7 @@ src_dir = SHARED_DATA_DIR / "inputs/threats/urban"
 
 def extract_urban_by_mask(mask_config):
     """Calculate the area of overlap between shapes and urbanization
-    for each decade from 2020 to 2100.
+    for each decade from 2030 to 2100.
 
     Data are at 30 meters, pixel-aligned to extent raster.
 
@@ -25,8 +25,8 @@ def extract_urban_by_mask(mask_config):
     dict
         {
             'urban': <acres already urban>,
-            "high": [<acres 2020>, <acres 2030>, ..., <acres 2100>],
-            "low": [<acres 2020>, <acres 2030>, ..., <acres 2100>],
+            "high": [<acres 2030>, ..., <acres 2100>],
+            "low": [<acres 2030>, ..., <acres 2100>],
         }
     """
 

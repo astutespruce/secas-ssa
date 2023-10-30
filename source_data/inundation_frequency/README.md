@@ -19,6 +19,6 @@ Allen into 5 bins:
 - 51-90: high
 - 91-100: very high
 
-These binned values are then combined with NLCD 2019 land cover classes and
+These binned values are then combined with NLCD 2021 land cover classes and
 coded so that each NLCD class has a value for each of the 5 inundation frequency
 values (if the combination occurs).

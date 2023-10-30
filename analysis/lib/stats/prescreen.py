@@ -27,6 +27,8 @@ raster_datasets = {
 
 def get_available_datasets(shapes, bounds):
     available_datasets = detect_data(raster_datasets, shapes, bounds)
+
+    # SLR projections available where SLR depth is available
     available_datasets["slr_proj"] = available_datasets["slr_depth"]
 
     # HUC12 data are always available
