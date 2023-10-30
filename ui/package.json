@@ -39,7 +39,6 @@
     "react-dropzone": "^14.2.1",
     "react-hook-form": "^7.47.0",
     "react-minimal-pie-chart": "^8.1.0",
-    "react-query": "^3.33.7",
     "stream-browserify": "^3.0.0",
     "theme-ui": "^0.16.1",
     "use-error-boundary": "^2.0.4",
