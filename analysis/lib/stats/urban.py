@@ -10,27 +10,27 @@ from api.settings import SHARED_DATA_DIR
 src_dir = SHARED_DATA_DIR / "inputs/threats/urban"
 
 
-def extract_urban_by_mask(shape_mask, window, cellsize):
+def extract_urban_by_mask(mask_config):
     """Calculate the area of overlap between shapes and urbanization
-    for each decade from 2020 to 2100.
+    for each decade from 2030 to 2100.
 
     Data are at 30 meters, pixel-aligned to extent raster.
 
     Parameters
     ----------
-    shape_mask : ndarray, True outside shapes
-    window : rasterio.windows.Window for extracting area of shape_mask from raster
-    cellsize : area of each pixel
+    mask_config : AOIMaskConfig
 
     Returns
     -------
     dict
         {
             'urban': <acres already urban>,
-            "high": [<acres 2020>, <acres 2030>, ..., <acres 2100>],
-            "low": [<acres 2020>, <acres 2030>, ..., <acres 2100>],
+            "high": [<acres 2030>, ..., <acres 2100>],
+            "low": [<acres 2030>, ..., <acres 2100>],
         }
     """
+
+    cellsize = mask_config.cellsize
 
     high = []
     low = []
@@ -38,10 +38,10 @@ def extract_urban_by_mask(shape_mask, window, cellsize):
     for year in URBAN_YEARS:
         filename = src_dir / f"urban_{year}.tif"
         counts = extract_count_in_geometry(
-            filename, shape_mask, window, URBAN_BINS, boundless=True
+            filename, mask_config, URBAN_BINS, boundless=True
         )
 
-        if year == 2020:
+        if year == 2030:
             # extract area already urban (in index 51) and add to front of list
             already_urban = counts[51] * cellsize
             high.append(already_urban)

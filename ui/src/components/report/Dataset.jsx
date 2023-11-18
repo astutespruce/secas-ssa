@@ -31,6 +31,8 @@ const Dataset = ({ id, name, description, selected, disabled, onToggle }) => {
             disabled={disabled}
             onChange={disabled ? null : handleToggle}
             sx={{
+              opacity: disabled ? 0.2 : 1,
+              cursor: disabled ? 'not-allowed' : 'pointer',
               'input:focus ~ &': {
                 backgroundColor: 'transparent',
               },

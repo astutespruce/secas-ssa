@@ -4,10 +4,10 @@ from analysis.constants import DATASETS
 from analysis.lib.raster import extract_count_in_geometry
 from api.settings import SHARED_DATA_DIR
 
-src_dir = SHARED_DATA_DIR / "inputs/indicators/base"
+src_dir = SHARED_DATA_DIR / "inputs/indicators"
 
 
-def extract_indicator_by_mask(id, shape_mask, window, cellsize):
+def extract_indicator_by_mask(id, mask_config):
     """Calculate the area of overlap by value in the indicator dataset
 
     Data are at 30 meters, pixel-aligned to extent raster.
@@ -16,11 +16,7 @@ def extract_indicator_by_mask(id, shape_mask, window, cellsize):
     ----------
     id : str
         ID of indicator dataset
-    shape_mask : ndarray, True outside shapes
-    window : rasterio.windows.Window
-        for extracting area of shape_mask from raster
-    cellsize : float
-        area of each pixel
+    mask_config : AOIMaskConfig
 
     Returns
     -------
@@ -35,7 +31,7 @@ def extract_indicator_by_mask(id, shape_mask, window, cellsize):
     values = [e["value"] for e in indicator["values"]]
     bins = np.arange(0, max(values) + 1)
     counts = extract_count_in_geometry(
-        filename, shape_mask, window, bins, boundless=True
+        filename, mask_config, bins, boundless=True
     )
 
     # Some indicators exclude 0 values, remove them from counts
@@ -43,4 +39,4 @@ def extract_indicator_by_mask(id, shape_mask, window, cellsize):
     if min_value > 0:
         counts = counts[min_value:]
 
-    return counts * cellsize
+    return counts * mask_config.cellsize

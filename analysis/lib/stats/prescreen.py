@@ -10,7 +10,7 @@ from analysis.lib.stats.inundation_frequency import inundation_frequency_dir
 
 indicators = [d for d in DATASETS.values() if d["id"].startswith("se_")]
 
-# all datasets are pixel-aligned 30m
+# all datasets are pixel-aligned 30m, but may have different origin points
 raster_datasets = {
     **{
         d["id"]: indicators_dir / d["filename"].replace(".tif", "_mask.tif")
@@ -27,6 +27,8 @@ raster_datasets = {
 
 def get_available_datasets(shapes, bounds):
     available_datasets = detect_data(raster_datasets, shapes, bounds)
+
+    # SLR projections available where SLR depth is available
     available_datasets["slr_proj"] = available_datasets["slr_depth"]
 
     # HUC12 data are always available

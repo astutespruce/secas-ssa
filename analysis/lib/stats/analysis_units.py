@@ -1,12 +1,11 @@
 import geopandas as gp
 import pandas as pd
 import shapely
-
 import rasterio
 
 from analysis.constants import M2_ACRES, SECAS_STATES
 from analysis.lib.geometry import to_dict_all
-from analysis.lib.raster import boundless_raster_geometry_mask
+from analysis.lib.raster import boundless_raster_geometry_mask, shift_window
 from analysis.lib.stats.inundation_frequency import (
     extract_nlcd_inundation_frequency_by_mask,
 )
@@ -26,8 +25,47 @@ from api.settings import SHARED_DATA_DIR
 
 data_dir = SHARED_DATA_DIR / "inputs"
 bnd_dir = data_dir / "boundaries"
-extent_filename = bnd_dir / "nonmarine_mask.tif"
+extent_filename = bnd_dir / "blueprint_extent.tif"
+extent_mask_filename = bnd_dir / "blueprint_extent_mask.tif"
 states_filename = bnd_dir / "states.feather"
+
+
+class AOIMaskConfig(object):
+    """Class to store prescreen and rasterized mask information for masking
+    other raster datasets"""
+
+    def __init__(self, shapes, bounds):
+        """_summary_
+
+        Parameters
+        ----------
+        shapes : list-like of geometry objects that provide __geo_interface__
+        bounds : list-like of [xmin, ymin, xmax, ymax]
+        """
+        # create mask and window
+        with rasterio.open(extent_filename) as src:
+            (
+                self.shape_mask,
+                self._mask_transform,
+                self._mask_window,
+            ) = boundless_raster_geometry_mask(src, shapes, bounds, all_touched=False)
+
+            self.cellsize = src.res[0] * src.res[1] * M2_ACRES
+            self.mask_pixels = (~self.shape_mask).sum()
+            self.mask_acres = self.mask_pixels * self.cellsize
+
+            data = src.read(1, window=self._mask_window, boundless=True)
+            # count pixels within extent that are within the shape_mask
+            self.overlap_acres = (data[~self.shape_mask]).sum() * self.cellsize
+            if self.overlap_acres < 1e-6:
+                self.overlap_acres = 0
+
+            self.outside_se_acres = self.mask_acres - self.overlap_acres
+            if self.outside_se_acres < 1e-6:
+                self.outside_se_acres = 0
+
+    def get_mask_window(self, target_transform):
+        return shift_window(self._mask_window, self._mask_transform, target_transform)
 
 
 async def get_analysis_unit_results(df, datasets, progress_callback=None):
@@ -74,102 +112,88 @@ async def get_analysis_unit_results(df, datasets, progress_callback=None):
 
     sarp_huc12_stats = None
     if (
-        "sarp_aquatic_barriers" in datasets
-        or "sarp_aquatic_network_alteration" in datasets
+        len(
+            set(
+                ["sarp_aquatic_barriers", "sarp_aquatic_network_alteration"]
+            ).intersection(datasets)
+        )
+        > 0
     ):
         sarp_huc12_stats = extract_sarp_huc12_stats(df)
 
     count = 0
-    with rasterio.open(extent_filename) as extent_raster:
-        # square meters to acres
-        cellsize = extent_raster.res[0] * extent_raster.res[1] * M2_ACRES
-        nodata = int(extent_raster.nodata)
 
-        for index, row in df.iterrows():
-            print(f"Processing {index}")
-            result = {}
-            shapes = [row.__geo__]
+    for index, row in df.iterrows():
+        print(f"Processing {index}")
+        mask_config = AOIMaskConfig(shapes=[row.__geo__], bounds=row.bounds)
 
-            # calculate main mask; if 0 bail out
-            shape_mask, _, window = boundless_raster_geometry_mask(
-                extent_raster, shapes, row.bounds, all_touched=False
-            )
+        result = {
+            "pixels": mask_config.mask_pixels,
+            "rasterized_acres": mask_config.mask_acres,
+            "overlap": mask_config.overlap_acres,
+            "outside_se": mask_config.outside_se_acres,
+        }
 
-            result["pixels"] = (~shape_mask).sum()
-            result["rasterized_acres"] = result["pixels"] * cellsize
-
-            data = extent_raster.read(1, window=window, boundless=True)
-            mask = (data == nodata) | shape_mask
-
-            # slice out flattened array of values that are not masked
-            result["overlap"] = data[~mask].sum() * cellsize
-            result["outside_se"] = result["rasterized_acres"] - result["overlap"]
-            if result["overlap"] == 0:
-                results.append(result)
-
-                if progress_callback is not None:
-                    await progress_callback(100 * count / len(df))
-
-                count += 1
-                continue
-
-            # Extract SLR
-            if "slr_depth" in datasets or "slr_proj" in datasets:
-                result["slr_depth"] = extract_slr_depth_by_mask(
-                    shape_mask,
-                    window,
-                    cellsize,
-                    result["rasterized_acres"],
-                    result["outside_se"],
-                )
-
-            if "slr_proj" in datasets:
-                result["slr_proj"] = extract_slr_projections_by_geometry(row.geometry)
-
-            # Extract urban
-            if "urban" in datasets:
-                result["urban"] = extract_urban_by_mask(shape_mask, window, cellsize)
-
-            # Extract NLCD
-            if "nlcd_landcover" in datasets:
-                result["nlcd_landcover"] = extract_nlcd_landcover_by_mask(
-                    shape_mask, window, cellsize
-                )
-
-            if "nlcd_impervious" in datasets:
-                result["nlcd_impervious"] = extract_nlcd_impervious_by_mask(
-                    shape_mask, window, cellsize
-                )
-
-            # Extract SE Blueprint indicators
-            se_blueprint_indicators = [
-                dataset for dataset in datasets if dataset.startswith("se_blueprint")
-            ]
-            for dataset in se_blueprint_indicators:
-                result[dataset] = extract_indicator_by_mask(
-                    dataset, shape_mask, window, cellsize
-                )
-
-            # Extract inundation frequency
-            if "nlcd_inundation_freq" in datasets:
-                result[
-                    "nlcd_inundation_freq"
-                ] = extract_nlcd_inundation_frequency_by_mask(
-                    shape_mask, window, cellsize
-                )
-
+        if mask_config.overlap_acres == 0:
             results.append(result)
 
             if progress_callback is not None:
                 await progress_callback(100 * count / len(df))
 
             count += 1
+            continue
 
-        df = df[["states", "count", "acres"]].join(
-            pd.DataFrame(results, index=df.index)
-        )
+        # Extract SLR
+        if "slr_depth" in datasets or "slr_proj" in datasets:
+            result["slr_depth"] = extract_slr_depth_by_mask(mask_config)
 
-        if sarp_huc12_stats is not None:
-            df = df.join(sarp_huc12_stats)
+        if "slr_proj" in datasets:
+            result["slr_proj"] = extract_slr_projections_by_geometry(row.geometry)
 
-        return df
+        # Extract urban
+        if "urban" in datasets:
+            result["urban"] = extract_urban_by_mask(mask_config)
+
+        # Extract NLCD
+        if "nlcd_landcover" in datasets:
+            result["nlcd_landcover"] = extract_nlcd_landcover_by_mask(
+                mask_config
+            )
+
+        if "nlcd_impervious" in datasets:
+            result["nlcd_impervious"] = extract_nlcd_impervious_by_mask(
+                mask_config
+            )
+
+        # Extract SE Blueprint indicators
+        se_blueprint_indicators = [
+            dataset for dataset in datasets if dataset.startswith("se_blueprint")
+        ]
+        for dataset in se_blueprint_indicators:
+            result[dataset] = extract_indicator_by_mask(
+                dataset, mask_config
+            )
+
+        # Extract inundation frequency
+        if "nlcd_inundation_freq" in datasets:
+            result[
+                "nlcd_inundation_freq"
+            ] = extract_nlcd_inundation_frequency_by_mask(
+                mask_config
+            )
+
+        results.append(result)
+
+        if progress_callback is not None:
+            await progress_callback(100 * count / len(df))
+
+        count += 1
+
+    df = df[["states", "count", "acres"]].join(
+        pd.DataFrame(results, index=df.index)
+    )
+
+    if sarp_huc12_stats is not None:
+        df = df.join(sarp_huc12_stats)
+
+    return df

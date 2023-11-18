@@ -24,7 +24,7 @@ proj_filename = src_dir / "noaa_1deg_cells.feather"
 
 
 def extract_slr_depth_by_mask(
-    shape_mask, window, cellsize, rasterized_acres, outside_se_acres
+    mask_config
 ):
     """Calculate the area of overlap between geometries and each level of SLR
     between 0 (currently inundated) and 6 meters.
@@ -36,15 +36,7 @@ def extract_slr_depth_by_mask(
 
     Parameters
     ----------
-    shape_mask : ndarray, True outside shapes
-    window : rasterio.windows.Window
-        for extracting area of shape_mask from raster
-    cellsize : float
-        area of each pixel
-    rasterized_acres : float
-        area of shape_mask in acres
-    outside_se_acres : float
-        area outside of Southeast Blueprint within shape_mask
+    mask_config : AOIMaskConfig
 
     Returns
     -------
@@ -52,9 +44,13 @@ def extract_slr_depth_by_mask(
         [area for 0ft inundation, area for 1ft, ..., area for 10f]
     """
 
+    rasterized_acres = mask_config.mask_acres
+    outside_se_acres = mask_config.outside_se_acres
+    cellsize = mask_config.cellsize
+
     acres = (
         extract_count_in_geometry(
-            depth_filename, shape_mask, window, bins=SLR_BINS, boundless=True
+            depth_filename, mask_config, bins=SLR_BINS, boundless=True
         )
         * cellsize
     )

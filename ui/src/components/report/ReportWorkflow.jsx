@@ -141,8 +141,6 @@ const ReportWorkflow = () => {
 
   let stepContent = null
 
-  console.log('selectedAttribute', selectedAttribute)
-
   switch (steps[stepIndex].id) {
     case 'upload': {
       stepContent = <Upload onSuccess={handleUploadFileSuccess} />

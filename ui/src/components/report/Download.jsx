@@ -4,7 +4,7 @@ import { Box, Button, Flex, Divider, Paragraph, Text } from 'theme-ui'
 import { ReplyAll, Download as DownloadIcon } from '@emotion-icons/fa-solid'
 
 import { JobContainer } from 'components/job'
-import { Link } from 'components/link'
+import { OutboundLink } from 'components/link'
 
 import config from '../../../gatsby-config'
 
@@ -38,7 +38,7 @@ const Download = ({ uuid, selectedAttribute, selectedDatasets, onCancel }) => {
             </Flex>
           </Button>
           <Box>
-            <Link to={reportURL}>
+            <OutboundLink to={reportURL}>
               <Button variant="primary">
                 <Flex>
                   <DownloadIcon
@@ -48,7 +48,7 @@ const Download = ({ uuid, selectedAttribute, selectedDatasets, onCancel }) => {
                   <Text>Download report</Text>
                 </Flex>
               </Button>
-            </Link>
+            </OutboundLink>
           </Box>
         </Flex>
       </Box>

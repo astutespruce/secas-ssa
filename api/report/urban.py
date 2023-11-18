@@ -13,7 +13,7 @@ def add_urbanization_sheet(xlsx, df, name_col_width, area_col_width, area_label)
     description = dataset["valueDescription"]
 
     # transform data into one row for high and low urbanization per analysis unit
-    years = ["2019 (acres)"] + [f"{year} (acres)" for year in URBAN_YEARS]
+    years = ["2021 (acres)"] + [f"{year} (acres)" for year in URBAN_YEARS]
     urban = []
     breaks = []
     counter = 0

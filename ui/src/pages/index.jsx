@@ -185,7 +185,7 @@ const IndexPage = ({
           <Box as="ul" sx={{ fontSize: 2 }}>
             <li>
               Terrestrial and freshwater indicators created as part of the
-              Southeast Blueprint 2022, including
+              Southeast Blueprint 2023, including
               <Grid columns={3} gap={3} sx={{ mt: '0.5rem', mb: '1rem' }}>
                 <Box
                   sx={{
@@ -241,13 +241,13 @@ const IndexPage = ({
             </li>
             <li>
               <OutboundLink to="https://www.usgs.gov/centers/eros/science/national-land-cover-database">
-                National Land Cover Database 2001 - 2019: land cover and
+                National Land Cover Database 2001 - 2021: land cover and
                 impervious surface
               </OutboundLink>
             </li>
             <li>
               Current and projected future urban development areas by decade
-              2020 to 2100 created by the FUTURES project
+              2030 to 2100 created by the FUTURES project
             </li>
             <li>
               Areas impacted by sea-level rise up to 10 feet calculated by the{' '}
