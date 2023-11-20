@@ -25,47 +25,45 @@ const Header = () => (
       boxShadow: '0 2px 6px #000',
     }}
   >
-    <>
-      <Flex
+    <Flex
+      sx={{
+        alignItems: 'center',
+      }}
+    >
+      <Link
+        to="/"
         sx={{
-          alignItems: 'center',
+          textDecoration: 'none !important',
+          display: 'block',
+          color: '#FFF',
         }}
       >
-        <Link
-          to="/"
+        <Flex
           sx={{
-            textDecoration: 'none !important',
-            display: 'block',
-            color: '#FFF',
+            flexWrap: 'wrap',
+            alignItems: ['flex-start', 'flex-start', 'baseline'],
+            flexDirection: ['column', 'column', 'row'],
           }}
         >
-          <Flex
+          <Heading
+            as="h1"
             sx={{
-              flexWrap: 'wrap',
-              alignItems: ['flex-start', 'flex-start', 'baseline'],
-              flexDirection: ['column', 'column', 'row'],
+              fontWeight: 400,
+              fontSize: [2, 2, 4],
+              lineHeight: 1,
+              m: 0,
+              breakInside: 'avoid',
+              flex: '0 1 auto',
+              color: '#FFF',
             }}
           >
-            <Heading
-              as="h1"
-              sx={{
-                fontWeight: 400,
-                fontSize: ['10px', 1, 4],
-                lineHeight: 1,
-                m: 0,
-                breakInside: 'avoid',
-                flex: '0 1 auto',
-                color: '#FFF',
-              }}
-            >
-              {title}
-            </Heading>
-          </Flex>
-        </Link>
-      </Flex>
+            {title}
+          </Heading>
+        </Flex>
+      </Link>
+    </Flex>
 
-      <HeaderButtons />
-    </>
+    <HeaderButtons />
   </Flex>
 )
 

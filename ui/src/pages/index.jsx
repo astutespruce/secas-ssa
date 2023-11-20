@@ -78,7 +78,11 @@ const IndexPage = ({
         <Flex sx={{ justifyContent: 'center', my: '2rem' }}>
           <Link to="/report">
             <Button
-              sx={{ fontSize: '1.5rem', display: 'flex', alignItems: 'center' }}
+              sx={{
+                fontSize: '1.5rem',
+                display: 'flex',
+                alignItems: 'center',
+              }}
             >
               <FileAlt size="1em" />
               <Text sx={{ ml: '0.5rem' }}>Create Custom Report</Text>

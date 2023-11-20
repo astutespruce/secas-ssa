@@ -25,7 +25,6 @@ const ReportPage = ({
       height="16rem"
       maxHeight="16rem"
       minHeight="16rem"
-      backgroundPosition="bottom"
     />
 
     <ReportWorkflow />
