@@ -3,15 +3,13 @@ import math
 import tempfile
 
 import geopandas as gp
-import shapely
 
-from analysis.constants import M2_ACRES
 from analysis.lib.geometry import dissolve
 from analysis.lib.stats.analysis_units import get_analysis_unit_results
 from api.errors import DataError
 from api.progress import set_progress
 from api.report.xlsx import create_xlsx
-from api.settings import TEMP_DIR, CUSTOM_REPORT_MAX_ACRES
+from api.settings import TEMP_DIR
 
 
 log = logging.getLogger("api")
@@ -62,17 +60,6 @@ async def create_report(ctx, uuid, datasets, field=None, name=None):
 
     else:
         df = df.set_index(field)
-
-    # check that extent of features does not exceed limit
-    extent_areas = shapely.area(shapely.box(*shapely.bounds(df.geometry).T)) * M2_ACRES
-    num_above_limit = (extent_areas > CUSTOM_REPORT_MAX_ACRES).sum()
-    if num_above_limit:
-        log.error(
-            f"{num_above_limit} of the analysis units are above the maximum allowed extent of {CUSTOM_REPORT_MAX_ACRES:,} acres"
-        )
-        raise DataError(
-            f"The extent of {num_above_limit} of the analysis units is above the maximum allowed extent of {CUSTOM_REPORT_MAX_ACRES:,} acres.  Please use smaller analysis areas."
-        )
 
     progress_scale = [10, 75]
     message = "Calculating statistics (may take a while)"

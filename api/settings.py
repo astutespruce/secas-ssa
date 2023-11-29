@@ -20,7 +20,13 @@ API_TOKEN = os.getenv("API_TOKEN")
 API_SECRET = os.getenv("API_SECRET")
 MAX_JOBS = int(os.getenv("MAX_JOBS", 2))
 MAX_FILE_SIZE = float(os.getenv("MAX_FILE_SIZE", 100))  # MB
-CUSTOM_REPORT_MAX_ACRES = int(os.getenv("SSA_CUSTOM_REPORT_MAX_ACRES", 25e6))
+# individual extents
+CUSTOM_REPORT_MAX_EXTENT_ACRES = int(
+    os.getenv("SSA_CUSTOM_REPORT_MAX_EXTENT_ACRES", 15e6)
+)
+CUSTOM_REPORT_MAX_TOTAL_ACRES = int(
+    os.getenv("SSA_CUSTOM_REPORT_MAX_TOTAL_ACRES", 25e6)
+)
 LOGGING_LEVEL = os.getenv("LOGGING_LEVEL", "DEBUG")
 REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
 REDIS_PORT = os.getenv("REDIS_PORT", 6379)

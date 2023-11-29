@@ -4,11 +4,12 @@ from zipfile import ZipFile
 from pyogrio import list_layers, read_dataframe, read_info
 import shapely
 
-from analysis.constants import DATA_CRS
+from analysis.constants import DATA_CRS, M2_ACRES
 from analysis.lib.geometry import make_valid, to_dict_all
 from analysis.lib.stats.prescreen import get_available_datasets
 from api.errors import DataError
 from api.progress import set_progress
+from api.settings import CUSTOM_REPORT_MAX_EXTENT_ACRES, CUSTOM_REPORT_MAX_TOTAL_ACRES
 
 
 log = logging.getLogger("api")
@@ -147,6 +148,29 @@ async def inspect(ctx, zip_filename, uuid):
     except Exception:
         log.error(f"Failed to reproject dataframe: {path}, layer={layer}")
         raise DataError("Could not reproject dataset to standard projection")
+
+    ### check that extent of features does not exceed limit
+    extent_areas = (
+        shapely.area(shapely.box(*shapely.bounds(df.geometry.values).T)) * M2_ACRES
+    )
+    num_above_limit = (extent_areas > CUSTOM_REPORT_MAX_EXTENT_ACRES).sum()
+    if num_above_limit:
+        log.error(
+            f"{num_above_limit} of the analysis units are above the maximum allowed extent of {CUSTOM_REPORT_MAX_EXTENT_ACRES:,} acres"
+        )
+        raise DataError(
+            f"The extent of {num_above_limit} of the analysis units is above the maximum allowed extent of {CUSTOM_REPORT_MAX_EXTENT_ACRES:,} acres.  Please use smaller analysis areas."
+        )
+
+    # check that the combined area of features does not exceed limit
+    total_area = shapely.area(df.geometry.values).sum() * M2_ACRES
+    if total_area > CUSTOM_REPORT_MAX_TOTAL_ACRES:
+        log.error(
+            f"Combined area ({total_area:,.0f} acres) is above the allowed maximum area of {CUSTOM_REPORT_MAX_TOTAL_ACRES:,} acres"
+        )
+        raise DataError(
+            f"The combined area of all analysis units ({total_area:,.0f} acres) is above the maximum limit of {CUSTOM_REPORT_MAX_TOTAL_ACRES:,} acres.  Please use fewer analysis areas per run."
+        )
 
     ### Make geometry valid
     await set_progress(ctx["redis"], ctx["job_id"], 10, "Making valid")
