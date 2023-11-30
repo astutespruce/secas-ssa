@@ -2,7 +2,7 @@ import React, { useState, useCallback, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import { Button, Divider, Heading, Flex, Progress, Text } from 'theme-ui'
 
-import { captureException } from 'util/log'
+import { captureException, logGAEvent } from 'util/log'
 import { submitJob } from './api'
 import JobError from './JobError'
 
@@ -14,6 +14,18 @@ const JobContainer = ({ data, path, defaultMessage, onCancel, onSuccess }) => {
   })
 
   const doSubmitJob = useCallback(async () => {
+    if (data.file) {
+      logGAEvent('file-upload', {
+        name,
+        file: data.file.name,
+        sizeKB: data.file.size / 1024,
+      })
+    } else if (data.datasets) {
+      logGAEvent('create-report', {
+        datasets: data.datasets,
+      })
+    }
+
     try {
       // upload file and update progress
       const { result, error: jobError } = await submitJob(
@@ -45,6 +57,9 @@ const JobContainer = ({ data, path, defaultMessage, onCancel, onSuccess }) => {
           message: null,
           error: jobError,
         }))
+
+        logGAEvent('file-upload-error')
+
         return
       }
 
