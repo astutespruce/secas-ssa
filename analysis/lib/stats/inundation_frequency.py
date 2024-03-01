@@ -14,7 +14,7 @@ inundation_frequency_filename = (
 
 def extract_nlcd_inundation_frequency_by_mask(mask_config):
     """Calculate the area of overlap between shapes and inundation frequency
-    by NLCD 2019 land cover class.
+    by NLCD 2021 land cover class.
 
     Data are at 30 meters, pixel-aligned to extent raster.
 
