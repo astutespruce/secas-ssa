@@ -18,11 +18,15 @@ def add_urbanization_sheet(xlsx, df, name_col_width, area_col_width, area_label)
     breaks = []
     counter = 0
     for id, row in df.iterrows():
-        for level in ["low", "high"]:
-            values = row["urban"][level]
-            urban.append([id, row.overlap, level.capitalize()] + list(values))
-
+        if row.overlap > 0:
+            for level in ["low", "high"]:
+                values = row["urban"][level]
+                urban.append([id, row.overlap, level.capitalize()] + list(values))
+                counter += 1
+        else:
+            urban.append([id, row.overlap])
             counter += 1
+
         breaks.append(counter)
 
     urban = pd.DataFrame(

@@ -5,8 +5,8 @@ from pyogrio import list_layers, read_dataframe, read_info
 import shapely
 
 from analysis.constants import DATA_CRS, M2_ACRES
-from analysis.lib.geometry import make_valid, to_dict_all
-from analysis.lib.stats.prescreen import get_available_datasets
+from analysis.lib.geometry import make_valid
+from analysis.lib.stats.prescreen import verify_overlap, get_available_datasets
 from api.errors import DataError
 from api.progress import set_progress
 from api.settings import CUSTOM_REPORT_MAX_EXTENT_ACRES, CUSTOM_REPORT_MAX_TOTAL_ACRES
@@ -189,15 +189,16 @@ async def inspect(ctx, zip_filename, uuid):
     if len(df) == 0:
         raise DataError("No valid polygon boundaries available in dataset")
 
+    if not verify_overlap(df):
+        raise DataError("None of the polygon boundaries overlap available datasets")
+
     # Save as feather file for subsequent steps
     outfilename = str(zip_filename).replace(".zip", ".feather")
     df.to_feather(outfilename)
 
     ### prescreen datasets available
     await set_progress(ctx["redis"], ctx["job_id"], 50, "Checking available datasets")
-    results["available_datasets"] = get_available_datasets(
-        to_dict_all(df.geometry.values), df.total_bounds
-    )
+    results["available_datasets"] = get_available_datasets(df)
 
     await set_progress(ctx["redis"], ctx["job_id"], 100, "All done!")
 

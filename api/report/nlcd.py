@@ -16,10 +16,14 @@ def add_ncld_landcover_sheet(xlsx, df, name_col_width, area_col_width, area_labe
     breaks = []
     counter = 0
     for id, row in df.iterrows():
-        for landcover, values in row.nlcd_landcover.items():
-            nlcd.append([id, row.overlap, landcover] + list(values))
-
+        if row.overlap > 0:
+            for landcover, values in row.nlcd_landcover.items():
+                nlcd.append([id, row.overlap, landcover] + list(values))
+                counter += 1
+        else:
+            nlcd.append([id, row.overlap])
             counter += 1
+
         breaks.append(counter)
 
     nlcd = pd.DataFrame(

@@ -25,6 +25,7 @@ from api.settings import SHARED_DATA_DIR
 
 data_dir = SHARED_DATA_DIR / "inputs"
 bnd_dir = data_dir / "boundaries"
+boundary_filename = bnd_dir / "se_boundary.feather"
 extent_filename = bnd_dir / "blueprint_extent.tif"
 extent_mask_filename = bnd_dir / "blueprint_extent_mask.tif"
 states_filename = bnd_dir / "states.feather"
@@ -156,29 +157,21 @@ async def get_analysis_unit_results(df, datasets, progress_callback=None):
 
         # Extract NLCD
         if "nlcd_landcover" in datasets:
-            result["nlcd_landcover"] = extract_nlcd_landcover_by_mask(
-                mask_config
-            )
+            result["nlcd_landcover"] = extract_nlcd_landcover_by_mask(mask_config)
 
         if "nlcd_impervious" in datasets:
-            result["nlcd_impervious"] = extract_nlcd_impervious_by_mask(
-                mask_config
-            )
+            result["nlcd_impervious"] = extract_nlcd_impervious_by_mask(mask_config)
 
         # Extract SE Blueprint indicators
         se_blueprint_indicators = [
             dataset for dataset in datasets if dataset.startswith("se_blueprint")
         ]
         for dataset in se_blueprint_indicators:
-            result[dataset] = extract_indicator_by_mask(
-                dataset, mask_config
-            )
+            result[dataset] = extract_indicator_by_mask(dataset, mask_config)
 
         # Extract inundation frequency
         if "nlcd_inundation_freq" in datasets:
-            result[
-                "nlcd_inundation_freq"
-            ] = extract_nlcd_inundation_frequency_by_mask(
+            result["nlcd_inundation_freq"] = extract_nlcd_inundation_frequency_by_mask(
                 mask_config
             )
 
@@ -189,9 +182,7 @@ async def get_analysis_unit_results(df, datasets, progress_callback=None):
 
         count += 1
 
-    df = df[["states", "count", "acres"]].join(
-        pd.DataFrame(results, index=df.index)
-    )
+    df = df[["states", "count", "acres"]].join(pd.DataFrame(results, index=df.index))
 
     if sarp_huc12_stats is not None:
         df = df.join(sarp_huc12_stats)

@@ -14,7 +14,8 @@ def add_indicator_sheet(
     description = dataset["description"]
     values = dataset["values"]
     nodata_label = dataset.get(
-        "nodata_label", f"Area outside {sheet_name.lower()} data extent"
+        "nodata_label",
+        f"Area outside {sheet_name.lower()} data extent within Southeast data extent",
     )
 
     columns = [f"{v['label']} (acres)" for v in values]

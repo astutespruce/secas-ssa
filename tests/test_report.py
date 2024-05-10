@@ -7,9 +7,9 @@ from pyogrio.geopandas import read_dataframe
 import shapely
 
 from analysis.constants import DATA_CRS
-from analysis.lib.geometry import dissolve, make_valid, to_dict_all
+from analysis.lib.geometry import dissolve, make_valid
 from analysis.lib.stats.analysis_units import get_analysis_unit_results
-from analysis.lib.stats.prescreen import get_available_datasets
+from analysis.lib.stats.prescreen import get_available_datasets, verify_overlap
 from api.report.xlsx import create_xlsx
 
 
@@ -34,7 +34,7 @@ aois = [
     #     "analysis_unit_label": 1,
     # },
     # {"name": "Lousiana COAs", "path": "Combined_COAsv1_dis", "field": "COAName"}
-    {"name": "San Juan area, PR", "path": "SanJuan", "field": None, "analysis_unit_label": 1,},
+    # {"name": "San Juan area, PR", "path": "SanJuan", "field": None, "analysis_unit_label": 1,},
     # {
     #     "name": "fl_slr_test",
     #     "path": "fl_slr_test",
@@ -73,19 +73,15 @@ for aoi in aois:
     df = df.explode(index_parts=False)
     df = df.loc[shapely.get_type_id(df.geometry.values) == 3]
 
-    # find available datasets
-    datasets = [
-        id
-        for id, present in get_available_datasets(
-            to_dict_all(df.geometry.values),
-            df.total_bounds,
-        ).items()
-        if present
-    ]
-    # datasets = ["nlcd_inundation_freq"]
-
     # dissolve by analysis unit identifier
     df = dissolve(df, by=field).set_index(field)
+
+    if not verify_overlap(df):
+        raise ValueError("None of the polygon boundaries overlap available datasets")
+
+    # find available datasets
+    datasets = [id for id, present in get_available_datasets(df).items() if present]
+    # datasets = ["nlcd_inundation_freq"]
 
     ### calculate results, data must be in DATA_CRS
     print("Calculating results...")

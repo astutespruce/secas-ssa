@@ -23,7 +23,11 @@ def add_slr_projection_sheet(xlsx, df, name_col_width, area_col_width, area_labe
     counter = 0
     for id, row in df.iterrows():
         # must also have depth to show projection data
-        if row.get("slr_depth", None) is None or row.get("slr_proj") is None:
+        if (
+            row.overlap == 0
+            or row.get("slr_depth", None) is None
+            or row.get("slr_proj", None) is None
+        ):
             slr.append([id, row.overlap, "no", ""] + [""] * len(SLR_YEARS))
             counter += 1
         else:
@@ -31,7 +35,7 @@ def add_slr_projection_sheet(xlsx, df, name_col_width, area_col_width, area_labe
                 slr.append([id, row.overlap, "yes", scenario] + list(values))
                 counter += 1
 
-        breaks.append(counter)
+            breaks.append(counter)
 
     slr = pd.DataFrame(
         slr,
@@ -60,7 +64,11 @@ def add_slr_inundation_sheet(xlsx, df, name_col_width, area_col_width, area_labe
 
     slr = []
     for id, row in df.iterrows():
-        slr.append([id, row.overlap] + list(row.slr_depth))
+        out_row = [id, row.overlap]
+        if row.overlap > 0:
+            out_row += list(row.slr_depth)
+
+        slr.append(out_row)
 
     first_cols = [df.index.name, area_label]
     depth_cols = [f"Inundated at {depth} feet (acres)" for depth in SLR_DEPTHS]

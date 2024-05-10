@@ -21,10 +21,14 @@ def add_nlcd_inundation_frequency_sheet(
     breaks = []
     counter = 0
     for id, row in df.iterrows():
-        for landcover, values in row[dataset_id].items():
-            nlcd.append([id, row.overlap, landcover] + list(values))
-
+        if row.overlap > 0:
+            for landcover, values in row[dataset_id].items():
+                nlcd.append([id, row.overlap, landcover] + list(values))
+                counter += 1
+        else:
+            nlcd.append([id, row.overlap])
             counter += 1
+
         breaks.append(counter)
 
     nlcd = pd.DataFrame(
