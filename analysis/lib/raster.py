@@ -383,6 +383,9 @@ def get_overlapping_windows(src, geometry, bounds, window_size):
 
     total_windows = len(windows)
 
+    if total_windows == 0:
+        return [], 0
+
     window_boxes = shapely.box(*np.array([src.window_bounds(w) for w in windows]).T)
     shapely.prepare(geometry)
     ix = shapely.intersects(geometry, window_boxes)
