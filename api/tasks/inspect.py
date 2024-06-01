@@ -6,7 +6,10 @@ import shapely
 
 from analysis.constants import DATA_CRS, M2_ACRES
 from analysis.lib.geometry import make_valid
-from analysis.lib.stats.prescreen import verify_overlap, get_available_datasets
+from analysis.lib.stats.prescreen import (
+    get_overlapping_analysis_units,
+    get_available_datasets,
+)
 from api.errors import DataError
 from api.progress import set_progress
 from api.settings import CUSTOM_REPORT_MAX_EXTENT_ACRES, CUSTOM_REPORT_MAX_TOTAL_ACRES
@@ -189,16 +192,18 @@ async def inspect(ctx, zip_filename, uuid):
     if len(df) == 0:
         raise DataError("No valid polygon boundaries available in dataset")
 
-    if not verify_overlap(df):
+    overlapping_df = get_overlapping_analysis_units(df)
+
+    if len(overlapping_df) == 0:
         raise DataError("None of the polygon boundaries overlap available datasets")
 
     # Save as feather file for subsequent steps
     outfilename = str(zip_filename).replace(".zip", ".feather")
     df.to_feather(outfilename)
 
-    ### prescreen datasets available
+    ### prescreen datasets available (using only analysis units that overlap)
     await set_progress(ctx["redis"], ctx["job_id"], 50, "Checking available datasets")
-    results["available_datasets"] = get_available_datasets(df)
+    results["available_datasets"] = get_available_datasets(overlapping_df)
 
     await set_progress(ctx["redis"], ctx["job_id"], 100, "All done!")
 

@@ -33,10 +33,22 @@ raster_datasets = {
 }
 
 
-def verify_overlap(df):
+def get_overlapping_analysis_units(df):
+    """Return analysis units that intersect the Southeast boundary
+
+    Parameters
+    ----------
+    df : GeoDataFrame
+
+    Returns
+    -------
+    GeoDataFrame
+        data frame containing analysis units that intersect the southeast boundary
+    """
+
     bnd = gp.read_feather(boundary_filename).geometry.values[0]
-    return (
-        len(shapely.STRtree(df.geometry.values).query(bnd, predicate="intersects")) > 0
+    return df.take(
+        sorted(shapely.STRtree(df.geometry.values).query(bnd, predicate="intersects"))
     )
 
 
