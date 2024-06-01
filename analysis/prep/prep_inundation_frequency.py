@@ -1,5 +1,4 @@
 from pathlib import Path
-import subprocess
 
 import numpy as np
 import rasterio
@@ -38,15 +37,14 @@ if not outfilename.exists():
             width=bnd_raster.width,
             height=bnd_raster.height,
             src_nodata=128,
-            nodata=127, # data is int8, have to use safe upper value when reading
+            nodata=127,  # data is int8, have to use safe upper value when reading
             transform=bnd_raster.transform,
             crs=DATA_CRS,
             resampling=Resampling.nearest,
-            dtype=('int8')
+            dtype=("int8"),
         ) as vrt:
-            data = vrt.read()[0].astype('uint8')
-            data[data==127] = NODATA
-
+            data = vrt.read()[0].astype("uint8")
+            data[data == 127] = NODATA
 
     with rasterio.open(src_dir / "SEIF_TX_OK_MERGE.tif") as src:
         with WarpedVRT(
@@ -61,7 +59,7 @@ if not outfilename.exists():
             ok_tx_data = vrt.read()[0]
 
     # where they overlap, use OK/TX
-    ix = ok_tx_data!=NODATA
+    ix = ok_tx_data != NODATA
     data[ix] = ok_tx_data[ix]
 
     # Set areas outside the SE Blueprint to NODATA

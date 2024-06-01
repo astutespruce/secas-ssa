@@ -1,5 +1,6 @@
 import geopandas as gp
 import numpy as np
+import rasterio
 import shapely
 
 from analysis.constants import (
@@ -8,9 +9,6 @@ from analysis.constants import (
     SLR_YEARS,
     SLR_PROJ_COLUMNS,
     SLR_PROJ_SCENARIOS,
-)
-from analysis.lib.raster import (
-    extract_count_in_geometry,
 )
 from api.settings import SHARED_DATA_DIR
 
@@ -23,9 +21,7 @@ depth_filename = src_dir / "slr.tif"
 proj_filename = src_dir / "noaa_1deg_cells.feather"
 
 
-def extract_slr_depth_by_mask(
-    mask_config
-):
+def summarize_slr_in_aoi(rasterized_geometry):
     """Calculate the area of overlap between geometries and each level of SLR
     between 0 (currently inundated) and 6 meters.
 
@@ -36,7 +32,7 @@ def extract_slr_depth_by_mask(
 
     Parameters
     ----------
-    mask_config : AOIMaskConfig
+    rasterized_geometry : RasterizedGeometry
 
     Returns
     -------
@@ -44,22 +40,17 @@ def extract_slr_depth_by_mask(
         [area for 0ft inundation, area for 1ft, ..., area for 10f]
     """
 
-    rasterized_acres = mask_config.mask_acres
-    outside_se_acres = mask_config.outside_se_acres
-    cellsize = mask_config.cellsize
+    with rasterio.open(depth_filename) as src:
+        acres = rasterized_geometry.get_acres_by_bin(src, bins=SLR_BINS)
 
-    acres = (
-        extract_count_in_geometry(
-            depth_filename, mask_config, bins=SLR_BINS, boundless=True
-        )
-        * cellsize
+    nodata_acres = (
+        rasterized_geometry.acres - rasterized_geometry.outside_se_acres - acres.sum()
     )
 
-    nodata_acres = rasterized_acres - outside_se_acres - acres.sum()
     if nodata_acres < 1e-6:
         nodata_acres = 0
 
-    # combine areas not modeled with SLR nodata areas
+    # set NODATA into value 13
     acres[13] += nodata_acres
 
     # accumulate values for depths 0-10ft

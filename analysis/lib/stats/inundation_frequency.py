@@ -1,18 +1,20 @@
 from collections import defaultdict
 
+import rasterio
+
 from analysis.constants import NLCD_INUNDATION_FREQUENCY, NLCD_INDEXES
-from analysis.lib.raster import extract_count_in_geometry
 from api.settings import DATA_DIR
 
 BINS = list(NLCD_INUNDATION_FREQUENCY.keys())
 
 inundation_frequency_dir = DATA_DIR / "inputs/inundation_frequency"
+
 inundation_frequency_filename = (
     inundation_frequency_dir / "nlcd_inundation_frequency.tif"
 )
 
 
-def extract_nlcd_inundation_frequency_by_mask(mask_config):
+def summarize_nlcd_inundation_frequency_in_aoi(rasterized_geometry):
     """Calculate the area of overlap between shapes and inundation frequency
     by NLCD 2021 land cover class.
 
@@ -20,9 +22,7 @@ def extract_nlcd_inundation_frequency_by_mask(mask_config):
 
     Parameters
     ----------
-    shape_mask : ndarray, True outside shapes
-    window : rasterio.windows.Window for extracting area of shape_mask from raster
-    cellsize : area of each pixel
+    rasterized_geometry : RasterizedGeometry
 
     Returns
     -------
@@ -32,12 +32,8 @@ def extract_nlcd_inundation_frequency_by_mask(mask_config):
         {<NLCD index>: [<inundation freq bin 0 acres>,...], ...}
     """
 
-    acres = (
-        extract_count_in_geometry(
-            inundation_frequency_filename, mask_config, bins=BINS, boundless=True
-        )
-        * mask_config.cellsize
-    ).round(2)
+    with rasterio.open(inundation_frequency_filename) as src:
+        acres = rasterized_geometry.get_acres_by_bin(src, BINS).round(2)
 
     results = defaultdict(list)
     for key, entry in NLCD_INUNDATION_FREQUENCY.items():
