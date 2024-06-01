@@ -1,3 +1,4 @@
+from itertools import product
 import math
 
 from affine import Affine
@@ -7,6 +8,7 @@ from rasterio.enums import Resampling
 from rasterio.mask import geometry_mask
 from rasterio.vrt import WarpedVRT
 from rasterio.windows import Window
+import shapely
 
 from analysis.constants import OVERVIEW_FACTORS, DATA_CRS
 from api.settings import SHARED_DATA_DIR
@@ -124,81 +126,6 @@ def boundless_raster_geometry_mask(dataset, shapes, bounds, all_touched=False):
     )
 
     return mask, transform, window
-
-
-def extract_count_in_geometry(filename, mask_config, bins, boundless=False):
-    """Apply the geometry mask to values read from filename, and generate a list
-    of pixel counts for each bin in bins.
-
-    Parameters
-    ----------
-    filename : str
-        input GeoTIFF filename
-    mask_config : AOIMaskConfig
-    bins : list-like
-        List-like of values ranging from 0 to max value (not sparse!).
-        Counts will be generated that correspond to this list of bins.
-    boundless : bool (default: False)
-        If True, will use boundless reads of the data.  This must be used
-        if the window extends beyond the extent of the dataset.
-
-    Returns
-    -------
-    ndarray
-        Total number of pixels for each bin
-    """
-
-    with rasterio.open(filename) as src:
-        window = mask_config.get_mask_window(src.transform)
-        data = src.read(1, window=window, boundless=boundless)
-        nodata = src.nodatavals[0]
-
-    mask = (data == nodata) | mask_config.shape_mask
-
-    # slice out flattened array of values that are not masked
-    values = data[~mask]
-
-    # count number of pixels in each bin
-    return np.bincount(
-        values, minlength=len(bins) if bins is not None else None
-    ).astype("uint32")
-
-
-def extract_zonal_mean(filename, geometry_mask, window, boundless=False):
-    """Apply the geometry mask to values read from filename and calculate
-    the mean within that area.
-
-    Parameters
-    ----------
-    filename : str
-        input GeoTIFF filename
-    geometry_mask : 2D boolean ndarray
-        True for all pixels outside geometry, False inside.
-    window : rasterio.windows.Window
-        Window that defines the footprint of the geometry_mask within the raster.
-    boundless : bool (default: False)
-        If True, will use boundless reads of the data.  This must be used
-        if the window extends beyond the extent of the dataset.
-    Returns
-    -------
-    float
-        will be nan where there is no data within mask
-    """
-
-    with rasterio.open(filename) as src:
-        data = src.read(1, window=window, boundless=boundless)
-        nodata = src.nodatavals[0]
-
-    mask = (data == nodata) | geometry_mask
-
-    # since mask is True everywhere it is masked OUT, if the min is
-    # True, then there is no data
-    if mask.min():
-        return np.nan
-
-    # slice out flattened array of values that are not masked
-    # and calculate the mean
-    return data[~mask].mean()
 
 
 def detect_data(datasets, shapes, bounds):
@@ -321,32 +248,6 @@ def add_overviews(filename):
         src.build_overviews(OVERVIEW_FACTORS, Resampling.nearest)
 
 
-def calculate_percent_overlap(filename, shapes, bounds):
-    """Calculate percent of any pixels touched by shapes that is not NODATA.
-
-    Parameters
-    ----------
-    filename : str
-    shapes : list-like of GeoJSON features
-    bounds : list-like of [xmin, ymin, xmax, ymax]
-
-    Returns
-    -------
-    float
-        percent overlap of non-nodata values in mask
-    """
-    with rasterio.open(filename) as src:
-        shape_mask, transform, window = boundless_raster_geometry_mask(
-            src, shapes, bounds, all_touched=False
-        )
-
-    counts = extract_count_in_geometry(
-        filename, shape_mask, window, bins=None, boundless=True
-    )
-
-    return 100 * counts.sum() / (~shape_mask).sum()
-
-
 def extract_window(src, window, transform, nodata):
     """Extract raster data from src within window, and warp to DATA_CRS
 
@@ -402,3 +303,202 @@ def write_raster(filename, data, transform, crs, nodata):
     }
     with rasterio.open(filename, "w", **meta) as out:
         out.write(data, 1)
+
+
+def window_overlaps(window, dataset):
+    """Verify that window overlaps with extent of dataset
+
+    Parameters
+    ----------
+    window : reasterio.wndows.Window
+    dataset : open rasterio dataset
+
+    Returns
+    -------
+    bool
+    """
+    clipped_window = clip_window(window, dataset.width, dataset.height)
+    if clipped_window.width > 0 and clipped_window.height > 0:
+        return True
+
+    return False
+
+
+def get_overlapping_windows(src, geometry, bounds, window_size):
+    """Extract windows of window_size for reading from src that overlap with
+    geometry.
+
+    Parameters
+    ----------
+    src : open rasterio Dataset
+    geometry : shapely geometry
+    bounds : [xmin, ymin, xmax, ymax]
+        Bounds of geometry
+    window_size : int
+
+    Returns
+    -------
+
+    tuple of:
+        (
+            ndarray of rasterio.windows.Window,
+            ratio of number of overlapping windows to total number of windows in extent
+        )
+    """
+
+    # Select all windows that intersect geometry
+    res = src.res[0]
+    src_bounds = src.bounds
+    start_row = max(
+        math.floor(math.floor((src_bounds[3] - bounds[3]) / res) / window_size)
+        * window_size,
+        0,
+    )
+    end_row = min(
+        math.ceil(math.ceil((src_bounds[3] - bounds[1]) / res) / window_size)
+        * window_size
+        + 1,
+        src.height,
+    )
+
+    start_col = max(
+        math.floor(math.floor((bounds[0] - src_bounds[0]) / res) / window_size)
+        * window_size,
+        0,
+    )
+    end_col = min(
+        math.ceil(math.ceil((bounds[2] - src_bounds[0]) / res) / window_size)
+        * window_size
+        + 1,
+        src.width,
+    )
+
+    windows = [
+        Window(row_off=row_off, col_off=col_off, width=window_size, height=window_size)
+        for row_off, col_off in product(
+            range(start_row, end_row, window_size),
+            range(start_col, end_col, window_size),
+        )
+    ]
+
+    total_windows = len(windows)
+
+    if total_windows == 0:
+        return [], 0
+
+    window_boxes = shapely.box(*np.array([src.window_bounds(w) for w in windows]).T)
+    shapely.prepare(geometry)
+    ix = shapely.intersects(geometry, window_boxes)
+    windows = np.array(windows)[ix]
+
+    return windows, len(windows) / total_windows
+
+
+class WindowGeometryMask(object):
+    """Geometry mask with an associated read window for optimized
+    reading from the dataset
+
+    NOTE: all pixels within geometry mask are True
+    """
+
+    def __init__(self, dataset, window, shapes, all_touched=False):
+        """Create full resolution geometry mask and associated read window
+
+        Parameters
+        ----------
+        dataset : open rasterio dataset
+        window : rasterio.windows.Window
+        shapes : list-like of GeoJSON geometry objects
+        """
+        self.dataset_transform = dataset.transform
+        self.window = window
+        self.window_transform = dataset.window_transform(window)
+        self.shape_mask = geometry_mask(
+            shapes,
+            transform=self.window_transform,
+            out_shape=(int(window.height), int(window.width)),
+            all_touched=all_touched,
+            invert=True,
+        )
+
+    def detect_data(self, dataset):
+        """Detect if there are any non-NODATA pixel values in the dataset within
+        the geometry mask.
+
+        Intended to be used for a low-resolution version of the geometry mask
+        and dataset.
+
+        Parameters
+        ----------
+        dataset : open rasterio dataset
+
+        Returns
+        -------
+        bool
+            returns True if there are non-NODATA pixel values present
+        """
+        # DEBUG: check for implementation errors
+        # FIXME: comment out
+        if (
+            dataset.transform.a != self.dataset_transform.a
+            or dataset.transform.e != self.dataset_transform.e
+        ):
+            raise ValueError(
+                f"{dataset.name} resolution does not match that used for mask windows"
+            )
+
+        if dataset.transform == self.dataset_transform:
+            read_window = self.window
+
+        else:
+            read_window = shift_window(
+                self.window, self.window_transform, dataset.transform
+            )
+            if not window_overlaps(read_window, dataset):
+                return False
+
+        nodata = getattr(np, dataset.dtypes[0])(dataset.nodata)
+        data = dataset.read(1, window=read_window, boundless=True)
+
+        # if there are non-nodata values within geometry mask, then there are data
+        if (data[self.shape_mask] != nodata).any():
+            return True
+
+        return False
+
+    def get_pixel_count_by_bin(self, dataset, bins):
+        """Get count of pixels in each bin
+
+        Parameters
+        ----------
+        dataset : open rasterio dataset
+        bins : list-like
+            List-like of values ranging from 0 to max value (not sparse!).
+            Counts will be generated that correspond to this list of bins.
+
+        Returns
+        -------
+        ndarray
+            Total number of pixels for each bin
+        """
+        # DEBUG: check for implementation errors
+        # FIXME: comment out
+        if (
+            dataset.transform.a != self.dataset_transform.a
+            or dataset.transform.e != self.dataset_transform.e
+        ):
+            raise ValueError(
+                f"{dataset.name} resolution does not match that used for mask windows"
+            )
+
+        read_window = (
+            self.window
+            if dataset.transform == self.dataset_transform
+            else shift_window(self.window, self.window_transform, dataset.transform)
+        )
+        nodata = getattr(np, dataset.dtypes[0])(dataset.nodata)
+        data = dataset.read(1, window=read_window, boundless=True)
+
+        # extract values inside geometry except where they are NODATA
+        values = data[self.shape_mask & (data != nodata)]
+        return np.bincount(values, minlength=len(bins))

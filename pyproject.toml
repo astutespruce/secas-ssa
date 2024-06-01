@@ -33,3 +33,5 @@ watchgod = "^0.8.2"
 progress = "^1.6"
 cython = "^3.0.10"
 
+[tool.ruff]
+exclude = ['.scratch']

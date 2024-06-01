@@ -1,15 +1,17 @@
 import numpy as np
+import rasterio
 
 from analysis.constants import NLCD_YEARS, NLCD_INDEXES
-from analysis.lib.raster import extract_count_in_geometry
 from api.settings import SHARED_DATA_DIR
 
 src_dir = SHARED_DATA_DIR / "inputs/nlcd"
+landcover_filename = str(src_dir / "landcover_{year}.tif")
+impervious_filename = str(src_dir / "impervious_{year}.tif")
 
 PERCENTS = np.arange(0, 1.01, 0.01)
 
 
-def extract_nlcd_landcover_by_mask(mask_config):
+def summarize_nlcd_landcover_in_aoi(rasterized_geometry):
     """Calculate the area of overlap between shapes and NLCD indexes (not codes)
     for each available year.
 
@@ -17,7 +19,7 @@ def extract_nlcd_landcover_by_mask(mask_config):
 
     Parameters
     ----------
-    mask_config : AOIMaskConfig
+    rasterized_geometry : RasterizedGeometry
 
     Returns
     -------
@@ -29,12 +31,10 @@ def extract_nlcd_landcover_by_mask(mask_config):
     areas = []
 
     for year in NLCD_YEARS:
-        filename = src_dir / f"landcover_{year}.tif"
-        counts = extract_count_in_geometry(
-            filename, mask_config, bins, boundless=True
-        )
+        with rasterio.open(landcover_filename.format(year=year)) as src:
+            acres = rasterized_geometry.get_acres_by_bin(src, bins)
 
-        areas.append(counts * mask_config.cellsize)
+        areas.append(acres)
 
     # Transpose and convert to dict, only keep those that have areas
     areas = np.array(areas).T
@@ -48,7 +48,7 @@ def extract_nlcd_landcover_by_mask(mask_config):
     return results
 
 
-def extract_nlcd_impervious_by_mask(mask_config):
+def summarize_nlcd_impervious_in_aoi(rasterized_geometry):
     """Calculate total amount of impervious surface within shape_mask based on
     count per percent (0-100) * percent
 
@@ -68,12 +68,10 @@ def extract_nlcd_impervious_by_mask(mask_config):
     areas = []
 
     for year in NLCD_YEARS:
-        filename = src_dir / f"impervious_{year}.tif"
-        counts = extract_count_in_geometry(
-            filename, mask_config, bins, boundless=True
-        )
+        with rasterio.open(impervious_filename.format(year=year)) as src:
+            acres = rasterized_geometry.get_acres_by_bin(src, bins)
 
-        areas.append((PERCENTS * counts * mask_config.cellsize).sum())
+        areas.append((PERCENTS * acres).sum())
 
     # Transpose
     return np.array(areas).T.tolist()

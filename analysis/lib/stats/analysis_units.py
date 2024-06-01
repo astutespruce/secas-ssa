@@ -1,25 +1,26 @@
 import geopandas as gp
+import numpy as np
 import pandas as pd
 import shapely
 import rasterio
 
 from analysis.constants import M2_ACRES, SECAS_STATES
-from analysis.lib.geometry import to_dict_all
-from analysis.lib.raster import boundless_raster_geometry_mask, shift_window
+from analysis.lib.geometry import to_dict
+from analysis.lib.raster import WindowGeometryMask, get_window, get_overlapping_windows
 from analysis.lib.stats.inundation_frequency import (
-    extract_nlcd_inundation_frequency_by_mask,
+    summarize_nlcd_inundation_frequency_in_aoi,
 )
 from analysis.lib.stats.sarp import extract_sarp_huc12_stats
 from analysis.lib.stats.slr import (
-    extract_slr_depth_by_mask,
+    summarize_slr_in_aoi,
     extract_slr_projections_by_geometry,
 )
-from analysis.lib.stats.urban import extract_urban_by_mask
+from analysis.lib.stats.urban import summarize_urban_in_aoi
 from analysis.lib.stats.nlcd import (
-    extract_nlcd_landcover_by_mask,
-    extract_nlcd_impervious_by_mask,
+    summarize_nlcd_landcover_in_aoi,
+    summarize_nlcd_impervious_in_aoi,
 )
-from analysis.lib.stats.se_blueprint_indicators import extract_indicator_by_mask
+from analysis.lib.stats.se_blueprint_indicators import summarize_indicator_in_aoi
 from api.settings import SHARED_DATA_DIR
 
 
@@ -31,42 +32,102 @@ extent_mask_filename = bnd_dir / "blueprint_extent_mask.tif"
 states_filename = bnd_dir / "states.feather"
 
 
-class AOIMaskConfig(object):
-    """Class to store prescreen and rasterized mask information for masking
-    other raster datasets"""
+WINDOW_SIZE = 2048  # approx 16 MB for 8 bit data
 
-    def __init__(self, shapes, bounds):
+
+class RasterizedGeometry(object):
+    """Helper class to detect and extract data for a rasterized geometry
+    Similar to RasterizedGeometry in secas-blueprint respository but without a
+    low resolution mask for detecting datasets (handled prior to calling here)
+    """
+
+    def __init__(self, geometry):
         """_summary_
 
         Parameters
         ----------
-        shapes : list-like of geometry objects that provide __geo_interface__
-        bounds : list-like of [xmin, ymin, xmax, ymax]
+        geometry : shapely geometry
         """
-        # create mask and window
+        self.bounds = shapely.bounds(geometry)
+
+        all_shapes = [to_dict(geometry)]
+
+        # create masks and windows
         with rasterio.open(extent_filename) as src:
-            (
-                self.shape_mask,
-                self._mask_transform,
-                self._mask_window,
-            ) = boundless_raster_geometry_mask(src, shapes, bounds, all_touched=False)
+            windows, ratio = get_overlapping_windows(
+                src, geometry, bounds=self.bounds, window_size=WINDOW_SIZE
+            )
 
+            num_windows = len(windows)
+            self.masks = []
+
+            # threshold for using windows determined by testing performance
+            if num_windows >= 50 or (num_windows > 1 and ratio <= 0.25):
+                print(f"Using {len(windows)} windows for reading (ratio: {ratio:.3f})")
+                for window in windows:
+                    # clip geometry to window then rasterize
+                    clipped = shapely.clip_by_rect(geometry, *src.window_bounds(window))
+                    mask = WindowGeometryMask(src, window, shapes=[to_dict(clipped)])
+                    self.masks.append(mask)
+
+            else:
+                print(
+                    f"Using 1 window for reading (overlapping windows: {num_windows}, ratio: {ratio:.3f})"
+                )
+                window = get_window(src, self.bounds)
+                mask = WindowGeometryMask(src, window, all_shapes)
+                self.masks.append(mask)
+
+            # cell size in acres
             self.cellsize = src.res[0] * src.res[1] * M2_ACRES
-            self.mask_pixels = (~self.shape_mask).sum()
-            self.mask_acres = self.mask_pixels * self.cellsize
 
-            data = src.read(1, window=self._mask_window, boundless=True)
-            # count pixels within extent that are within the shape_mask
-            self.overlap_acres = (data[~self.shape_mask]).sum() * self.cellsize
-            if self.overlap_acres < 1e-6:
-                self.overlap_acres = 0
+            self.pixels = sum(mask.shape_mask.sum() for mask in self.masks)
+            self.acres = self.pixels * self.cellsize
 
-            self.outside_se_acres = self.mask_acres - self.overlap_acres
-            if self.outside_se_acres < 1e-6:
-                self.outside_se_acres = 0
+            self.within_se_pixels = sum(
+                mask.get_pixel_count_by_bin(src, bins=[0, 1])[1] for mask in self.masks
+            )
+            self.within_se_acres = self.within_se_pixels * self.cellsize
 
-    def get_mask_window(self, target_transform):
-        return shift_window(self._mask_window, self._mask_transform, target_transform)
+            self.outside_se_acres = (
+                self.pixels - self.within_se_pixels
+            ) * self.cellsize
+
+    def get_pixel_count_by_bin(self, dataset, bins):
+        """Get count of pixels in each bin
+
+        Parameters
+        ----------
+        dataset : open rasterio dataset
+        bins : list-like
+            List-like of values ranging from 0 to max value (not sparse!).
+            Counts will be generated that correspond to this list of bins.
+
+        Returns
+        -------
+        ndarray
+            Total number of pixels for each bin
+        """
+        return np.sum(
+            [mask.get_pixel_count_by_bin(dataset, bins) for mask in self.masks], axis=0
+        )
+
+    def get_acres_by_bin(self, dataset, bins):
+        """Get acres in each bin
+
+        Parameters
+        ----------
+        dataset : open rasterio dataset
+        bins : list-like
+            List-like of values ranging from 0 to max value (not sparse!).
+            Counts will be generated that correspond to this list of bins.
+
+        Returns
+        -------
+        ndarray
+            Total number of acres for each bin
+        """
+        return self.get_pixel_count_by_bin(dataset, bins) * self.cellsize
 
 
 async def get_analysis_unit_results(df, datasets, progress_callback=None):
@@ -88,11 +149,12 @@ async def get_analysis_unit_results(df, datasets, progress_callback=None):
 
     states = gp.read_feather(states_filename, columns=["state", "id", "geometry"])
     states = states.loc[states.id.isin(SECAS_STATES)]
-    tree = shapely.STRtree(df.geometry.values)
-    left, right = tree.query(states.geometry.values, predicate="intersects")
+    left, right = shapely.STRtree(states.geometry.values).query(
+        df.geometry.values, predicate="intersects"
+    )
     state_join = (
         pd.DataFrame(
-            {"state": states.state.values.take(left)}, index=df.index.values.take(right)
+            {"state": states.state.values.take(right)}, index=df.index.values.take(left)
         )
         .groupby(level=0)
         .state.unique()
@@ -104,12 +166,9 @@ async def get_analysis_unit_results(df, datasets, progress_callback=None):
     df = df.join(state_join)
     df["count"] = shapely.get_num_geometries(df.geometry.values)
     df["acres"] = shapely.area(df.geometry.values) * M2_ACRES
-    df["__geo__"] = to_dict_all(df.geometry.values)
     df["bounds"] = shapely.bounds(df.geometry.values).tolist()
 
     results = []
-
-    # TODO: prefilter polygons to those that overlap boundary
 
     sarp_huc12_stats = None
     if (
@@ -126,16 +185,17 @@ async def get_analysis_unit_results(df, datasets, progress_callback=None):
 
     for index, row in df.iterrows():
         print(f"Processing {index}")
-        mask_config = AOIMaskConfig(shapes=[row.__geo__], bounds=row.bounds)
+        rasterized_geometry = RasterizedGeometry(row.geometry)
 
         result = {
-            "pixels": mask_config.mask_pixels,
-            "rasterized_acres": mask_config.mask_acres,
-            "overlap": mask_config.overlap_acres,
-            "outside_se": mask_config.outside_se_acres,
+            "pixels": rasterized_geometry.pixels,
+            "rasterized_acres": rasterized_geometry.acres,
+            "overlap": rasterized_geometry.within_se_acres,
+            "outside_se": rasterized_geometry.outside_se_acres,
         }
 
-        if mask_config.overlap_acres == 0:
+        # short-circuit if there are no overlapping pixels
+        if rasterized_geometry.within_se_acres == 0:
             results.append(result)
 
             if progress_callback is not None:
@@ -146,33 +206,38 @@ async def get_analysis_unit_results(df, datasets, progress_callback=None):
 
         # Extract SLR
         if "slr_depth" in datasets or "slr_proj" in datasets:
-            result["slr_depth"] = extract_slr_depth_by_mask(mask_config)
+            result["slr_depth"] = summarize_slr_in_aoi(rasterized_geometry)
+            # extract_slr_depth_by_mask(mask_config)
 
         if "slr_proj" in datasets:
             result["slr_proj"] = extract_slr_projections_by_geometry(row.geometry)
 
         # Extract urban
         if "urban" in datasets:
-            result["urban"] = extract_urban_by_mask(mask_config)
+            result["urban"] = summarize_urban_in_aoi(rasterized_geometry)
 
         # Extract NLCD
         if "nlcd_landcover" in datasets:
-            result["nlcd_landcover"] = extract_nlcd_landcover_by_mask(mask_config)
+            result["nlcd_landcover"] = summarize_nlcd_landcover_in_aoi(
+                rasterized_geometry
+            )
 
         if "nlcd_impervious" in datasets:
-            result["nlcd_impervious"] = extract_nlcd_impervious_by_mask(mask_config)
+            result["nlcd_impervious"] = summarize_nlcd_impervious_in_aoi(
+                rasterized_geometry
+            )
 
         # Extract SE Blueprint indicators
         se_blueprint_indicators = [
             dataset for dataset in datasets if dataset.startswith("se_blueprint")
         ]
         for dataset in se_blueprint_indicators:
-            result[dataset] = extract_indicator_by_mask(dataset, mask_config)
+            result[dataset] = summarize_indicator_in_aoi(dataset, rasterized_geometry)
 
         # Extract inundation frequency
         if "nlcd_inundation_freq" in datasets:
-            result["nlcd_inundation_freq"] = extract_nlcd_inundation_frequency_by_mask(
-                mask_config
+            result["nlcd_inundation_freq"] = summarize_nlcd_inundation_frequency_in_aoi(
+                rasterized_geometry
             )
 
         results.append(result)
