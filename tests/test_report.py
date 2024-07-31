@@ -9,7 +9,10 @@ import shapely
 from analysis.constants import DATA_CRS
 from analysis.lib.geometry import dissolve, make_valid
 from analysis.lib.stats.analysis_units import get_analysis_unit_results
-from analysis.lib.stats.prescreen import get_available_datasets, verify_overlap
+from analysis.lib.stats.prescreen import (
+    get_available_datasets,
+    get_overlapping_analysis_units,
+)
 from api.report.xlsx import create_xlsx
 
 
@@ -26,6 +29,13 @@ aois = [
     #     "path": "Rabbitsfott_resilience_final_SECAS_only",
     #     "field": "HUC10",
     # },
+    {
+        "name": "Data_Cdan_Populations_1km_Buffer_Dissolve",
+        "path": "Data_Cdan_Populations_1km_Buffer_Dissolve",
+        "field": None,
+        "analysis_unit_label": "Pop A",
+        # "field": "POP_ID",
+    },
     # {
     #     "name": "Test single area",
     #     "path": "SingleTest",
@@ -33,20 +43,25 @@ aois = [
     #     # "analysis_unit_label": "Pop A",
     #     "analysis_unit_label": 1,
     # },
-    # {"name": "Lousiana COAs", "path": "Combined_COAsv1_dis", "field": "COAName"}
-    # {"name": "San Juan area, PR", "path": "SanJuan", "field": None, "analysis_unit_label": 1,},
+    # {"name": "Lousiana COAs", "path": "Combined_COAsv1_dis", "field": "COAName"},
+    # {
+    #     "name": "San Juan area, PR",
+    #     "path": "SanJuan",
+    #     "field": None,
+    #     "analysis_unit_label": 1,
+    # },
     # {
     #     "name": "fl_slr_test",
     #     "path": "fl_slr_test",
     #     "field": None,
     #     "analysis_unit_label": "Test population",
-    # }
+    # },
     # {
     #     "name": "big_cypress",
     #     "path": "big_cypress",
     #     "field": None,
     #     "analysis_unit_label": "Test population",
-    # }
+    # },
 ]
 
 
@@ -76,11 +91,15 @@ for aoi in aois:
     # dissolve by analysis unit identifier
     df = dissolve(df, by=field).set_index(field)
 
-    if not verify_overlap(df):
+    overlapping_df = get_overlapping_analysis_units(df)
+
+    if len(overlapping_df) == 0:
         raise ValueError("None of the polygon boundaries overlap available datasets")
 
     # find available datasets
-    datasets = [id for id, present in get_available_datasets(df).items() if present]
+    datasets = [
+        id for id, present in get_available_datasets(overlapping_df).items() if present
+    ]
     # datasets = ["nlcd_inundation_freq"]
 
     ### calculate results, data must be in DATA_CRS
