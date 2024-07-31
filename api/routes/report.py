@@ -29,7 +29,7 @@ async def create_report_endpoint(
     name: Optional[str] = Form(None),
     token: APIKey = Depends(validate_token),
 ):
-    filename = TEMP_DIR / f"{uuid}.feather"
+    filename = (TEMP_DIR / f"{uuid}.feather").resolve()
 
     # verify that file exists in temp directory, otherwise return 404;
     # should only happen if there is too much delay between submitting initial

@@ -32,7 +32,7 @@ async def create_report(ctx, uuid, datasets, field=None, name=None):
 
     await set_progress(ctx["redis"], ctx["job_id"], 0, "Reading dataset")
 
-    filename = TEMP_DIR / f"{uuid}.feather"
+    filename = (TEMP_DIR / f"{uuid}.feather").resolve()
 
     # double-check that it exists; this should not occur here
     # because we check for it before submitting job
