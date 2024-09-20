@@ -13,11 +13,9 @@ module.exports = {
     contactEmail: `se_ssa_spatial_toolkit@fws.gov`,
     apiToken: process.env.GATSBY_API_TOKEN,
     apiHost: process.env.GATSBY_API_HOST,
-    tileHost: process.env.GATSBY_TILE_HOST,
     sentryDSN: process.env.GATSBY_SENTRY_DSN,
     sentryENV: process.env.GATSBY_SENTRY_ENV || 'development',
     googleAnalyticsId: process.env.GATSBY_GOOGLE_ANALYTICS_ID,
-    mapboxToken: process.env.GATSBY_MAPBOX_API_TOKEN,
   },
   flags: {
     FAST_DEV: true,

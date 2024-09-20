@@ -5,10 +5,7 @@ import { ReplyAll, Download as DownloadIcon } from '@emotion-icons/fa-solid'
 
 import { JobContainer } from 'components/job'
 import { OutboundLink } from 'components/link'
-
-import config from '../../../gatsby-config'
-
-const { apiHost } = config.siteMetadata
+import { apiHost } from 'components/job/api'
 
 const Download = ({ uuid, selectedAttribute, selectedDatasets, onCancel }) => {
   const [reportURL, setReportURL] = useState(null)
