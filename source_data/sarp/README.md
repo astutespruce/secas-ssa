@@ -1,11 +1,11 @@
 # SARP Aquatic Barrier and Network Metrics
 
-The [Aquatic Barrier Prioritization Tool](https://aquaticbarriers.org/)
+The [National Aquatic Barrier Prioritization Tool](https://aquaticbarriers.org/)
 created by the Southeast Aquatic Resources Partnership (SARP) includes data
 describing aquatic barriers and the connectivity of aquatic networks.
 
 Data were extracted from the data used for the Aquatic Barrier Prioritization
-Tool v3.3.0 (10/23/2023) using this script:
+Tool v3.12.1 (9/9/2024) using this script:
 https://github.com/astutespruce/sarp-connectivity/blob/main/analysis/export/export_secas_ssa_stats.py
 
 Data include metrics at the HUC12 level:

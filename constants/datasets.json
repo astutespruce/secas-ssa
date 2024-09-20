@@ -119,9 +119,9 @@
       "filename": "CoastalShorelineCondition.tif",
       "name": "Coastal shoreline condition",
       "sheet_name": "Coastal shoreline condition",
-      "date": "2023",
-      "source": "Southeast Conservation Blueprint 2023",
-      "citation": "Southeast Conservation Adaptation Strategy (SECAS). 2023. Southeast Conservation Blueprint 2023. http://secassoutheast.org/blueprint",
+      "date": "2024",
+      "source": "Southeast Conservation Blueprint 2024",
+      "citation": "Southeast Conservation Adaptation Strategy (SECAS). 2024. Southeast Conservation Blueprint 2024. http://secassoutheast.org/blueprint",
       "values": [
         {
           "value": 0,
@@ -149,7 +149,7 @@
           "color": "#005C4D"
         }
       ],
-      "description": "This indicator assesses shoreline condition based on the presence of hardened structures like jetties, groins, and riprap, as well as other human development. By restricting the natural movement of sediment, shoreline armoring increases erosion, prevents the inland migration of coastal ecosystems in response to sea-level rise, and degrades habitat for birds, sea turtles, fish, plants, and other species both on and offshore. Natural shorelines in harder-to-develop coastal areas receive the highest shoreline condition scores, while hardened shorelines receive the lowest scores. This indicator originates from the National Oceanic and Atmospheric Administration’s Environmental Sensitivity Index dataset.",
+      "description": "This indicator assesses shoreline condition based on the presence of hardened structures like jetties, groins, and riprap, as well as other human development. By restricting the natural movement of sediment, shoreline armoring increases erosion, prevents the inland migration of coastal ecosystems in response to sea-level rise, and degrades habitat for birds, sea turtles, fish, plants, and other species both on and offshore. Natural shorelines in harder-to-develop coastal areas receive the highest shoreline condition scores, while hardened shorelines receive the lowest scores. This indicator originates from the National Oceanic and Atmospheric Administration's Environmental Sensitivity Index dataset.",
       "methods": "Data were used without additional modification.",
       "url": "https://secas-fws.hub.arcgis.com/maps/d75e310afae54c03b32a2a2699a2e5d7/about"
     },
@@ -158,9 +158,9 @@
       "filename": "CaribbeanCoastalShorelineCondition.tif",
       "name": "Caribbean Coastal shoreline condition",
       "sheet_name": "Caribbean coastal condition",
-      "date": "2023",
-      "source": "Southeast Conservation Blueprint 2023",
-      "citation": "Southeast Conservation Adaptation Strategy (SECAS). 2023. Southeast Conservation Blueprint 2023. http://secassoutheast.org/blueprint",
+      "date": "2024",
+      "source": "Southeast Conservation Blueprint 2024",
+      "citation": "Southeast Conservation Adaptation Strategy (SECAS). 2024. Southeast Conservation Blueprint 2024. http://secassoutheast.org/blueprint",
       "values": [
         {
           "value": 0,
@@ -173,7 +173,7 @@
           "color": "#428200"
         }
       ],
-      "description": "This indicator assesses shoreline alteration based on the presence of hardened structures like seawalls, groins, and riprap at the dynamic interface between land and water along the U.S. Caribbean coast. By restricting the natural movement of sediment, shoreline armoring increases erosion, prevents the inland migration of coastal ecosystems in response to sea-level rise, and degrades habitat for birds, sea turtles, fish, plants, and other species both on and offshore. This indicator originates from the National Oceanic and Atmospheric Administration’s Continuously Updated Shoreline Product.",
+      "description": "This indicator assesses shoreline alteration based on the presence of hardened structures like seawalls, groins, and riprap at the dynamic interface between land and water along the U.S. Caribbean coast. By restricting the natural movement of sediment, shoreline armoring increases erosion, prevents the inland migration of coastal ecosystems in response to sea-level rise, and degrades habitat for birds, sea turtles, fish, plants, and other species both on and offshore. This indicator originates from the National Oceanic and Atmospheric Administration's Continuously Updated Shoreline Product.",
       "methods": "Data were used without additional modification.",
       "url": "https://secas-fws.hub.arcgis.com/maps/52049e30b212477093df581f2a5cb381/about"
     },
@@ -182,9 +182,9 @@
       "filename": "ResilientCoastalSites.tif",
       "name": "Resilient coastal sites",
       "sheet_name": "Resilient coastal sites",
-      "date": "2023",
-      "source": "Southeast Conservation Blueprint 2023",
-      "citation": "Southeast Conservation Adaptation Strategy (SECAS). 2023. Southeast Conservation Blueprint 2023. http://secassoutheast.org/blueprint",
+      "date": "2024",
+      "source": "Southeast Conservation Blueprint 2024",
+      "citation": "Southeast Conservation Adaptation Strategy (SECAS). 2024. Southeast Conservation Blueprint 2024. http://secassoutheast.org/blueprint",
       "values": [
         {
           "value": 1,
@@ -222,18 +222,18 @@
           "color": "#205905"
         }
       ],
-      "description": "This indicator depicts the capacity of coastal habitats to migrate to adjacent lowlands in order to sustain biodiversity and natural services under increasing inundation from sea-level rise. It is based on the physical and condition characteristics of current tidal complexes, their predicted migration space, and surrounding buffer areas. These characteristics include marsh complex size, shared edge with migration space, sediment balance, water quality, natural landcover, landform diversity, and more. This indicator originates from The Nature Conservancy’s Resilient Coastal Sites project.",
+      "description": "This indicator depicts the capacity of coastal habitats to migrate to adjacent lowlands in order to sustain biodiversity and natural services under increasing inundation from sea-level rise. It is based on the physical and condition characteristics of current tidal complexes, their predicted migration space, and surrounding buffer areas. These characteristics include marsh complex size, shared edge with migration space, sediment balance, water quality, natural landcover, landform diversity, and more. This indicator originates from The Nature Conservancy's Resilient Coastal Sites project.",
       "methods": "Data were used without additional modification.",
-      "url": "https://secas-fws.hub.arcgis.com/maps/fws::resilient-coastal-sites-southeast-blueprint-indicator-2023/about"
+      "url": "https://secas-fws.hub.arcgis.com/maps/0534ee723e0e4c92aba1c84d2266d587/about"
     },
     {
       "id": "se_blueprint_stablecoastalwetlands",
       "filename": "StableCoastalWetlands.tif",
       "name": "Stable coastal wetlands",
       "sheet_name": "Stable coastal wetlands",
-      "date": "2023",
-      "source": "Southeast Conservation Blueprint 2023",
-      "citation": "Southeast Conservation Adaptation Strategy (SECAS). 2023. Southeast Conservation Blueprint 2023. http://secassoutheast.org/blueprint",
+      "date": "2024",
+      "source": "Southeast Conservation Blueprint 2024",
+      "citation": "Southeast Conservation Adaptation Strategy (SECAS). 2024. Southeast Conservation Blueprint 2024. http://secassoutheast.org/blueprint",
       "values": [
         {
           "value": 0,
@@ -261,9 +261,9 @@
       "filename": "NaturalLandcoverInFloodplains.tif",
       "name": "Natural landcover in floodplains",
       "sheet_name": "Floodplain natural landcover",
-      "date": "2023",
-      "source": "Southeast Conservation Blueprint 2023",
-      "citation": "Southeast Conservation Adaptation Strategy (SECAS). 2023. Southeast Conservation Blueprint 2023. http://secassoutheast.org/blueprint",
+      "date": "2024",
+      "source": "Southeast Conservation Blueprint 2024",
+      "citation": "Southeast Conservation Adaptation Strategy (SECAS). 2024. Southeast Conservation Blueprint 2024. http://secassoutheast.org/blueprint",
       "values": [
         {
           "value": 0,
@@ -299,7 +299,7 @@
       "nodata_label": "Not within an estimated floodplain or outside floodplain natural landcover data extent",
       "description": "This indicator measures the amount of natural landcover in the estimated floodplain of rivers and streams within each catchment. It assesses the stream channel and its surrounding riparian buffer, measuring the percent of unaltered habitat like forests, wetlands, or open water (rather than agriculture or development). Intact vegetated buffers within the floodplain of rivers and streams provide aquatic habitat, improve water quality, reduce erosion and flooding, recharge groundwater, and more. This indicator originates from the National Land Cover Database and applies to the Environmental Protection Agency's estimated floodplain, which spatially defines areas estimated to be inundated by a 100-year flood (also known as the 1% annual chance flood).",
       "methods": "Data were used without additional modification.",
-      "url": "https://secas-fws.hub.arcgis.com/maps/9a908b4b3a8443bea1fca74261d7938f/about"
+      "url": "https://secas-fws.hub.arcgis.com/maps/0fbad75c4419447c8eea8b734cedb042/about"
     },
 
     {
@@ -307,9 +307,9 @@
       "filename": "CaribbeanNaturalLandcoverInFloodplains.tif",
       "name": "Caribbean natural landcover in floodplains",
       "sheet_name": "Caribbean floodplain landcover",
-      "date": "2023",
-      "source": "Southeast Conservation Blueprint 2023",
-      "citation": "Southeast Conservation Adaptation Strategy (SECAS). 2023. Southeast Conservation Blueprint 2023. http://secassoutheast.org/blueprint",
+      "date": "2024",
+      "source": "Southeast Conservation Blueprint 2024",
+      "citation": "Southeast Conservation Adaptation Strategy (SECAS). 2024. Southeast Conservation Blueprint 2024. http://secassoutheast.org/blueprint",
       "values": [
         {
           "value": 0,
@@ -353,9 +353,9 @@
       "filename": "NetworkComplexity.tif",
       "name": "Aquatic network complexity",
       "sheet_name": "Aquatic network complexity",
-      "date": "2023",
-      "source": "Southeast Conservation Blueprint 2023",
-      "citation": "Southeast Conservation Adaptation Strategy (SECAS). 2023. Southeast Conservation Blueprint 2023. http://secassoutheast.org/blueprint",
+      "date": "2024",
+      "source": "Southeast Conservation Blueprint 2024",
+      "citation": "Southeast Conservation Adaptation Strategy (SECAS). 2024. Southeast Conservation Blueprint 2024. http://secassoutheast.org/blueprint",
       "values": [
         {
           "value": 0,
@@ -401,7 +401,7 @@
       "nodata_label": "Not within an estimated floodplain or outside aquatic network complexity data extent",
       "description": "This indicator depicts the number of connected stream size classes in a river network between dams or waterfalls. River networks with a variety of connected stream classes help retain aquatic biodiversity in a changing climate by allowing species to access climate refugia and move between habitats. This indicator originates from the Southeast Aquatic Resources Partnership and applies to the Environmental Protection Agency's estimated floodplain, which spatially defines areas estimated to be inundated by a 100-year flood (also known as the 1% annual chance flood).",
       "methods": "Data were used without additional modification.",
-      "url": "https://secas-fws.hub.arcgis.com/maps/29903714287a430f8cf71e3e42dccbcc/about"
+      "url": "https://secas-fws.hub.arcgis.com/maps/3d2199887798400c8a36ced410ceb17d/about"
     },
 
     {
@@ -409,9 +409,9 @@
       "filename": "CaribbeanNetworkComplexity.tif",
       "name": "Caribbean aquatic network complexity",
       "sheet_name": "Caribbean network complexity",
-      "date": "2023",
-      "source": "Southeast Conservation Blueprint 2023",
-      "citation": "Southeast Conservation Adaptation Strategy (SECAS). 2023. Southeast Conservation Blueprint 2023. http://secassoutheast.org/blueprint",
+      "date": "2024",
+      "source": "Southeast Conservation Blueprint 2024",
+      "citation": "Southeast Conservation Adaptation Strategy (SECAS). 2024. Southeast Conservation Blueprint 2024. http://secassoutheast.org/blueprint",
       "values": [
         {
           "value": 0,
@@ -450,9 +450,9 @@
       "filename": "FireFrequency.tif",
       "name": "Fire frequency",
       "sheet_name": "Fire frequency",
-      "date": "2023",
-      "source": "Southeast Conservation Blueprint 2023",
-      "citation": "Southeast Conservation Adaptation Strategy (SECAS). 2023. Southeast Conservation Blueprint 2023. http://secassoutheast.org/blueprint",
+      "date": "2024",
+      "source": "Southeast Conservation Blueprint 2024",
+      "citation": "Southeast Conservation Adaptation Strategy (SECAS). 2024. Southeast Conservation Blueprint 2024. http://secassoutheast.org/blueprint",
       "values": [
         {
           "value": 0,
@@ -484,9 +484,9 @@
       "filename": "IntactHabitatCores.tif",
       "name": "Intact habitat cores",
       "sheet_name": "Intact habitat cores",
-      "date": "2023",
-      "source": "Southeast Conservation Blueprint 2023",
-      "citation": "Southeast Conservation Adaptation Strategy (SECAS). 2023. Southeast Conservation Blueprint 2023. http://secassoutheast.org/blueprint",
+      "date": "2024",
+      "source": "Southeast Conservation Blueprint 2024",
+      "citation": "Southeast Conservation Adaptation Strategy (SECAS). 2024. Southeast Conservation Blueprint 2024. http://secassoutheast.org/blueprint",
       "values": [
         {
           "value": 0,
@@ -511,16 +511,16 @@
       ],
       "description": "This indicator represents the size of large, unfragmented patches of natural habitat. It identifies minimally disturbed natural areas at least 100 acres in size and greater than 200 meters wide. Large areas of intact natural habitat are important for many wildlife species, including reptiles and amphibians, birds, and large mammals. This indicator originates from Esri's green infrastructure data.",
       "methods": "Data were used without additional modification.",
-      "url": "https://secas-fws.hub.arcgis.com/maps/cd9bf9cb7cb545ce96cbc154a4fdc214/about"
+      "url": "https://secas-fws.hub.arcgis.com/maps/be5ed90574104af198a9260e27f92fa6/about"
     },
     {
       "id": "se_blueprint_resilientterrestrialsites",
       "filename": "ResilientTerrestrialSites.tif",
       "name": "Resilient terrestrial sites",
       "sheet_name": "Resilient terrestrial sites",
-      "date": "2023",
-      "source": "Southeast Conservation Blueprint 2023",
-      "citation": "Southeast Conservation Adaptation Strategy (SECAS). 2023. Southeast Conservation Blueprint 2023. http://secassoutheast.org/blueprint",
+      "date": "2024",
+      "source": "Southeast Conservation Blueprint 2024",
+      "citation": "Southeast Conservation Adaptation Strategy (SECAS). 2024. Southeast Conservation Blueprint 2024. http://secassoutheast.org/blueprint",
       "values": [
         {
           "value": 0,
@@ -565,17 +565,17 @@
       ],
       "description": "This indicator depicts an area's capacity to maintain species diversity and ecosystem function in the face of climate change. It measures two factors that influence resilience. The first, landscape diversity, reflects the number of microhabitats and climatic gradients created by topography, elevation, and hydrology. The second, local connectedness, reflects the degree of habitat fragmentation and strength of barriers to species movement. Highly resilient sites contain many different habitat niches that support biodiversity, and allow species to move freely through the landscape to find suitable microclimates as the climate changes. This indicator originates from The Nature Conservancy's Resilient Land data.",
       "methods": "Data were used without additional modification.",
-      "url": "https://secas-fws.hub.arcgis.com/maps/fws::resilient-terrestrial-sites-southeast-blueprint-indicator-2023/about"
+      "url": "https://secas-fws.hub.arcgis.com/maps/f776465ae36d4471bf5985cf1a536681/about"
     },
     {
       "id": "sarp_aquatic_barriers",
       "name": "Aquatic barriers",
       "sheet_name": "Aquatic barriers",
       "source": "Southeast Aquatic Resources Partnership",
-      "date": "2023",
-      "citation": "Southeast Aquatic Resources Partnership. 2023.  Aquatic Barrier Prioritization Tool (version 3.3.0; Oct 2023).",
+      "date": "2024",
+      "citation": "Southeast Aquatic Resources Partnership. 2024.  National Aquatic Barrier Prioritization Tool (version 3.12.1).",
       "url": "https://aquaticbarriers.org/",
-      "description": "This dataset includes the count of dams and potential road-related barriers within the HUC12 subwatersheds that overlap the analysis units.  Dams are derived from the Southeast Aquatic Resource Partnership's barrier inventory, which is compiled from multiple sources.  Potential road-related barriers are derived from the USGS Database of Stream Crossings in the U.S.  NOTE: potential road-related barriers include features such as bridges, which may not be barriers to aquatic organism dispersal, as well as culverts with high outlet drops, which are complete barriers to the passage of aquatic organisms.  The degree of impact of these barriers to aquatic organisms has only been surveyed for a very small number of these potential road-related barriers; please see the Aquatic Barrier Prioritization Tool for more details.",
+      "description": "This dataset includes the count of dams and potential road-related barriers within the HUC12 subwatersheds that overlap the analysis units.  Dams are derived from the Southeast Aquatic Resource Partnership's barrier inventory, which is compiled from multiple sources.  Potential road-related barriers are derived from the USGS Database of Stream Crossings in the U.S.  NOTE: potential road-related barriers include features such as bridges, which may not be barriers to aquatic organism dispersal, as well as culverts with high outlet drops, which are complete barriers to the passage of aquatic organisms.  The degree of impact of these barriers to aquatic organisms has only been surveyed for a very small number of these potential road-related barriers; please see the National Aquatic Barrier Prioritization Tool for more details.",
       "valueDescription": "Values show the total number of dams and potential road-related barriers across all HUC12 subwatersheds that overlap each analysis unit.",
       "methods": "Dams are snapped to the aquatic network and duplicate records resulting from merging multiple source databases are removed where possible.  Duplicate dam records and erroneous data (where known) are omitted here.  Duplicate potential road-related barriers are removed if they co-occur within a 10 meter distance of anotehr road-related barrier.  The total number of dams and potential road-related barriers are calculated for each HUC12 subwatershed."
     },
@@ -584,10 +584,10 @@
       "name": "Aquatic network alteration",
       "sheet_name": "Aquatic network alteration",
       "source": "Southeast Aquatic Resources Partnership",
-      "date": "2023",
-      "citation": "Southeast Aquatic Resources Partnership. 2023.  Aquatic Barrier Prioritization Tool (version 3.3.0).",
+      "date": "2024",
+      "citation": "Southeast Aquatic Resources Partnership. 2024.  National Aquatic Barrier Prioritization Tool (version 3.12.1).",
       "url": "https://aquaticbarriers.org/",
-      "description": "This dataset shows the length of the aquatic network (rivers / streams) that is considered anthropogenically altered by one or more data sources.  The aquatic network is derived from the USGS National Hydrography Dataset (NHD) High Resolution dataset for use in the Aquatic Barrier Prioritization Tool (https://connectivity.sarpdata.com/) created by the Southeast Aquatic Resources Partnership.  Flowlines are considered altered if they are coded by NHD as canal / ditch or pipeline type, overlap with altered riverine areas in the National Wetlands inventory, or fall within a reservoir identified by NHD or state water body datasets.  Not all areas of aboveground flow are represented within this dataset, so it should be taken as an approximate measure of aquatic network alteration.  It is not intended to represent all anthropogenic alterations to aquatic ecosystems.",
+      "description": "This dataset shows the length of the aquatic network (rivers / streams) that is considered anthropogenically altered by one or more data sources.  The aquatic network is derived from the USGS National Hydrography Dataset (NHD) High Resolution dataset for use in the National Aquatic Barrier Prioritization Tool (https://aquaticbarriers.org/) created by the Southeast Aquatic Resources Partnership.  Flowlines are considered altered if they are coded by NHD as canal / ditch or pipeline type, overlap with altered riverine areas in the National Wetlands inventory, or fall within a reservoir identified by NHD or state water body datasets.  Not all areas of aboveground flow are represented within this dataset, so it should be taken as an approximate measure of aquatic network alteration.  It is not intended to represent all anthropogenic alterations to aquatic ecosystems.",
       "valueDescription": "Values show the percent of the total length of the aquatic network that is considered altered.  Network lengths are combined across all HUC12 subwatersheds that overlap each analysis unit.",
       "methods": "The aquatic network is derived from the USGS National Hydrography Dataset (NHD) High Resolution flowlines dataset, excluding flowlines (rivers / streams) that represent coastlines, underground connections, long pipelines, or lack catchment drainage information.  Flowlines are considered altered if they are coded by NHD as canal / ditch or pipeline type, overlap with altered riverine areas in the National Wetlands inventory, or fall within a reservoir identified by NHD or state water body datasets."
     },
