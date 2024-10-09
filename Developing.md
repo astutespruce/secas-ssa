@@ -16,7 +16,19 @@ Python dependencies are managed using `uv`. First,
 ```bash
 uv venv .venv --python 3.12
 <source it according to your shell, e.g., source .venv/bin/activate.fish>
-uv sync --extras dev
+uv pip install -e .[dev]
+```
+
+To check for outdated dependencies and upgrade them:
+
+```bash
+uv pip install -r pyproject.toml --upgrade --dry-run
+
+# upgrade it
+uv pip install --upgrade <package>
+
+# lock it
+uv lock --upgrade-package <package>
 ```
 
 To update the requirements.txt file used to build these dependencies into the API
