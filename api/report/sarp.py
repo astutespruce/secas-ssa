@@ -9,7 +9,13 @@ def add_sarp_barriers_sheet(xlsx, df, name_col_width):
     sheet_name = dataset["sheet_name"]
     description = dataset["valueDescription"]
 
-    barriers = df[["subwatersheds", "dams", "crossings",]].rename(
+    barriers = df[
+        [
+            "subwatersheds",
+            "dams",
+            "crossings",
+        ]
+    ].rename(
         columns={
             "subwatersheds": "Subwatersheds",
             "dams": "Dams",
@@ -19,7 +25,7 @@ def add_sarp_barriers_sheet(xlsx, df, name_col_width):
     barriers.reset_index().to_excel(xlsx, sheet_name=sheet_name, index=False)
     ws = xlsx.sheets[sheet_name]
 
-    set_column_widths(ws, [name_col_width, 14, 12, 12])
+    set_column_widths(ws, [name_col_width, 14, 12, 16])
 
     set_cell_styles(ws)
 
@@ -44,7 +50,7 @@ def add_sarp_network_alteration_sheet(xlsx, df, name_col_width):
     alteration.reset_index().to_excel(xlsx, sheet_name=sheet_name, index=False)
     ws = xlsx.sheets[sheet_name]
 
-    set_column_widths(ws, [name_col_width, 14, 12, 12, 12])
+    set_column_widths(ws, [name_col_width, 14, 12, 12, 18])
 
     set_cell_styles(ws, area_columns=[2, 3], percent_columns=[4])
 

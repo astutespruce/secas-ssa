@@ -10,5 +10,30 @@ The API is implemented in Python and provides summary reports for pre-defined su
 
 ## Development
 
-Python dependencies are managed using `poetry`. First, install poetry, then
-`poetry install` to install most of them.
+Python dependencies are managed using `uv`. First,
+[install uv](https://docs.astral.sh/uv/), then:
+
+```bash
+uv venv .venv --python 3.12
+<source it according to your shell, e.g., source .venv/bin/activate.fish>
+uv pip install -e .[dev]
+```
+
+To check for outdated dependencies and upgrade them:
+
+```bash
+uv pip install -r pyproject.toml --upgrade --dry-run
+
+# upgrade it
+uv pip install --upgrade <package>
+
+# lock it
+uv lock --upgrade-package <package>
+```
+
+To update the requirements.txt file used to build these dependencies into the API
+Docker container for deployment, run:
+
+```bash
+uv pip compile pyproject.toml -o ../secas-docker/docker/api/secas-ssa-requirements.txt
+```

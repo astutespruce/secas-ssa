@@ -14,6 +14,8 @@ if (hasWindow && !apiHost) {
   apiHost = `//${window.location.host}`
 }
 
+export { apiHost }
+
 export const submitJob = async (path, data, onProgress) => {
   const formData = new FormData()
   Object.entries(data).forEach(([key, value]) => {
