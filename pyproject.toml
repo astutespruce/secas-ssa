@@ -25,10 +25,8 @@ dependencies = [
     "numpy",
     "openpyxl",
     "pandas",
-    "Pillow",
     "progress",
-    # NOTE: pyarrow 17 appears to have an error with registering the FileSystemFactory
-    "pyarrow==16",
+    "pyarrow",
     "pymgl",
     "pyogrio",
     "python-calamine",
@@ -40,7 +38,6 @@ dependencies = [
     "sentry-sdk",
     "shapely",
     "uvicorn",
-    "weasyprint",
 ]
 
 [project.optional-dependencies]
