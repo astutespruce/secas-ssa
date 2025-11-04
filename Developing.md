@@ -25,7 +25,7 @@ To check for outdated dependencies and upgrade them:
 uv pip list --outdated
 
 # install latest version
-uv pip install -U <packages>
+uv sync --upgrade --all-extras
 ```
 
 To update the requirements.txt file used to build these dependencies into the API
