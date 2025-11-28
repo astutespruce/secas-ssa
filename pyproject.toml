@@ -22,7 +22,7 @@ dependencies = [
     "geopandas",
     "gunicorn",
     "Jinja2",
-    "numpy",
+    "numpy==2.2.6",
     "openpyxl",
     "pandas",
     "progress",
