@@ -224,7 +224,7 @@
       ],
       "description": "This indicator depicts the capacity of coastal habitats to migrate to adjacent lowlands in order to sustain biodiversity and natural services under increasing inundation from sea-level rise. It is based on the physical and condition characteristics of current tidal complexes, their predicted migration space, and surrounding buffer areas. These characteristics include marsh complex size, shared edge with migration space, sediment balance, water quality, natural landcover, landform diversity, and more. This indicator originates from The Nature Conservancy's Resilient Coastal Sites project.",
       "methods": "Data were used without additional modification.",
-      "url": "https://secas-fws.hub.arcgis.com/maps/fws::resilient-coastal-sites-southeast-blueprint-indicator-2023/about"
+      "url": "https://secas-fws.hub.arcgis.com/maps/2ea2c0d83ec24c91b53a1179a5ce7b18/about"
     },
     {
       "id": "se_blueprint_stablecoastalwetlands",
@@ -565,7 +565,7 @@
       ],
       "description": "This indicator depicts an area's capacity to maintain species diversity and ecosystem function in the face of climate change. It measures two factors that influence resilience. The first, landscape diversity, reflects the number of microhabitats and climatic gradients created by topography, elevation, and hydrology. The second, local connectedness, reflects the degree of habitat fragmentation and strength of barriers to species movement. Highly resilient sites contain many different habitat niches that support biodiversity, and allow species to move freely through the landscape to find suitable microclimates as the climate changes. This indicator originates from The Nature Conservancy's Resilient Land data.",
       "methods": "Data were used without additional modification.",
-      "url": "https://secas-fws.hub.arcgis.com/maps/fws::resilient-terrestrial-sites-southeast-blueprint-indicator/about"
+      "url": "https://secas-fws.hub.arcgis.com/maps/2db724a1cac14e43a2acc9bc0a33be47/about"
     },
     {
       "id": "sarp_aquatic_barriers",

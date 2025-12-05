@@ -189,7 +189,7 @@ const IndexPage = ({
           <Box as="ul" sx={{ fontSize: 2 }}>
             <li>
               Terrestrial and freshwater indicators created as part of the
-              Southeast Blueprint 2024, including
+              Southeast Blueprint 2025, including
               <Grid columns={3} gap={3} sx={{ mt: '0.5rem', mb: '1rem' }}>
                 <Box
                   sx={{
