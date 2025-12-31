@@ -57,15 +57,15 @@
 		</div>
 	</div>
 </div>
-<div class="hidden sm:block text-sm text-right pr-1 leading-tight">
-	Photo: Great Smokey Mountains National Park, <a
+<div class="hidden sm:block text-sm text-right pr-1 leading-tight text-grey-8">
+	Great Smokey Mountains National Park. Photo: <a
 		href="https://unsplash.com/photos/1bj4WGNDFHw"
 		target="_blank">Robert Thiemann</a
 	>
 </div>
 
 <div class="container pt-6 pb-8">
-	<p class="text-2xl">
+	<p class="text-xl sm:text-2xl">
 		<a href="https://www.fws.gov/project/species-status-assessment" target="_blank">
 			Species Status Assessments
 		</a>
@@ -100,27 +100,27 @@
 
 	<hr />
 
-	<h2 class="text-6xl mt-8">How to create a report</h2>
-	<div class="grid grid-cols-[2fr_1fr] gap-8 mt-8">
+	<h2 class="text-3xl sm:text-4xl md:text-6xl mt-8">How to create a report</h2>
+	<div class="grid sm:grid-cols-[2fr_1fr] gap-8 mt-8">
 		<div>
 			{#each steps as step, i (step.label)}
 				<div class="not-first:mt-8">
-					<div class="flex gap-2 items-center">
+					<div class="flex gap-4 items-center">
 						<div
-							class="bg-foreground text-white flex items-center justify-center rounded-full size-10 text-2xl font-bold"
+							class="flex-none bg-foreground text-white flex items-center justify-center rounded-full size-8 sm:size-10 text-xl sm:text-2xl font-bold"
 						>
 							{i + 1}
 						</div>
-						<div class="text-2xl font-bold">{step.label}</div>
+						<div class="text-xl sm:text-2xl font-bold leading-tight">{step.label}</div>
 					</div>
-					<p class="ml-12">
+					<p class="ml-14">
 						{step.description}
 					</p>
 				</div>
 			{/each}
 		</div>
 
-		<figure>
+		<figure class="hidden sm:block">
 			<enhanced:img src="$images/4971502145_03d6b78f28_o.jpg" alt="Key Deer at Key Deer NWR" />
 			<figcaption>
 				Key Deer at Key Deer NWR. Photo: <a
@@ -133,36 +133,36 @@
 
 	<hr />
 
-	<h2 class="text-4xl mt-8">What datasets are available?</h2>
+	<h2 class="text-2xl sm:text-3xl md:text-4xl mt-8">What datasets are available?</h2>
 
 	<p class="text-xl mt-2">This tool includes the following datasets:</p>
-	<div class="grid gap-8 grid-cols-[2fr_1fr] mt-2 text-lg">
-		<ul class="list-disc pl-4 [&>li+li]:mt-2">
-			<li>
+	<div class="grid gap-8 sm:grid-cols-[2fr_1fr] mt-2 text-lg">
+		<ul>
+			<li class="[&_ul_li]:leading-tight">
 				Terrestrial and freshwater indicators created as part of the Southeast Blueprint 2025,
 				including
 
-				<div class="grid gap-px grid-cols-3 mt-2 bg-grey-2 border border-grey-2">
-					<div class="bg-grey-0 px-4 pb-4 pt-2">
+				<div class="grid gap-px sm:grid-cols-3 mt-2 sm:bg-grey-2 sm:border sm:border-grey-2">
+					<div class="sm:bg-grey-0 px-4 pb-4 sm:pt-2">
 						<div class="italic">Terrestrial</div>
-						<ul class="list-disc pl-4 leading-tight [&>li+li]:mt-2">
+						<ul>
 							<li>fire frequency</li>
 							<li>intact habitat cores</li>
 							<li>resilient terrestrial sites</li>
 						</ul>
 					</div>
 
-					<div class="bg-grey-0 px-4 border-l-2 border-l-grey-2 pb-4 pt-2">
+					<div class="sm:bg-grey-0 px-4 pb-4 sm:pt-2">
 						<div class="italic text-lg">Freshwater</div>
-						<ul class="list-disc pl-4 leading-tight [&>li+li]:mt-2">
+						<ul>
 							<li>aquatic network complexity</li>
 							<li>natural landcover in floodplains</li>
 						</ul>
 					</div>
 
-					<div class="bg-grey-0 px-4 border-l-2 border-l-grey-2 pb-4 pt-2">
+					<div class="sm:bg-grey-0 px-4 pb-4 sm:pt-2">
 						<div class="italic text-lg">Coastal</div>
-						<ul class="list-disc pl-4 leading-tight [&>li+li]:mt-2">
+						<ul>
 							<li>coastal shoreline condition</li>
 							<li>resilient coastal sites</li>
 							<li>stable coastal wetlands</li>
@@ -208,7 +208,7 @@
 				.
 			</li>
 		</ul>
-		<figure>
+		<figure class="hidden sm:block">
 			<enhanced:img
 				src="$images/5142785872_b34caf59e3_h.jpg"
 				alt="Prescribed fire at Mississippi Sandhill Crane NWR 2004"
@@ -230,8 +230,8 @@
 
 	<hr />
 
-	<div class="grid grid-cols-[1fr_2fr] gap-8">
-		<figure>
+	<div class="grid sm:grid-cols-[1fr_2fr] gap-8">
+		<figure class="hidden sm:block">
 			<enhanced:img
 				src="$images/5149490458_5ffcce6c44_c.jpg"
 				alt="Looking for mussels on the Little Tennessee River"
@@ -260,7 +260,7 @@
 	<hr />
 
 	<h2 class="mt-8 text-4xl">Credits</h2>
-	<div class="grid gap-8 grid-cols-[2fr_1fr] mt-2">
+	<div class="grid gap-8 sm:grid-cols-[2fr_1fr] mt-2">
 		<div>
 			<p>
 				This application was developed by{' '}
@@ -272,7 +272,7 @@
 				.
 			</p>
 		</div>
-		<figure>
+		<figure class="hidden sm:block">
 			<enhanced:img
 				src="$images/8027062941_e8fcdf1247_c.jpg"
 				alt="Endangered mussels for release in the Powell River"

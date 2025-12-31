@@ -137,11 +137,23 @@
 	}
 
 	hr {
-		@apply border-b-8 border-b-blue-9 my-16;
+		@apply border-b-8 border-b-blue-9 my-12;
 	}
 
 	figure figcaption {
 		@apply text-sm text-grey-8 text-right leading-tight;
+	}
+
+	ul {
+		@apply list-disc pl-4 text-lg;
+
+		ul {
+			@apply pl-5;
+		}
+
+		li + li {
+			@apply mt-2;
+		}
 	}
 }
 
