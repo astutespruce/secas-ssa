@@ -18,7 +18,7 @@
 		</div>
 		<div class="container mt-6 md:mt-14">
 			<h1
-				class="relative text-white z-2 text-shadow-sm text-shadow-black text-4xl sm:text-5xl md:text-6xl lg:text-7xl"
+				class="relative text-white z-2 text-shadow-sm text-shadow-black text-4xl sm:text-5xl md:text-6xl"
 			>
 				Dataset details
 			</h1>

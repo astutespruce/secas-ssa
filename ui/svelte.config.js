@@ -8,7 +8,6 @@ dotEnvConfig({ path: `.env.${process.env.NODE_ENV}` })
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
 	preprocess: vitePreprocess(),
-
 	kit: {
 		adapter: adapter({
 			pages: 'public',

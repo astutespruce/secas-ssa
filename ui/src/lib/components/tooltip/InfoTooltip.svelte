@@ -10,18 +10,14 @@
 <div class="hidden md:block">
 	<Tooltip.Provider delayDuration={0}>
 		<Tooltip.Root disableHoverableContent disableCloseOnTriggerClick>
-			<Tooltip.Trigger aria-label="show description of layer">
-				<QuestionCircle
-					width="1.25rem"
-					height="1.25rem"
-					class="cursor-pointer text-grey-4 hover:text-grey-9"
-				/>
+			<Tooltip.Trigger aria-label="show description" class="mt-2">
+				<QuestionCircle class="cursor-pointer text-grey-4 hover:text-grey-9" />
 			</Tooltip.Trigger>
-			<Tooltip.Content side="right" sideOffset={2} class="pt-2 pb-4 px-3 max-w-[28rem]">
-				<h4 class="text-[1rem]">
+			<Tooltip.Content side="right" sideOffset={2} class="pt-2 pb-4 px-3 max-w-md">
+				<h4 class="text-base">
 					{title}
 				</h4>
-				<p class="text-[0.9rem] leading-tight">
+				<p class="text-sm leading-tight">
 					{description}
 				</p>
 			</Tooltip.Content>
@@ -32,14 +28,14 @@
 <!-- mobile is a dialog instead -->
 <div class="block md:hidden">
 	<Dialog.Root>
-		<Dialog.Trigger aria-label="show description of layer">
+		<Dialog.Trigger aria-label="show description">
 			<QuestionCircle
 				width="1.25rem"
 				height="1.25rem"
 				class="cursor-pointer text-grey-4 hover:text-grey-9"
 			/>
 		</Dialog.Trigger>
-		<Dialog.Content class="z-[10000]">
+		<Dialog.Content class="z-10000">
 			<Dialog.Header class="border-b pb-2 border-b-grey-3">
 				<Dialog.Title class="text-left text-2xl">{title}</Dialog.Title>
 			</Dialog.Header>

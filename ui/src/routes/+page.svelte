@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { resolve } from '$app/paths'
 	import { Root as Alert } from '$lib/components/ui/alert'
+	import { Badge } from '$lib/components/ui/badge'
 	import { Button } from '$lib/components/ui/button'
 
 	import ExclamationTriangle from '~icons/fa-solid/exclamation-triangle'
@@ -106,11 +107,9 @@
 			{#each steps as step, i (step.label)}
 				<div class="not-first:mt-8">
 					<div class="flex gap-4 items-center">
-						<div
-							class="flex-none bg-foreground text-white flex items-center justify-center rounded-full size-8 sm:size-10 text-xl sm:text-2xl font-bold"
-						>
+						<Badge class="text-2xl size-9">
 							{i + 1}
-						</div>
+						</Badge>
 						<div class="text-xl sm:text-2xl font-bold leading-tight">{step.label}</div>
 					</div>
 					<p class="ml-14">

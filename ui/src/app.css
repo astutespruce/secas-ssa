@@ -95,6 +95,8 @@
 	--color-secondary-foreground: var(--secondary-grey-8);
 	--color-destructive: var(--error);
 
+	--color-popover: var(--white);
+
 	--radius-sm: calc(var(--radius) - 4px);
 	--radius-md: calc(var(--radius) - 2px);
 	--radius-lg: var(--radius);
