@@ -4,8 +4,10 @@
 	import { zod4, zod4Client } from 'sveltekit-superforms/adapters'
 	import { z } from 'zod'
 
-	import Download from '~icons/fa-solid/download'
+	import DownloadIcon from '~icons/fa-solid/download'
+	import UploadIcon from '~icons/fa-solid/upload'
 	import ExclamationTriangle from '~icons/fa-solid/exclamation-triangle'
+	import ReplyAllIcon from '~icons/fa-solid/reply-all'
 	import { cn } from '$lib/utils.js'
 	import { Field, Control, Label, Button as SubmitButton } from '$lib/components/ui/form'
 	import { Badge } from '$lib/components/ui/badge'
@@ -109,22 +111,23 @@
 	const isValid = $derived($formData.file && !$errors.file)
 </script>
 
-<div class="grid sm:grid-cols-2 gap-16">
-	<div>
-		<div class="flex gap-4 items-center">
-			<Badge class="text-2xl size-9">1</Badge>
-			<div class="text-2xl font-bold leading-tight">Upload analysis unit boundaries</div>
+<form enctype="multipart/form-data" use:enhance>
+	<div class="grid sm:grid-cols-2 gap-16">
+		<div>
+			<div class="flex gap-4 items-center">
+				<Badge class="text-2xl size-9">1</Badge>
+				<div class="text-2xl font-bold leading-tight">Upload analysis unit boundaries</div>
+			</div>
+			<p class="mt-4">
+				Upload a shapefile or ESRI File Geodatabase Feature Class with the boundaries of the
+				analysis units you want to use for your report. Each analysis unit will be analyzed
+				independently.
+				<br />
+				<br />
+				You will be able to select the attribute that identifies the analysis units in the next step.
+			</p>
 		</div>
-		<p class="mt-4">
-			Upload a shapefile or ESRI File Geodatabase Feature Class with the boundaries of the analysis
-			units you want to use for your report. Each analysis unit will be analyzed independently.
-			<br />
-			<br />
-			You will be able to select the attribute that identifies the analysis units in the next step.
-		</p>
-	</div>
-	<div>
-		<form enctype="multipart/form-data" use:enhance>
+		<div>
 			<Field {form} name="file" class="">
 				<Control>
 					{#snippet children({ props })}
@@ -159,7 +162,7 @@
 								)}
 							>
 								<div>
-									<Download width="2rem" height="2rem" />
+									<DownloadIcon class="size-8" />
 								</div>
 								<p class="text-2xl font-bold mt-2">Drop your zip file here</p>
 								<p class="text-lg text-grey-8 leading-tight mt-4">
@@ -187,17 +190,24 @@
 					{/snippet}
 				</Control>
 			</Field>
-
-			<hr class="border-b-6 my-8" />
-
-			<div class="flex justify-between">
-				<div>
-					{#if isValid}
-						<Button onclick={handleResetFile} variant="secondary">Choose a different file</Button>
-					{/if}
-				</div>
-				<SubmitButton disabled={!isValid}>Upload File</SubmitButton>
-			</div>
-		</form>
+		</div>
 	</div>
-</div>
+
+	<hr class="border-b-6 my-8" />
+
+	<div class="flex justify-between">
+		<div>
+			{#if isValid}
+				<Button onclick={handleResetFile} variant="destructive">
+					<ReplyAllIcon class="size-5" />
+					Start over
+				</Button>
+			{/if}
+		</div>
+		<SubmitButton disabled={!isValid}>
+			<UploadIcon class="size-5" />
+
+			Upload File</SubmitButton
+		>
+	</div>
+</form>

@@ -1,4 +1,6 @@
 <script lang="ts">
+	import ReplyAllIcon from '~icons/fa-solid/reply-all'
+	import NextIcon from '~icons/fa-solid/angle-double-right'
 	import { Badge } from '$lib/components/ui/badge'
 	import { Button } from '$lib/components/ui/button'
 	import * as Select from '$lib/components/ui/select'
@@ -61,12 +63,18 @@
 				.
 			</div>
 		{/if}
-
-		<hr />
-
-		<div class="flex justify-between gap-4">
-			<Button variant="secondary" onclick={onBack}>Back</Button>
-			<Button onclick={onNext}>Next</Button>
-		</div>
 	</div>
+</div>
+
+<hr />
+
+<div class="flex justify-between gap-4">
+	<Button variant="destructive" onclick={onBack}
+		><ReplyAllIcon class="size-5" />
+		Start over</Button
+	>
+	<Button onclick={onNext}>
+		Select factors
+		<NextIcon class="size-5" />
+	</Button>
 </div>

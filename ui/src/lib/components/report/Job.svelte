@@ -98,7 +98,7 @@
 	<hr />
 	<div class="flex justify-center">
 		<Button variant="destructive" onclick={handleCancel}>
-			<ReplyAllIcon class="size-6" />
+			<ReplyAllIcon class="size-5" />
 			Start over
 		</Button>
 	</div>

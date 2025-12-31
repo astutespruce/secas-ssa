@@ -1,6 +1,5 @@
 <script lang="ts">
 	import Check from '~icons/fa-solid/check'
-	import { captureException, logGAEvent } from '$lib/util/log'
 	import { cn } from '$lib/utils'
 
 	import { Badge } from '$lib/components/ui/badge'
@@ -126,8 +125,8 @@
 	>.
 </div>
 
-<div class="container pt-6 pb-4">
-	<div class="grid-cols-4 shadow-xl border border-grey-6 border-r border-r-grey-8 hidden sm:grid">
+<div class="container pt-8 pb-4">
+	<div class="grid-cols-4 border border-grey-6 border-r border-r-grey-8 hidden sm:grid">
 		{#each steps as step, i (step.id)}
 			<Button
 				variant="ghost"

@@ -1,6 +1,8 @@
 <script lang="ts">
 	import CaretDown from '~icons/fa-solid/caret-down'
 	import CaretRight from '~icons/fa-solid/caret-right'
+	import BackIcon from '~icons/fa-solid/angle-double-left'
+	import FileIcon from '~icons/fa-solid/file-alt'
 	import { Badge } from '$lib/components/ui/badge'
 	import { Button } from '$lib/components/ui/button'
 	import { Checkbox } from '$lib/components/ui/checkbox'
@@ -120,14 +122,20 @@
 				</Collapsible.Root>
 			{/each}
 		</div>
-
-		<hr />
-
-		<div class="flex justify-between gap-4">
-			<Button variant="secondary" onclick={onBack}>Back</Button>
-			<Button onclick={hasDatasets ? onNext : () => {}} disabled={!hasDatasets}
-				>Create report</Button
-			>
-		</div>
 	</div>
+</div>
+
+<hr />
+
+<div class="flex justify-between gap-4 pb-8">
+	<Button variant="secondary" onclick={onBack}>
+		<BackIcon class="size-5" />
+
+		Select factors</Button
+	>
+	<Button onclick={hasDatasets ? onNext : () => {}} disabled={!hasDatasets}>
+		<FileIcon class="size-5" />
+
+		Create report</Button
+	>
 </div>
