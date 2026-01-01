@@ -122,9 +122,10 @@
 		<figure class="hidden sm:block">
 			<enhanced:img src="$images/4971502145_03d6b78f28_o.jpg" alt="Key Deer at Key Deer NWR" />
 			<figcaption>
-				Key Deer at Key Deer NWR. Photo: <a
+				Key Deer at Key Deer NWR. <br />Photo:
+				<a
 					href="https://flickr.com/photos/usfwssoutheast/4971502145/in/photostream/"
-					target="_blank">U.S. Fish and Wildlife Service Southeast Region</a
+					target="_blank">USFWS Southeast Region</a
 				>.
 			</figcaption>
 		</figure>
@@ -210,12 +211,12 @@
 		<figure class="hidden sm:block">
 			<enhanced:img
 				src="$images/5142785872_b34caf59e3_h.jpg"
-				alt="Prescribed fire at Mississippi Sandhill Crane NWR 2004"
+				alt="Prescribed fire, Mississippi Sandhill Crane NWR 2004"
 			/>
 			<figcaption>
-				Prescribed fire at Mississippi Sandhill Crane NWR 2004. Photo: <a
-					href="https://flickr.com/photos/usfwssoutheast/5142785872/"
-					target="_blank">U.S. Fish and Wildlife Service Southeast Region</a
+				Prescribed fire, Mississippi Sandhill Crane NWR 2004. <br />Photo:
+				<a href="https://flickr.com/photos/usfwssoutheast/5142785872/" target="_blank"
+					>USFWS Southeast Region</a
 				>.
 			</figcaption>
 		</figure>
@@ -235,10 +236,11 @@
 				src="$images/5149490458_5ffcce6c44_c.jpg"
 				alt="Looking for mussels on the Little Tennessee River"
 			/>
-			<figcaption>
-				Looking for mussels on the Little Tennessee River. Photo: <a
-					href="https://flickr.com/photos/usfwssoutheast/5149490458/"
-					target="_blank">Gary Peeples / U.S. Fish and Wildlife Service Southeast Region</a
+			<figcaption class="text-left">
+				Looking for mussels on the Little Tennessee River.
+				<br />Photo:
+				<a href="https://flickr.com/photos/usfwssoutheast/5149490458/" target="_blank"
+					>Gary Peeples / USFWS Southeast Region</a
 				>.
 			</figcaption>
 		</figure>
@@ -277,9 +279,9 @@
 				alt="Endangered mussels for release in the Powell River"
 			/>
 			<figcaption>
-				Endangered mussels for release in the Powell River. Photo: <a
-					href="https://flickr.com/photos/usfwssoutheast/8027062941/in/photostream/"
-					>Gary Peeples / U.S. Fish and Wildlife Service Southeast Region</a
+				Endangered mussels for release in the Powell River. <br />Photo:
+				<a href="https://flickr.com/photos/usfwssoutheast/8027062941/in/photostream/"
+					>Gary Peeples / USFWS Southeast Region</a
 				>.
 			</figcaption>
 		</figure>
