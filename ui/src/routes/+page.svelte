@@ -284,8 +284,10 @@
 			/>
 			<figcaption>
 				Endangered mussels for release in the Powell River. <br />Photo:
-				<a href="https://flickr.com/photos/usfwssoutheast/8027062941/in/photostream/"
-					>Gary Peeples / USFWS Southeast Region</a
+				<a
+					href="https://flickr.com/photos/usfwssoutheast/8027062941/in/photostream/"
+					target="_blank"
+					tabindex="-1">Gary Peeples / USFWS Southeast Region</a
 				>.
 			</figcaption>
 		</figure>
