@@ -70,11 +70,11 @@
 
 <div class="flex justify-between gap-4">
 	<Button variant="destructive" onclick={onBack}
-		><ReplyAllIcon class="size-5" />
+		><ReplyAllIcon class="size-5" aria-hidden="true" />
 		Start over</Button
 	>
 	<Button onclick={onNext}>
 		Select factors
-		<NextIcon class="size-5" />
+		<NextIcon class="size-5" aria-hidden="true" />
 	</Button>
 </div>

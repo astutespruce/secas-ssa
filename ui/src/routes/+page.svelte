@@ -47,21 +47,24 @@
 			/>
 		</div>
 		<div class="container mt-6 md:mt-14">
-			<h1 class="relative text-white z-2 text-shadow-sm text-shadow-black">
-				<div class="text-4xl sm:text-5xl md:text-6xl lg:text-7xl">
-					Southeast Species Status Landscape Assessment Tool
-				</div>
-				<div class="hidden sm:block sm:text-3xl font-normal mt-2">
-					Supporting species status assessments using standardized landscape-level data
-				</div>
+			<h1
+				class="relative text-white z-2 text-shadow-sm text-shadow-black text-4xl sm:text-5xl md:text-6xl lg:text-7xl"
+			>
+				Southeast Species Status Landscape Assessment Tool
 			</h1>
+			<div
+				class="relative z-2 hidden sm:block sm:text-3xl font-normal mt-2 text-white text-shadow-black text-shadow-sm"
+			>
+				Supporting species status assessments using standardized landscape-level data
+			</div>
 		</div>
 	</div>
 </div>
 <div class="hidden sm:block text-sm text-right pr-1 leading-tight text-grey-8">
 	Great Smokey Mountains National Park. Photo: <a
 		href="https://unsplash.com/photos/1bj4WGNDFHw"
-		target="_blank">Robert Thiemann</a
+		target="_blank"
+		tabindex="-1">Robert Thiemann</a
 	>
 </div>
 
@@ -83,14 +86,14 @@
 
 	<div class="flex justify-center mt-16">
 		<Button href={resolve('/report')} class="no-underline text-2xl py-6">
-			<FileAlt class="size-6" />
+			<FileAlt class="size-6" aria-hidden="true" />
 			Create Custom Report</Button
 		>
 	</div>
 
-	<Alert class="text-lg mt-16 bg-accent text-white flex gap-4 border-none">
+	<Alert class="text-lg mt-16 bg-destructive/15 text-foreground flex gap-4 border-none">
 		<div>
-			<ExclamationTriangle class="size-14 flex-none" />
+			<ExclamationTriangle class="size-14 flex-none" aria-hidden="true" />
 		</div>
 		<div>
 			<b>WARNING</b>: This is an early development version of this application that is being used to
@@ -125,7 +128,8 @@
 				Key Deer at Key Deer NWR. <br />Photo:
 				<a
 					href="https://flickr.com/photos/usfwssoutheast/4971502145/in/photostream/"
-					target="_blank">USFWS Southeast Region</a
+					target="_blank"
+					tabindex="-1">USFWS Southeast Region</a
 				>.
 			</figcaption>
 		</figure>
@@ -215,7 +219,7 @@
 			/>
 			<figcaption>
 				Prescribed fire, Mississippi Sandhill Crane NWR 2004. <br />Photo:
-				<a href="https://flickr.com/photos/usfwssoutheast/5142785872/" target="_blank"
+				<a href="https://flickr.com/photos/usfwssoutheast/5142785872/" target="_blank" tabindex="-1"
 					>USFWS Southeast Region</a
 				>.
 			</figcaption>
@@ -239,7 +243,7 @@
 			<figcaption class="text-left">
 				Looking for mussels on the Little Tennessee River.
 				<br />Photo:
-				<a href="https://flickr.com/photos/usfwssoutheast/5149490458/" target="_blank"
+				<a href="https://flickr.com/photos/usfwssoutheast/5149490458/" target="_blank" tabindex="-1"
 					>Gary Peeples / USFWS Southeast Region</a
 				>.
 			</figcaption>

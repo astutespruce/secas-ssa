@@ -28,7 +28,8 @@
 <div class="hidden sm:block text-sm text-right pr-1 leading-tight text-grey-8">
 	Prescribed burn at Florida Panther NWR. Photo: <a
 		href="https://flickr.com/photos/usfwssoutheast/5142785230/in/photostream/"
-		target="_blank">U.S. Fish and Wildlife Service Southeast Region</a
+		target="_blank"
+		tabindex="-1">U.S. Fish and Wildlife Service Southeast Region</a
 	>.
 </div>
 
@@ -83,7 +84,8 @@
 							<div>
 								{#if dataset.url}
 									<a href={dataset.url} class="flex items-center gap-2"
-										>{dataset.source} <ExternalLinkAlt class="size-4 text-link/50" /></a
+										>{dataset.source}
+										<ExternalLinkAlt class="size-4 text-link/50" aria-hidden="true" /></a
 									>
 								{:else}
 									{dataset.source}

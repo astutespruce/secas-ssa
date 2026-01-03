@@ -199,13 +199,13 @@
 		<div>
 			{#if isValid}
 				<Button onclick={handleResetFile} variant="destructive">
-					<ReplyAllIcon class="size-5" />
+					<ReplyAllIcon class="size-5" aria-hidden="true" />
 					Start over
 				</Button>
 			{/if}
 		</div>
 		<SubmitButton disabled={!isValid}>
-			<UploadIcon class="size-5" />
+			<UploadIcon class="size-5" aria-hidden="true" />
 
 			Upload File</SubmitButton
 		>

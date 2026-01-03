@@ -12,16 +12,16 @@
 		<div class="flex-none">
 			<ContactDialog>
 				<div class="flex items-center gap-2 cursor-pointer hover:underline">
-					<Envelope width="1em" height="1em" />
+					<Envelope class="size-4" aria-hidden="true" />
 					Contact us
 				</div>
 			</ContactDialog>
 		</div>
-		<div class="hidden lg:block">|</div>
-		<div class="flex-none">
+		<div class="hidden md:block">|</div>
+		<div class="flex-none hidden md:block">
 			<ReportProblemDialog>
-				<div class="items-center gap-2 cursor-pointer hover:underline hidden lg:flex">
-					<ExclamationCircle width="1em" height="1em" />
+				<div class="items-center gap-2 cursor-pointer hover:underline flex">
+					<ExclamationCircle class="size-4" aria-hidden="true" />
 					Report a problem
 				</div>
 			</ReportProblemDialog>

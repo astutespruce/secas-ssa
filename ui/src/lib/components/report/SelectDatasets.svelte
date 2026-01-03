@@ -82,15 +82,11 @@
 						style={`background-color: ${category.color}; border-color: ${category.borderColor}`}
 					>
 						{#if openCategories[category.id]}
-							<CaretDown class="size-6" />
+							<CaretDown class="size-6" aria-hidden="true" />
 						{:else}
-							<CaretRight class="size-6" />
+							<CaretRight class="size-6" aria-hidden="true" />
 						{/if}
-						<img
-							src={icons[category.id as IconIndex]}
-							alt={`${category.label} icon`}
-							class="size-8"
-						/>
+						<img src={icons[category.id as IconIndex]} alt="" aria-hidden="true" class="size-8" />
 						<div class="font-bold text-xl">
 							{category.label}
 						</div>
@@ -100,6 +96,7 @@
 							<div class="flex items-center gap-2">
 								<Checkbox
 									id={dataset.id}
+									aria-label={`Select / deselect ${dataset.name}`}
 									class="cursor-pointer size-5 rounded-xs disabled:border-grey-4 border-2 [&_svg]:size-4"
 									bind:checked={selectedDatasets[dataset.id]}
 									disabled={!availableDatasets[dataset.id]}
@@ -115,7 +112,11 @@
 										<span class="text-sm"> (no data available) </span>
 									{/if}
 								</Label>
-								<InfoTooltip title={dataset.name} description={dataset.description} />
+								<InfoTooltip
+									title={dataset.name}
+									description={dataset.description}
+									aria-label={`Show details for ${dataset.name}`}
+								/>
 							</div>
 						{/each}
 					</Collapsible.Content>
@@ -129,12 +130,12 @@
 
 <div class="flex justify-between gap-4 pb-8">
 	<Button variant="secondary" onclick={onBack}>
-		<BackIcon class="size-5" />
+		<BackIcon class="size-5" aria-hidden="true" />
 
 		Select factors</Button
 	>
 	<Button onclick={hasDatasets ? onNext : () => {}} disabled={!hasDatasets}>
-		<FileIcon class="size-5" />
+		<FileIcon class="size-5" aria-hidden="true" />
 
 		Create report</Button
 	>

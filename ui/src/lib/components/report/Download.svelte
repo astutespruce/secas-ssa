@@ -51,12 +51,12 @@
 
 		<div class="flex gap-4 justify-between">
 			<Button variant="destructive" onclick={onCancel}>
-				<ReplyAllIcon class="size-6" />
+				<ReplyAllIcon class="size-6" aria-hidden="true" />
 				Start over
 			</Button>
 
 			<Button href={reportURL} target="_blank" class="no-underline">
-				<DownloadIcon class="size-6" />
+				<DownloadIcon class="size-6" aria-hidden="true" />
 				Download report
 			</Button>
 		</div>

@@ -121,12 +121,13 @@
 <div class="hidden sm:block text-sm text-right pr-1 leading-tight text-grey-8">
 	White River National Wildlife Refuge. Photo: <a
 		href="https://www.flickr.com/photos/usfwssoutheast/5494812678/"
-		target="_blank">U.S. Fish and Wildlife Service Southeast Region</a
+		target="_blank"
+		tabindex="-1">U.S. Fish and Wildlife Service Southeast Region</a
 	>.
 </div>
 
 <div class="container pt-8 pb-4">
-	<div class="grid-cols-4 border border-grey-6 border-r border-r-grey-8 hidden sm:grid">
+	<nav class="grid-cols-4 border border-grey-6 border-r border-r-grey-8 hidden sm:grid">
 		{#each steps as step, i (step.id)}
 			<Button
 				variant="ghost"
@@ -159,10 +160,11 @@
 					class={cn('size-4 invisible hidden sm:block', {
 						visible: i < stepIndex
 					})}
+					aria-hidden="true"
 				/>
 			</Button>
 		{/each}
-	</div>
+	</nav>
 
 	{#if step === 'upload'}
 		<Upload onSuccess={handleFileUploadSuccess} />

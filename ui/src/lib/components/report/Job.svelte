@@ -78,9 +78,9 @@
 </script>
 
 {#if error !== null}
-	<Alert class="text-lg mt-16 bg-destructive/10 text-destructive flex gap-4 border-destructive">
+	<Alert class="text-lg mt-16 bg-destructive/15 text-destructive flex gap-4 border-destructive">
 		<div>
-			<ExclamationTriangle class="size-14 flex-none" />
+			<ExclamationTriangle class="size-14 flex-none" aria-hidden="true" />
 		</div>
 		<div>
 			<div class="text-2xl font-bold">Uh oh! There was an error!</div>
@@ -98,7 +98,7 @@
 	<hr />
 	<div class="flex justify-center">
 		<Button variant="destructive" onclick={handleCancel}>
-			<ReplyAllIcon class="size-5" />
+			<ReplyAllIcon class="size-5" aria-hidden="true" />
 			Start over
 		</Button>
 	</div>
