@@ -15,28 +15,29 @@
 		}
 	)}
 >
-	<nav aria-label="Main navigation">
-		<div class="sm:flex flex-auto justify-between items-center gap-3 pl-2 pr-4 py-1">
-			<a
-				href={resolve('/')}
-				class="lg:flex gap-1.5 flex-wrap items-center no-underline text-white hover:text-white focus:outline-2 outline-accent outline-offset-6"
-			>
-				<div class="m-0 leading-none font-normal text-[0.8rem] md:text-[1rem] lg:text-2xl">
-					Southeast
-				</div>
-				<div class="m-0 text-lg md:text-2xl font-normal leading-none">
-					Species Status Landscape Assessment Tool
-				</div>
-			</a>
-			<div class="hidden flex-none md:flex gap-3 lg:gap-5">
-				<a
-					href={resolve('/report')}
-					class="flex gap-1.5 items-center flex-none font-bold text-md bg-transparent hover:bg-black/20 no-underline px-2 py-1.5 border border-white cursor-pointer rounded-sm text-white focus:outline-2 focus:outline-accent"
-				>
-					<FileUpload aria-hidden="true" />
-					Create Custom Report
-				</a>
+	<nav
+		class="sm:flex flex-auto justify-between items-center gap-3 pl-2 pr-4 py-1"
+		aria-label="Main navigation"
+	>
+		<a
+			href={resolve('/')}
+			class="lg:flex gap-1.5 flex-wrap items-center no-underline text-white hover:text-white focus:outline-2 outline-accent outline-offset-6"
+		>
+			<div class="m-0 leading-none font-normal text-[0.8rem] md:text-[1rem] lg:text-2xl">
+				Southeast
 			</div>
+			<div class="m-0 text-lg md:text-2xl font-normal leading-none">
+				Species Status Landscape Assessment Tool
+			</div>
+		</a>
+		<div class="hidden flex-none md:flex gap-3 lg:gap-5">
+			<a
+				href={resolve('/report')}
+				class="flex gap-1.5 items-center flex-none font-bold text-md bg-transparent hover:bg-black/20 no-underline px-2 py-1.5 border border-white cursor-pointer rounded-sm text-white focus:outline-2 focus:outline-accent"
+			>
+				<FileUpload aria-hidden="true" />
+				Create Custom Report
+			</a>
 		</div>
 	</nav>
 </header>

@@ -61,7 +61,7 @@
 	</div>
 </div>
 <div class="hidden sm:block text-sm text-right pr-1 leading-tight text-grey-8">
-	Great Smokey Mountains National Park. Photo: <a
+	Great Smoky Mountains National Park. Photo: <a
 		href="https://unsplash.com/photos/1bj4WGNDFHw"
 		target="_blank"
 		tabindex="-1">Robert Thiemann</a
@@ -73,9 +73,9 @@
 		<a href="https://www.fws.gov/project/species-status-assessment" target="_blank">
 			Species Status Assessments
 		</a>
-		(SSAs) are used by U.S. Fish and Wildlife Service to make decisions under the Endangered Species Act.
-		SSAs depend on the latest available data that describe current and projected future landscape conditions
-		that may influence the persistence of populations of a species.
+		(SSAs) are used by the U.S. Fish and Wildlife Service to make decisions under the Endangered Species
+		Act. SSAs depend on the latest available data that describe current and projected future landscape
+		conditions that may influence the persistence of populations of a species.
 		<br />
 		<br />
 		This tool creates reports that help SSA analysts evaluate the potential influences of landscape-level
