@@ -4,9 +4,9 @@
 
 This uses a data processing pipeline in Python to prepare all spatial data for use in this application.
 
-The user interface is creating using GatsbyJS as a static web application.
+The user interface is creating using SvelteJS as a static web application.
 
-The API is implemented in Python and provides summary reports for pre-defined summary units and user-defined areas.
+The API is implemented in Python and provides summary XLSX reports for user-defined analysis areas.
 
 ## Data Analysis & API Development
 
@@ -35,8 +35,9 @@ Docker container for deployment, run:
 uv pip compile -U pyproject.toml -o ../secas-docker/docker/api/secas-ssa-requirements.txt
 ```
 
+See [api/README.md](./api/README.md) for more information about running the API locally.
 
-## User interface development
+## User Interface Development
 
 The user interface is developed using Javascript, executed in NodeJS during a
 dedicated build step to build the user interface into static assets, which are
