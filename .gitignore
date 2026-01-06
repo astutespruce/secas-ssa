@@ -40,3 +40,7 @@ data/inputs/inundation_frequency
 /ui/public
 
 /examples/*
+
+ui/.svelte-kit/*
+
+*.7z
