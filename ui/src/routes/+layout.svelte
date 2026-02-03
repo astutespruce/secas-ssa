@@ -3,7 +3,9 @@
 	import sourceSansPro from '@fontsource/source-sans-pro/files/source-sans-pro-latin-400-normal.woff2?url'
 	import sourceSansProBold from '@fontsource/source-sans-pro/files/source-sans-pro-latin-900-normal.woff2?url'
 
-	import { Analytics, Header, Footer } from '$lib/components/layout'
+	import { browser } from '$app/environment'
+	import { GOOGLE_ANALYTICS_ID } from '$lib/env'
+	import { Header, Footer } from '$lib/components/layout'
 
 	import '../app.css'
 
@@ -15,6 +17,22 @@
 		const _ = params
 		contentNode?.scrollTo({ top: 0, behavior: 'auto' })
 	})
+
+	const handleGTAGLoad = () => {
+		if (!window.dataLayer) {
+			console.warn('GTAG not properly initialized')
+			return
+		}
+
+		console.debug('setting up GTAG')
+
+		window.gtag = (...args) => {
+			dataLayer.push(...args)
+		}
+
+		gtag('js', new Date())
+		gtag('config', GOOGLE_ANALYTICS_ID)
+	}
 </script>
 
 <svelte:head>
@@ -26,9 +44,14 @@
 		href={sourceSansProBold}
 		crossorigin="anonymous"
 	/>
+	{#if browser && GOOGLE_ANALYTICS_ID}
+		<script
+			async
+			src={`https://www.googletagmanager.com/gtag/js?id=${GOOGLE_ANALYTICS_ID}`}
+			onload={handleGTAGLoad}
+		></script>
+	{/if}
 </svelte:head>
-
-<Analytics />
 
 <div class="flex flex-col h-full w-full overflow-none">
 	<Header />
