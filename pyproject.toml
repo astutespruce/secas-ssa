@@ -22,6 +22,7 @@ dependencies = [
     "geopandas",
     "gunicorn",
     "Jinja2",
+    "numba>=0.65.1",
     "numpy",
     "openpyxl",
     "pandas",
@@ -40,7 +41,6 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = [
-    "cython",
     "httpx[http2]",
     "ruff",
     "setuptools",
@@ -50,6 +50,10 @@ dev = [
 
 [tool.setuptools.packages.find]
 include = ["analysis", "api"]
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
 
 [tool.ruff]
 exclude = ['.scratch']

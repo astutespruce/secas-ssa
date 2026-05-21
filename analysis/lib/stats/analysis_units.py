@@ -10,6 +10,7 @@ from analysis.lib.raster import WindowGeometryMask, get_window, get_overlapping_
 from analysis.lib.stats.inundation_frequency import (
     summarize_nlcd_inundation_frequency_in_aoi,
 )
+from analysis.lib.stats.landfire import summarize_landfire_evt_in_aoi
 from analysis.lib.stats.sarp import extract_sarp_huc12_stats
 from analysis.lib.stats.slr import (
     summarize_slr_in_aoi,
@@ -63,7 +64,7 @@ class RasterizedGeometry(object):
 
             # threshold for using windows determined by testing performance
             if num_windows >= 50 or (num_windows > 1 and ratio <= 0.25):
-                print(f"Using {len(windows)} windows for reading (ratio: {ratio:.3f})")
+                # print(f"Using {len(windows)} windows for reading (ratio: {ratio:.3f})")
                 for window in windows:
                     # clip geometry to window then rasterize
                     clipped = shapely.clip_by_rect(geometry, *src.window_bounds(window))
@@ -71,9 +72,9 @@ class RasterizedGeometry(object):
                     self.masks.append(mask)
 
             else:
-                print(
-                    f"Using 1 window for reading (overlapping windows: {num_windows}, ratio: {ratio:.3f})"
-                )
+                # print(
+                #     f"Using 1 window for reading (overlapping windows: {num_windows}, ratio: {ratio:.3f})"
+                # )
                 window = get_window(src, self.bounds)
                 mask = WindowGeometryMask(src, window, all_shapes)
                 self.masks.append(mask)
@@ -84,9 +85,11 @@ class RasterizedGeometry(object):
             self.pixels = sum(mask.shape_mask.sum() for mask in self.masks)
             self.acres = self.pixels * self.cellsize
 
-            self.within_se_pixels = sum(
-                mask.get_pixel_count_by_bin(src, bins=[0, 1])[1] for mask in self.masks
-            )
+            count = np.zeros((2,), dtype="uint64")
+            for mask in self.masks:
+                mask.get_pixel_count_by_bin(src, out=count)
+
+            self.within_se_pixels = count[1]
             self.within_se_acres = self.within_se_pixels * self.cellsize
 
             self.outside_se_acres = (
@@ -108,9 +111,11 @@ class RasterizedGeometry(object):
         ndarray
             Total number of pixels for each bin
         """
-        return np.sum(
-            [mask.get_pixel_count_by_bin(dataset, bins) for mask in self.masks], axis=0
-        )
+        count = np.zeros((len(bins),), dtype="uint64")
+        for mask in self.masks:
+            mask.get_pixel_count_by_bin(dataset, out=count)
+
+        return count
 
     def get_acres_by_bin(self, dataset, bins):
         """Get acres in each bin
@@ -226,6 +231,10 @@ async def get_analysis_unit_results(df, datasets, progress_callback=None):
             result["nlcd_impervious"] = summarize_nlcd_impervious_in_aoi(
                 rasterized_geometry
             )
+
+        # Extract LANDFIRE EVT
+        if "landfire_evt" in datasets:
+            result["landfire_evt"] = summarize_landfire_evt_in_aoi(rasterized_geometry)
 
         # Extract SE Blueprint indicators
         se_blueprint_indicators = [

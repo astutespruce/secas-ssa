@@ -1,4 +1,4 @@
-*__pycache__/*
+**/__pycache__/*
 *.pyc
 *.egg-info/*
 *.zip
@@ -16,7 +16,8 @@
 data/inputs/boundaries/*
 data/inputs/se_blueprint_indicators/*
 !data/inputs/se_blueprint_indicators/README.md
-data/inputs/nlcd/*
+data/inputs/landfire/*
+data/inputs/nlcd_annual/*
 data/inputs/sarp*
 !data/inputs/sarp/README.md
 data/inputs/threats/slr/*
@@ -27,8 +28,10 @@ data/inputs/inundation_frequency
 
 /source_data/inundation_frequency/*
 !/source_data/inundation_frequency/README.md
-/source_data/nlcd/*
-!/source_data/nlcd/README.md
+/source_data/landfire/*
+!/source_data/landfire/README.md
+/source_data/nlcd_annual/*
+!/source_data/nlcd_annual/README.md
 /source_data/sarp/*
 !/source_data/sarp/README.md
 /source_data/slr/*

@@ -179,8 +179,14 @@
 					href="https://www.usgs.gov/centers/eros/science/national-land-cover-database"
 					target="_blank"
 				>
-					National Land Cover Database 2001 - 2021: land cover and impervious surface
+					National Land Cover Database
+				</a> land cover and impervious surface for 1985, 2000, 2015, 2020, and 2024
+			</li>
+			<li>
+				<a href="https://landfire.gov/vegetation/evt" target="_blank">
+					LANDFIRE Existing Vegetation Type
 				</a>
+				(2024 version)
 			</li>
 			<li>
 				Current and projected future urban development areas by decade 2030 to 2100 created by the

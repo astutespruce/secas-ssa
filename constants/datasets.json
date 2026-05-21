@@ -5,7 +5,14 @@
 			"label": "Landscape trends & stressors",
 			"color": "#ffffe9",
 			"borderColor": "#f2f25f",
-			"datasets": ["nlcd_landcover", "nlcd_impervious", "urban", "slr_proj", "slr_depth"]
+			"datasets": [
+				"nlcd_landcover",
+				"nlcd_impervious",
+				"landfire_evt",
+				"urban",
+				"slr_proj",
+				"slr_depth"
+			]
 		},
 		{
 			"id": "coastal",
@@ -49,27 +56,39 @@
 	"datasets": [
 		{
 			"id": "nlcd_landcover",
-			"name": "Land cover trends (2001-2021)",
+			"name": "Land cover trends (1985-2024)",
 			"sheet_name": "Landcover trends",
 			"source": "U.S. Geological Survey",
-			"date": "2021",
-			"citation": "Yang, L., et al. (2018). A new generation of the United States National Land Cover Database: Requirements, research priorities, design, and implementation strategies. ISPRS Journal of Photogrammetry and Remote Sensing 146: 108-123.",
-			"url": "https://www.usgs.gov/centers/eros/science/national-land-cover-database",
-			"description": "This dataset shows the amount of area in each major land cover class for 2001, 2004, 2006, 2008, 2011, 2013, 2016, 2019, 2021.  Land cover classes include open water, perennial ice/snow, developed (multiple intensities), barren land, deciduous forest, evergreen forest, mixed forest, shrub/scrub, grassland/herbaceous, pasture/hay, cultivated crops, woody wetlands, and emergent herbaceous wetlands.  Data are only available for Southeastern states within the contiguous U.S.",
+			"date": "2024",
+			"citation": "U.S. Geological Survey (USGS), 2024, Annual NLCD Collection 1 Science Products: U.S. Geological Survey data release, https://doi.org/10.5066/P94UXNTS.",
+			"url": "https://www.mrlc.gov/data",
+			"description": "This dataset shows the amount of area in each major land cover class for 1985, 2000, 2015, 2020, and 2024 based on the NLCD Annual data product.  Land cover classes include open water, perennial ice/snow, developed (multiple intensities), barren land, deciduous forest, evergreen forest, mixed forest, shrub/scrub, grassland/herbaceous, pasture/hay, cultivated crops, woody wetlands, and emergent herbaceous wetlands.  Data are only available for Southeastern states within the contiguous U.S.",
 			"valueDescription": "Values show the amount of each land cover class that is present within each analysis area for each year data are available from NLCD.  Only those land cover classes that are present within a given analysis area are shown.",
 			"methods": "Land cover data for each year were reprojected to match the standard grid used in this tool and clipped to Southeastern states."
 		},
 		{
 			"id": "nlcd_impervious",
-			"name": "Impervious surface trends (2001-2021)",
+			"name": "Impervious surface trends (1985-2024)",
 			"sheet_name": "Impervious surface trends",
 			"source": "U.S. Geological Survey",
-			"date": "2021",
-			"citation": "Yang, L., et al. (2018). A new generation of the United States National Land Cover Database: Requirements, research priorities, design, and implementation strategies. ISPRS Journal of Photogrammetry and Remote Sensing 146: 108-123.",
-			"url": "https://www.usgs.gov/centers/eros/science/national-land-cover-database",
-			"description": "This dataset shows percent impervious surface for 2001, 2004, 2006, 2008, 2011, 2013, 2016, 2019, 2021.",
+			"date": "2024",
+			"citation": "U.S. Geological Survey (USGS), 2024, Annual NLCD Collection 1 Science Products: U.S. Geological Survey data release, https://doi.org/10.5066/P94UXNTS.",
+			"url": "https://www.mrlc.gov/data",
+			"description": "This dataset shows percent impervious surface for 1985, 2000, 2015, 2020, and 2024 based on the NLCD Annual data product.",
 			"valueDescription": "Values show the total amount of impervious surface each analysis area for each year data are available from NLCD.  These are calculated as the total amount of area in each percent level of impervious surface times the percent.",
 			"methods": "Impervious surface data were reprojected to match the standard grid used in this tool and clipped to Southeastern states."
+		},
+		{
+			"id": "landfire_evt",
+			"name": "LANDFIRE Existing Vegetation Type",
+			"sheet_name": "LANDFIRE EVT",
+			"source": "LANDFIRE",
+			"date": "2024",
+			"citation": "LANDFIRE, 2024, Existing Vegetation Type Layer, LANDFIRE 2.5.0, U.S. Department of the Interior, Geological Survey, and U.S. Department of Agriculture. Accessed 19 May 2026 at https://landfire.gov/data/FullExtentDownloads.",
+			"url": "https://landfire.gov",
+			"description": "This dataset shows the amount of area in each existing vegetation type in the LANDFIRE EVT 2024 version.  Vegetation types include open water, perennial ice/snow, developed land, barren land and many different types of vegetation.",
+			"valueDescription": "Values show the amount of each existing vegetation type that is present within each analysis area.  Only those existing vegetation types that are present within a given analysis area are shown.",
+			"methods": "LANDFIRE EVT data data were reprojected to match the standard grid used in this tool and clipped to Southeastern states, U.S., Virgin Islands, and Puerto Rico."
 		},
 		{
 			"id": "urban",
@@ -80,7 +99,7 @@
 			"citation": "Center for Geospatial Analytics, NC State University (June 2023)",
 			"url": "https://www.sciencebase.gov/catalog/item/63f50297d34efa0476b04cf7",
 			"description": "The FUTURES urban growth model predicts the likelihood that an area will urbanize at every decade from 2030 to 2100. Developed areas from the 2021 National Landcover Database serve as the baseline for current urban areas. The model simulates landscape change based on trends in population growth, local development suitability factors, and an urban patch-growing algorithm. It considers environmental drivers like distance to floodplain, slope, and available infrastructure, and even socio-economic status. The probability of urbanization for each area reflects how many times it urbanized out of 50 model runs.  Limited to the inland continental Southeast.",
-			"valueDescription": "Current urbanization is derived from NLCD 2021.  Projected urbanization for 2030 through 2100 is based on the proportion of stochastic simulations out of 50 that predicted a given pixel will convert to urban.  The Low level of urbanization includes areas where at least 50% of the runs predicted that a pixel will convert to urban, and the High level of urbanization corresponds to areas where any of the runs predicted that a pixel will urbanize.  To calculate the total amount of urbanization within each analysis area, the proportion of stochastic urbanization simulations that predict urbanization for a given pixel is multiplied by the area associated with each proportion.",
+			"valueDescription": "Current urbanization is derived from NLCD 2021 (legacy version).  Projected urbanization for 2030 through 2100 is based on the proportion of stochastic simulations out of 50 that predicted a given pixel will convert to urban.  The Low level of urbanization includes areas where at least 50% of the runs predicted that a pixel will convert to urban, and the High level of urbanization corresponds to areas where any of the runs predicted that a pixel will urbanize.  To calculate the total amount of urbanization within each analysis area, the proportion of stochastic urbanization simulations that predict urbanization for a given pixel is multiplied by the area associated with each proportion.",
 			"methods": "Urbanization data were converted from floating point probabilities provided by the Center for Geospatial Analytics to the count of stochastic simulations out of 50, and reprojected to match the standard grid used in this tool and clipped to Southeastern states."
 		},
 		{

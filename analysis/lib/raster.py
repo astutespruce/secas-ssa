@@ -2,6 +2,7 @@ from itertools import product
 import math
 
 from affine import Affine
+import numba as nb
 import numpy as np
 import rasterio
 from rasterio.enums import Resampling
@@ -16,6 +17,127 @@ from api.settings import SHARED_DATA_DIR
 data_dir = SHARED_DATA_DIR / "inputs"
 extent_filename = data_dir / "boundaries/blueprint_extent.tif"
 extent_mask_filename = data_dir / "boundaries/blueprint_extent_mask.tif"
+
+
+@nb.njit(
+    [
+        "(int8[:, :],bool_[:, :],uint64[:],int8)",
+        "(uint8[:, :],bool_[:, :],uint64[:],uint8)",
+        "(int16[:, :],bool_[:, :],uint64[:],int16)",
+        "(uint16[:, :],bool_[:, :],uint64[:],uint16)",
+    ],
+    fastmath=True,
+    nogil=True,
+    cache=True,
+)
+def count_values_inplace(arr, mask, out, nodata):
+    """Calculate count of each value in arr.
+
+    About 2x as fast as np.bincount
+
+    Parameters
+    ----------
+    arr : ndarray of shape (rows, cols)
+        contains input values to be summarized
+    mask : bool ndarray of shape (rows, cols)
+        mask values are True for the areas to be counted
+    out : ndarray of shape (num_values, )
+        output array updated in place
+    nodata : value in dtype that matches arr
+        NODATA value in arr
+    """
+    c = nb.uint64(1)
+    for row in nb.prange(arr.shape[0]):
+        for col in nb.prange(arr.shape[1]):
+            if mask[row, col]:
+                value = arr[row, col]
+                if value != nodata:
+                    out[value] += c
+
+
+@nb.njit(
+    [
+        "(int8[:,:],)",
+        "(uint8[:,:],)",
+        "(int16[:,:],)",
+        "(uint16[:,:],)",
+    ],
+    fastmath=True,
+    nogil=True,
+    cache=True,
+)
+def unique(arr):
+    """Extract unique values in arr.
+
+    About 2x as fast as np.unique.
+
+    Parameters
+    ----------
+    arr : ndarray of shape (rows, cols)
+
+    Returns
+    -------
+    set
+    """
+    out = set()
+    for row in nb.prange(arr.shape[0]):
+        for col in nb.prange(arr.shape[1]):
+            out.add(arr[row, col])
+
+    return out
+
+
+@nb.njit(
+    [
+        "int8[:,:](int8[:,:],int8[:,:],int8,int8)",
+        "uint8[:,:](uint8[:,:],uint8[:,:],uint8,uint8)",
+        "int16[:,:](int16[:,:],int16[:,:],int16,int16)",
+        "uint16[:,:](uint16[:,:],uint16[:,:],uint16,uint16)",
+    ],
+    cache=True,
+)
+def remap(arr, remap_table, nodata, fill):
+    """Remap a 2D array of values
+
+    Parameters
+    ----------
+    arr : array of shape [:,:]
+        array of values to remap
+    remap_table : array of shape [n,2], same dtype as arr
+        array of pairs of source value, target value
+    nodata : same dtype as arr
+        value to use for mapping nodata
+    fill : same dtype as arr
+        value to use for filling output array
+
+    Returns
+    -------
+    array of shape [:,:]
+        array is same shape as arr
+    """
+
+    i = 0
+    j = 0
+    rows = arr.shape[0]
+    cols = arr.shape[1]
+
+    # process potentially sparse remap table into indexed array
+    max_value = np.max(remap_table[:, 0])
+    table = np.ones(shape=(max_value + 1,), dtype=remap_table.dtype) * fill
+    for i in range(len(remap_table)):
+        table[remap_table[i][0]] = remap_table[i][1]
+
+    out = np.ones_like(arr) * fill
+
+    for i in range(rows):
+        for j in range(cols):
+            value = arr[i, j]
+            if value == nodata:
+                out[i, j] = nodata
+            elif value <= max_value:
+                out[i, j] = table[value]
+
+    return out
 
 
 def get_window(dataset, bounds, boundless=True):
@@ -178,9 +300,9 @@ def detect_data(datasets, shapes, bounds):
                 continue
 
             data = src.read(1, window=read_window, boundless=True)
-            available_datasets[id] = np.any(
-                data[~(mask | (data == np.uint8(src.nodata)))]
-            ).item()
+            nodata = getattr(np, src.dtypes[0])(src.nodata)
+
+            available_datasets[id] = np.any(data[(~mask) & (data != nodata)]).item()
 
     return available_datasets
 
@@ -466,15 +588,15 @@ class WindowGeometryMask(object):
 
         return False
 
-    def get_pixel_count_by_bin(self, dataset, bins):
+    def get_pixel_count_by_bin(self, dataset, num_values=None, out=None):
         """Get count of pixels in each bin
 
         Parameters
         ----------
         dataset : open rasterio dataset
-        bins : list-like
-            List-like of values ranging from 0 to max value (not sparse!).
-            Counts will be generated that correspond to this list of bins.
+        num_values : int, optional (default: None)
+        out : ndarray of shape (num_values, ), optional (default: None)
+            output array, updated in place if provided
 
         Returns
         -------
@@ -482,7 +604,6 @@ class WindowGeometryMask(object):
             Total number of pixels for each bin
         """
         # DEBUG: check for implementation errors
-        # FIXME: comment out
         if (
             dataset.transform.a != self.dataset_transform.a
             or dataset.transform.e != self.dataset_transform.e
@@ -499,6 +620,12 @@ class WindowGeometryMask(object):
         nodata = getattr(np, dataset.dtypes[0])(dataset.nodata)
         data = dataset.read(1, window=read_window, boundless=True)
 
+        if out is None:
+            if num_values is None:
+                raise ValueError("Either num_values or out must be provided")
+
+            out = np.zeros((num_values,), dtype="uint64")
+
         # extract values inside geometry except where they are NODATA
-        values = data[self.shape_mask & (data != nodata)]
-        return np.bincount(values, minlength=len(bins))
+        count_values_inplace(data, self.shape_mask, out, nodata)
+        return out

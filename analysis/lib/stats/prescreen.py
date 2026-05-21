@@ -5,6 +5,7 @@ from analysis.constants import DATASETS
 from analysis.lib.raster import detect_data
 from analysis.lib.geometry import to_dict_all
 from analysis.lib.stats.slr import src_dir as slr_dir
+from analysis.lib.stats.landfire import src_dir as landfire_dir
 from analysis.lib.stats.nlcd import src_dir as nlcd_dir
 from analysis.lib.stats.urban import src_dir as urban_dir
 from analysis.lib.stats.se_blueprint_indicators import src_dir as indicators_dir
@@ -30,6 +31,7 @@ raster_datasets = {
     "nlcd_impervious": nlcd_dir / "impervious_mask.tif",
     "nlcd_inundation_freq": inundation_frequency_dir
     / "nlcd_inundation_frequency_mask.tif",
+    "landfire_evt": landfire_dir / "landfire_evt_mask.tif",
 }
 
 

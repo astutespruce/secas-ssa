@@ -2,9 +2,9 @@ import numpy as np
 import rasterio
 
 from analysis.constants import NLCD_YEARS, NLCD_INDEXES
-from api.settings import SHARED_DATA_DIR
+from api.settings import DATA_DIR
 
-src_dir = SHARED_DATA_DIR / "inputs/nlcd"
+src_dir = DATA_DIR / "inputs/nlcd_annual"
 landcover_filename = str(src_dir / "landcover_{year}.tif")
 impervious_filename = str(src_dir / "impervious_{year}.tif")
 
@@ -24,7 +24,7 @@ def summarize_nlcd_landcover_in_aoi(rasterized_geometry):
     Returns
     -------
     dict
-        {<NLCD index>: [<acres 2020>, <acres 2030>, ..., <acres 2100>], ...}
+        {<NLCD label>: [<acres 2020>, <acres 2030>, ..., <acres 2100>], ...}
     """
 
     bins = list(NLCD_INDEXES.keys())

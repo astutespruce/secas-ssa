@@ -39,7 +39,7 @@ SECAS_STATES = [
     "WV",
 ]
 
-NLCD_YEARS = [2001, 2004, 2006, 2008, 2011, 2013, 2016, 2019, 2021]
+NLCD_YEARS = [1985, 2000, 2015, 2020, 2024]
 
 # Original codes
 NLCD_CODES = {
@@ -136,6 +136,10 @@ SLR_COLORS = [
 
 
 json_dir = Path("constants")
+
 datasets_json = json.loads(open(json_dir / "datasets.json").read())
 DATASETS = {e["id"]: e for e in datasets_json["datasets"]}
 CATEGORIES = {e["id"]: e for e in datasets_json["categories"]}
+
+LANDFIRE_CODES = json.loads(open(json_dir / "landfire_evt.json").read())
+LANDFIRE_INDEXES = {i: e for i, e in enumerate(LANDFIRE_CODES.values())}

@@ -5,6 +5,7 @@ import pandas as pd
 from api.report.inundation_frequency import add_nlcd_inundation_frequency_sheet
 from api.report.metadata import add_data_details_sheet
 from api.report.slr import add_slr_inundation_sheet, add_slr_projection_sheet
+from api.report.landfire import add_landfire_evt_sheet
 from api.report.nlcd import add_ncld_landcover_sheet, add_ncld_impervious_sheet
 from api.report.sarp import add_sarp_barriers_sheet, add_sarp_network_alteration_sheet
 from api.report.summary import add_summary_sheet
@@ -34,7 +35,6 @@ def create_xlsx(df, datasets):
     ### Create XLSX file and write to memory buffer
     buffer = BytesIO()
     with pd.ExcelWriter(buffer) as xlsx:
-
         # Summary sheet
         add_summary_sheet(
             xlsx, df, name_col_width, area_col_width, area_label, outside_se
@@ -50,6 +50,10 @@ def create_xlsx(df, datasets):
             add_ncld_impervious_sheet(
                 xlsx, df, name_col_width, area_col_width, area_label
             )
+
+        # LANDFIRE EVT sheet
+        if "landfire_evt" in datasets:
+            add_landfire_evt_sheet(xlsx, df, name_col_width, area_col_width, area_label)
 
         # Urbanization sheet
         if "urban" in datasets:
