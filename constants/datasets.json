@@ -11,7 +11,8 @@
 				"landfire_evt",
 				"urban",
 				"slr_proj",
-				"slr_depth"
+				"slr_depth",
+				"protected_areas"
 			]
 		},
 		{
@@ -615,6 +616,18 @@
 			"description": "This dataset characterizes the landscape-scale relative inundation frequency. These data can provide information about ecological processes as well as hydrologic alteration in the floodplain. Landsat imagery acquired from 1984-2002 were used to generate multiple observations of inundation extent under varying hydrologic conditions. These data were composited into a landscape mosaic to depict relative inundation frequency over the entire Southeast US. Relative inundation frequency was combined with NLCD 2021 to depict inundation frequency by land cover type.",
 			"valueDescription": "Values show the amount of each land cover class that is in each inundation frequency class within each analysis area.  Only those land cover classes that are present within a given analysis area are shown.",
 			"methods": "Relative inundation frequency was binned into 5 classes and combined with NLCD 2021 land cover classes in order to describe inundation frequency by land cover class.  Data were reprojected from WGS 1984 to match the standard grid used in this tool and clipped to Southeastern states."
+		},
+		{
+			"id": "protected_areas",
+			"name": "Protected areas (PAD-US)",
+			"sheet_name": "Protected areas",
+			"source": "U.S. Geological Survey",
+			"date": "2025",
+			"citation": "U.S. Geological Survey (USGS) Gap Analysis Project (GAP), 2024, Protected Areas Database of the United States (PAD-US) 4.1: U.S. Geological Survey data release, https://doi.org/10.5066/P96WBCHS.",
+			"url": "https://www.usgs.gov/programs/gap-analysis-project/science/pad-us-data-overview",
+			"description": "This dataset includes protected areas recorded in the Protected Areas Database of the United States (PAD-US) 4.1 dataset by recorded owner and GAP status.",
+			"valueDescription": "Values show the protected areas by ownership, GAP status, and their overlapping acreage for each analysis unit.  WARNING: PAD-US 4.1 may include duplicate protected areas, near-duplicate protected areas, overlapping protected areas, and protected areas with incomplete or incorrect ownership or GAP status.  Use with caution and review carefully.  Acreage is based on geometric overlap of each protected area and each analysis area.",
+			"methods": "Protected areas were extracted from PAD-US 4.1 that overlap Southeastern states and include Fee, Designation, Easement, Marine, and Proclamation (Dept. of Defense lands only) boundaries.  Data were reprojected to the Albers Equal Area - Contiguous U.S. projection for spatial overlap and area calculations."
 		}
 	]
 }

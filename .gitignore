@@ -18,6 +18,8 @@ data/inputs/se_blueprint_indicators/*
 !data/inputs/se_blueprint_indicators/README.md
 data/inputs/landfire/*
 data/inputs/nlcd_annual/*
+data/inputs/protected_areas/*
+!data/inputs/protected_areas/README.md
 data/inputs/sarp*
 !data/inputs/sarp/README.md
 data/inputs/threats/slr/*

@@ -11,6 +11,7 @@ from analysis.lib.stats.inundation_frequency import (
     summarize_nlcd_inundation_frequency_in_aoi,
 )
 from analysis.lib.stats.landfire import summarize_landfire_evt_in_aoi
+from analysis.lib.stats.protected_areas import extract_protected_area_stats
 from analysis.lib.stats.sarp import extract_sarp_huc12_stats
 from analysis.lib.stats.slr import (
     summarize_slr_in_aoi,
@@ -186,6 +187,9 @@ async def get_analysis_unit_results(df, datasets, progress_callback=None):
     ):
         sarp_huc12_stats = extract_sarp_huc12_stats(df)
 
+    if "protected_areas" in datasets:
+        protected_area_stats = extract_protected_area_stats(df)
+
     count = 0
 
     for index, row in df.iterrows():
@@ -260,5 +264,8 @@ async def get_analysis_unit_results(df, datasets, progress_callback=None):
 
     if sarp_huc12_stats is not None:
         df = df.join(sarp_huc12_stats)
+
+    if protected_area_stats is not None:
+        df = df.join(protected_area_stats)
 
     return df

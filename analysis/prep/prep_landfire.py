@@ -10,13 +10,7 @@ from rasterio.vrt import WarpedVRT
 from rasterio.warp import transform_bounds
 from rasterio.windows import Window
 
-from analysis.constants import (
-    DATA_CRS,
-    LANDFIRE_CODES,
-    LANDFIRE_INDEXES,
-    MASK_RESOLUTION,
-)
-from analysis.lib.colors import hex_to_uint8
+from analysis.constants import DATA_CRS, MASK_RESOLUTION
 from analysis.lib.raster import (
     add_overviews,
     write_raster,
@@ -42,7 +36,6 @@ bnd_raster = rasterio.open(bnd_dir / "blueprint_extent.tif")
 df = pd.read_csv(
     src_dir / "LF2024_EVT_CONUS/CSV_Data/LF2024_EVT.csv", engine="pyarrow"
 ).rename(columns={"VALUE": "value", "EVT_NAME": "label"})
-# df["color"] = df.apply(lambda x: f"#{bytes([x.R, x.G, x.B]).hex()}", axis=1)
 df["alpha"] = 255
 
 outfilename = out_dir / "landfire_evt.tif"

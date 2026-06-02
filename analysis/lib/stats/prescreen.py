@@ -70,4 +70,8 @@ def get_available_datasets(df):
     available_datasets["sarp_aquatic_barriers"] = True
     available_datasets["sarp_aquatic_network_alteration"] = True
 
+    # protected areas are generally available; there is no optimal way to check
+    # this without running the full intersection
+    available_datasets["protected_areas"] = True
+
     return available_datasets

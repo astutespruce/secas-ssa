@@ -25,10 +25,20 @@ These are 30 meter data aligned to the Base Blueprint extent used in this tool.
 
 ## NLCD land cover and impervious surface data
 
-These datasets were prepared as part of the Southeast Blueprint Explorer data
-preparation process (`secas-blueprint/analysis/prep/prepare_nlcd.py`).
+These datasets were prepared using `analysis/prep/prep_nlcd.py`.
 
 These are 30 meter data aligned to the Base Blueprint extent used in this tool.
+
+## LANDFIRE Existing Vegetation Type
+
+The LANDFIRE EVT was prepared using `analysis/prep/prep_landfire.py`.
+
+## Protected areas
+
+This dataset builds off data as part of the Southeast Blueprint Explorer data
+preparation process, but includes GAP status for use here.
+
+The protected areas dataset was prepared using `analysis/prep/prep_protected_areas.py`.
 
 ## SARP Aquatic Barrier and Network Metrics
 

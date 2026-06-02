@@ -217,6 +217,15 @@
 				</a>
 				.
 			</li>
+			<li>
+				Protected areas based on the
+				<a
+					href="https://www.usgs.gov/programs/gap-analysis-project/science/pad-us-data-overview"
+					target="_blank"
+				>
+					Protected Areas Database of the United States (PAD-US) 4.1.
+				</a>
+			</li>
 		</ul>
 		<figure class="hidden sm:block">
 			<enhanced:img
