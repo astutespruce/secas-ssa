@@ -187,6 +187,7 @@ async def get_analysis_unit_results(df, datasets, progress_callback=None):
     ):
         sarp_huc12_stats = extract_sarp_huc12_stats(df)
 
+    protected_area_stats = None
     if "protected_areas" in datasets:
         protected_area_stats = extract_protected_area_stats(df)
 

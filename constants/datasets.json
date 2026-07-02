@@ -108,7 +108,7 @@
 			"name": "Sea-level rise inundation area",
 			"sheet_name": "SLR inundation area",
 			"source": "National Oceanic and Atmospheric Administration",
-			"citation": "NOAA Office for Coastal Management Sea Level Rise Data: 1-10 ft Sea Level Rise Inundation Extent (2017)",
+			"citation": "NOAA Office for Coastal Management Sea Level Rise Data: 1-10 ft Sea Level Rise Inundation Extent (2017-2023)",
 			"url": "https://coast.noaa.gov/slrdata/",
 			"date": "2023",
 			"description": "Sea-level rise inundation area data are provided by NOAA in 1 foot increments, based on available digital elevation model data.  These data are used to show the amount of each analysis unit that would be covered by that level of sea-level rise.",

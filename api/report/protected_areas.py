@@ -16,7 +16,7 @@ def add_protected_areas_sheet(xlsx, df, name_col_width, area_col_width):
     breaks = []
     counter = 0
     for id, row in df.iterrows():
-        if row.protected_areas:
+        if hasattr(row, "protected_areas") and row.protected_areas:
             for pa in row.protected_areas:
                 protected_areas.append(
                     [
@@ -29,7 +29,16 @@ def add_protected_areas_sheet(xlsx, df, name_col_width, area_col_width):
                     ]
                 )
         else:
-            protected_areas.append([id])
+            protected_areas.append(
+                [
+                    id,
+                    f"{row.acres:.2f}",
+                    "no protected areas at this location",
+                    "",
+                    "",
+                    "",
+                ]
+            )
             counter += 1
 
         breaks.append(counter)
