@@ -46,7 +46,7 @@
 				{#each attributes as attribute (attribute.value)}
 					<Select.Item
 						value={attribute.value}
-						class="cursor-pointer text-base data-highlighted:bg-blue-1! data-highlighted:text-foreground!"
+						class="cursor-pointer text-base data-highlighted:bg-blue-2/50! data-highlighted:text-foreground!"
 					>
 						{attribute.label}
 					</Select.Item>

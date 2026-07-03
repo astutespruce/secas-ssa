@@ -1,7 +1,7 @@
 <script lang="ts">
 	// style overrides:
-	// content, change to: bg-white text-foreground border border-grey-4
-	// arrow, change to: bg-grey size-4 border border-grey-4 [clip-path:polygon(100%_100%,100%_0%,0%_100%,10%_100%)] data-[side=right]:translate-x-[calc(50%_+_3px)]
+	// content, change to: bg-white text-foreground border border-grey-8/50
+	// arrow, change to: bg-grey size-4 border border-grey-8/50 [clip-path:polygon(100%_100%,100%_0%,0%_100%,10%_100%)] data-[side=right]:translate-x-[calc(50%_+_3px)]
 	import { Tooltip as TooltipPrimitive } from 'bits-ui'
 	import { cn } from '$lib/utils.js'
 	import TooltipPortal from './tooltip-portal.svelte'
@@ -30,7 +30,7 @@
 		{sideOffset}
 		{side}
 		class={cn(
-			'bg-white text-foreground animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-end-2 data-[side=right]:slide-in-from-start-2 data-[side=top]:slide-in-from-bottom-2 z-50 w-fit origin-(--bits-tooltip-content-transform-origin) rounded-md px-3 py-1.5 text-xs text-balance border border-grey-4',
+			'bg-white text-foreground animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-end-2 data-[side=right]:slide-in-from-start-2 data-[side=top]:slide-in-from-bottom-2 z-50 w-fit origin-(--bits-tooltip-content-transform-origin) rounded-md px-3 py-1.5 text-xs text-balance border border-grey-8/50',
 			className
 		)}
 		{...restProps}

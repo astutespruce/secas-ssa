@@ -11,7 +11,10 @@
 	<Tooltip.Provider delayDuration={0}>
 		<Tooltip.Root disableHoverableContent disableCloseOnTriggerClick>
 			<Tooltip.Trigger aria-label={ariaLabel} class="mt-2">
-				<QuestionCircle class="cursor-pointer text-grey-4 hover:text-grey-9" aria-hidden="true" />
+				<QuestionCircle
+					class="cursor-pointer text-grey-8/75 hover:text-grey-9"
+					aria-hidden="true"
+				/>
 			</Tooltip.Trigger>
 			<Tooltip.Content side="right" sideOffset={2} class="pt-2 pb-4 px-3 max-w-md">
 				<h4 class="text-base">
@@ -30,12 +33,12 @@
 	<Dialog.Root>
 		<Dialog.Trigger aria-label={ariaLabel}>
 			<QuestionCircle
-				class="size-5 cursor-pointer text-grey-4 hover:text-grey-9"
+				class="size-5 cursor-pointer text-grey-8/50 hover:text-grey-9"
 				aria-hidden="true"
 			/>
 		</Dialog.Trigger>
 		<Dialog.Content class="z-10000">
-			<Dialog.Header class="border-b pb-2 border-b-grey-3">
+			<Dialog.Header class="border-b pb-2 border-b-grey-2">
 				<Dialog.Title class="text-left text-2xl">{title}</Dialog.Title>
 			</Dialog.Header>
 			<p class="text-md">

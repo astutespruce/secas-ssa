@@ -66,7 +66,7 @@
 			<div class="text-2xl font-bold">Available landscape-level factors:</div>
 			<div class="flex items-center gap-2 flex-none justify-end">
 				<Button variant="link" class="p-0" onclick={handleSelectAll}>select all</Button>
-				<div class="text-grey-3">|</div>
+				<div class="text-grey-2">|</div>
 				<Button variant="link" class=" p-0" onclick={handleSelectNone}>select none</Button>
 			</div>
 		</div>
@@ -97,7 +97,7 @@
 								<Checkbox
 									id={dataset.id}
 									aria-label={`Select / deselect ${dataset.name}`}
-									class="cursor-pointer size-5 rounded-xs disabled:border-grey-4 border-2 [&_svg]:size-4"
+									class="cursor-pointer size-5 rounded-xs disabled:border-grey-8/50 border-2 [&_svg]:size-4"
 									bind:checked={selectedDatasets[dataset.id]}
 									disabled={!availableDatasets[dataset.id]}
 								/>

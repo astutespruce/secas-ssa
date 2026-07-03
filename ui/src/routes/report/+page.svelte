@@ -107,6 +107,7 @@
 				src="$images/5494812678_3849557155_o.jpg"
 				class="h-auto min-w-180 object-cover brightness-70"
 				alt=""
+				fetchpriority="high"
 			/>
 		</div>
 		<div class="container mt-6 md:mt-12">
@@ -127,15 +128,16 @@
 </div>
 
 <div class="container pt-8 pb-4">
-	<nav class="grid-cols-4 border border-grey-6 border-r border-r-grey-8 hidden sm:grid">
+	<nav class="grid-cols-4 border border-grey-8/50 hidden sm:grid">
 		{#each steps as step, i (step.id)}
 			<Button
 				variant="ghost"
 				class={cn(
-					'flex items-center gap-4 bg-blue-2 flex-auto rounded-none text-base disabled:opacity-100 hover:bg-blue-3 border-b-3 border-b-accent not-first-of-type:border-l not-first-of-type:border-l-grey-6 pt-2',
+					'flex items-center gap-4 flex-auto rounded-none text-base disabled:opacity-100 not-last-of-type:border-r border-r-grey-8/20 pt-2',
 					{
-						'bg-blue-4 font-bold cursor-default hover:bg-blue-4': i === stepIndex,
-						'bg-grey-1 text-grey-8 cursor-not-allowed border-b-transparent': i > stepIndex
+						'bg-ok/20 hover:bg-ok/30': i < stepIndex,
+						'bg-grey-8/30 font-bold cursor-default hover:bg-grey-8/30': i === stepIndex,
+						'bg-grey-1 text-grey-8 cursor-not-allowed': i > stepIndex
 					}
 				)}
 				disabled={i > stepIndex}
@@ -147,7 +149,9 @@
 			>
 				<Badge
 					class={cn('size-6 text-base hidden md:flex', {
-						'bg-grey-8': i !== stepIndex
+						'bg-ok': i < stepIndex,
+						'bg-foreground': i === stepIndex,
+						'bg-grey-8': i > stepIndex
 					})}
 				>
 					{i + 1}
@@ -157,7 +161,7 @@
 				</div>
 
 				<Check
-					class={cn('size-4 invisible hidden sm:block', {
+					class={cn('size-4 invisible', {
 						visible: i < stepIndex
 					})}
 					aria-hidden="true"

@@ -44,6 +44,7 @@
 				src="$images/robert-thiemann-1bj4WGNDFHw-unsplash.jpg"
 				class="h-auto min-w-180 object-cover brightness-80"
 				alt=""
+				fetchpriority="high"
 			/>
 		</div>
 		<div class="container mt-6 md:mt-14">
@@ -123,7 +124,11 @@
 		</div>
 
 		<figure class="hidden sm:block">
-			<enhanced:img src="$images/4971502145_03d6b78f28_o.jpg" alt="Key Deer at Key Deer NWR" />
+			<enhanced:img
+				src="$images/4971502145_03d6b78f28_o.jpg"
+				alt="Key Deer at Key Deer NWR"
+				loading="lazy"
+			/>
 			<figcaption>
 				Key Deer at Key Deer NWR. <br />Photo:
 				<a
@@ -231,6 +236,7 @@
 			<enhanced:img
 				src="$images/5142785872_b34caf59e3_h.jpg"
 				alt="Prescribed fire, Mississippi Sandhill Crane NWR 2004"
+				loading="lazy"
 			/>
 			<figcaption>
 				Prescribed fire, Mississippi Sandhill Crane NWR 2004. <br />Photo:
@@ -254,6 +260,7 @@
 			<enhanced:img
 				src="$images/5149490458_5ffcce6c44_c.jpg"
 				alt="Looking for mussels on the Little Tennessee River"
+				loading="lazy"
 			/>
 			<figcaption class="text-left">
 				Looking for mussels on the Little Tennessee River.
@@ -296,6 +303,7 @@
 			<enhanced:img
 				src="$images/8027062941_e8fcdf1247_c.jpg"
 				alt="Endangered mussels for release in the Powell River"
+				loading="lazy"
 			/>
 			<figcaption>
 				Endangered mussels for release in the Powell River. <br />Photo:

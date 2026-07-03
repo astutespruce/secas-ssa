@@ -9,11 +9,12 @@
 
 <div class="relative z-0 w-full">
 	<div class="relative overflow-hidden h-48">
-		<div class="z-1 absolute top-0 md:-top-[75%]">
+		<div class="z-1 absolute top-0 md:top-[-75%]">
 			<enhanced:img
 				src="$images/5142785230_69f04b6562_o.jpg"
 				class="h-auto min-w-180 object-cover brightness-70"
 				alt=""
+				fetchpriority="high"
 			/>
 		</div>
 		<div class="container mt-6 md:mt-14">
@@ -75,25 +76,21 @@
 		<h2 id={`${category.id}Section`} class="text-4xl">{category.label}</h2>
 		<div>
 			{#each category.datasets as dataset (dataset.id)}
-				<div class="border-l-4 border-l-grey-4 pl-2 mt-6 not-first:mt-12">
+				<div class="border-l-4 border-l-grey-8/50 pl-2 mt-6 not-first:mt-12">
 					<h3 id={`${dataset.id}Section`} class="text-2xl">{dataset.name}</h3>
 					<div class="leading-tight text-lg">
-						<div
-							class="mt-1 py-1 px-2 bg-grey-0 flex justify-between gap-2 border-t border-t-grey-1 border-b border-b-grey-1"
-						>
+						<div class="mt-1">
 							<div>
 								{#if dataset.url}
-									<a href={dataset.url} class="flex items-center gap-2"
-										>{dataset.source}
-										<ExternalLinkAlt class="size-4 text-link/50" aria-hidden="true" /></a
-									>
+									<a href={dataset.url} class="flex items-center gap-2">
+										{dataset.source} ({dataset.date})
+										<ExternalLinkAlt class="size-4 text-link/50" aria-hidden="true" />
+									</a>
 								{:else}
-									{dataset.source}
+									{dataset.source} ({dataset.date})
 								{/if}
 							</div>
-							<div>
-								Publication date: {dataset.date}
-							</div>
+							<div></div>
 						</div>
 						<p class="mt-2">
 							{dataset.description}
