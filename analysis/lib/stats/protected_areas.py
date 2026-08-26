@@ -32,6 +32,7 @@ def extract_protected_area_stats(df):
     protected_areas = read_dataframe(
         protected_areas_filename,
         columns=columns + ["geometry"],
+        # FIXME: use geometry mask or this reads too many features
         bbox=tuple(df.total_bounds),
         use_arrow=True,
     )

@@ -14,7 +14,6 @@ from api.settings import (
     SENTRY_DSN,
 )
 from api.routes.health import router as health_router
-
 from api.routes.report import router as report_router
 from api.routes.status import router as status_router
 from api.routes.upload import router as upload_router

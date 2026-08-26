@@ -21,8 +21,6 @@
 		{ id: 'download', label: 'Download report' }
 	]
 
-	type BooleanObject = { [key: string]: boolean }
-
 	type Step = 'upload' | 'selectAttribute' | 'selectDatasets' | 'download' | 'error'
 
 	let stepIndex: number = $state(0)
@@ -31,13 +29,15 @@
 	let uuid: string | null = $state(null)
 	let attributes: object = $state({}) // set via API
 	let selectedAttribute: string = $state('') // blank indicates no selected attribute
-	let openCategories: BooleanObject = $state(
+	let openCategories: Record<string, boolean> = $state(
 		Object.fromEntries(categories.map(({ id }) => [id, true]))
 	)
-	let allDatasets: BooleanObject = Object.fromEntries(Object.keys(datasets).map((id) => [id, true]))
+	let allDatasets: Record<string, boolean> = Object.fromEntries(
+		Object.keys(datasets).map((id) => [id, true])
+	)
 	// by default assume all are available and selected (as separate copies)
-	let availableDatasets: BooleanObject = $state(allDatasets)
-	let selectedDatasets: BooleanObject = $state({ ...allDatasets })
+	let availableDatasets: Record<string, boolean> = $state(allDatasets)
+	let selectedDatasets: Record<string, boolean> = $state({ ...allDatasets })
 
 	type FileUploadSuccessParams = {
 		uuid: string
@@ -53,7 +53,7 @@
 		uuid = uploadUuid
 		attributes = uploadAvailableFields
 		selectedAttribute = ''
-		availableDatasets = uploadAvailableDatasets as BooleanObject
+		availableDatasets = uploadAvailableDatasets as Record<string, boolean>
 		selectedDatasets = { ...uploadAvailableDatasets }
 	}
 

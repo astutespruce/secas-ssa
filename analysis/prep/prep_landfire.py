@@ -1,5 +1,5 @@
-from pathlib import Path
 import math
+from pathlib import Path
 from time import time
 
 import numpy as np
@@ -13,10 +13,10 @@ from rasterio.windows import Window
 from analysis.constants import DATA_CRS, MASK_RESOLUTION
 from analysis.lib.raster import (
     add_overviews,
-    write_raster,
-    remap,
     create_lowres_mask,
+    remap,
     unique,
+    write_raster,
 )
 
 LANDFIRE_NODATA = np.int16(-9999)
@@ -35,10 +35,11 @@ bnd_raster = rasterio.open(bnd_dir / "blueprint_extent.tif")
 
 df = pd.read_csv(
     src_dir / "LF2024_EVT_CONUS/CSV_Data/LF2024_EVT.csv", engine="pyarrow"
-).rename(columns={"VALUE": "value", "EVT_NAME": "label"})
+).rename(columns={"VALUE": "value", "EVT_NAME": "label", "EVT_GP_N": "group"})
 df["alpha"] = 255
 
 outfilename = out_dir / "landfire_evt.tif"
+
 
 if not outfilename.exists():
     start = time()
@@ -118,7 +119,7 @@ if not outfilename.exists():
         df = df.loc[df.value.isin(values_present)].reset_index(drop=True)
         # save lookup for later use
         with open("constants/landfire_evt.json", "w") as out:
-            df.set_index("value")[["label"]].to_json(out, orient="index")
+            df.set_index("value")[["label", "group"]].to_json(out, orient="index")
 
         # remap to contiguous values
         out_nodata = 32767

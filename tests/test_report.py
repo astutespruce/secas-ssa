@@ -29,13 +29,13 @@ aois = [
     #     "path": "Rabbitsfott_resilience_final_SECAS_only",
     #     "field": "HUC10",
     # },
-    {
-        "name": "Data_Cdan_Populations_1km_Buffer_Dissolve",
-        "path": "Data_Cdan_Populations_1km_Buffer_Dissolve",
-        "field": None,
-        "analysis_unit_label": "Pop A",
-        # "field": "POP_ID",
-    },
+    # {
+    #     "name": "Data_Cdan_Populations_1km_Buffer_Dissolve",
+    #     "path": "Data_Cdan_Populations_1km_Buffer_Dissolve",
+    #     "field": None,
+    #     "analysis_unit_label": "Pop A",
+    #     # "field": "POP_ID",
+    # },
     # {
     #     "name": "Test single area",
     #     "path": "SingleTest",
@@ -43,6 +43,16 @@ aois = [
     #     # "analysis_unit_label": "Pop A",
     #     "analysis_unit_label": 1,
     # },
+    # {
+    #     "name": "Test no protected areas",
+    #     "path": "test_no_protected_areas",
+    #     "field": "id",
+    # },
+    {
+        "name": "Test with one protected area",
+        "path": "test_with_some_protected_areas",
+        "field": "id",
+    },
     # {"name": "Lousiana COAs", "path": "Combined_COAsv1_dis", "field": "COAName"},
     # {
     #     "name": "San Juan area, PR",
@@ -97,10 +107,10 @@ for aoi in aois:
         raise ValueError("None of the polygon boundaries overlap available datasets")
 
     # find available datasets
-    datasets = [
-        id for id, present in get_available_datasets(overlapping_df).items() if present
-    ]
-    # datasets = ["nlcd_inundation_freq"]
+    # datasets = [
+    #     id for id, present in get_available_datasets(overlapping_df).items() if present
+    # ]
+    datasets = ["protected_areas", "landfire_evt"]
 
     ### calculate results, data must be in DATA_CRS
     print("Calculating results...")

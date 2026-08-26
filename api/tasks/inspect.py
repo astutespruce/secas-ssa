@@ -92,7 +92,7 @@ def get_dataset(zip_filename):
         raise DataError("data source must contain only one data layer")
 
     if "Polygon" not in layers[0, 1]:
-        log.error(f"Upload data source is not a polygon: {layers[0,1]}")
+        log.error(f"Upload data source is not a polygon: {layers[0, 1]}")
         raise DataError("data source must be a Polygon type")
 
     return filename, layers[0, 0]
@@ -201,7 +201,7 @@ async def inspect(ctx, zip_filename, uuid):
     outfilename = str(zip_filename).replace(".zip", ".feather")
     df.to_feather(outfilename)
 
-    ### prescreen datasets available (using only analysis units that overlap)
+    # prescreen datasets available (using only analysis units that overlap)
     await set_progress(ctx["redis"], ctx["job_id"], 50, "Checking available datasets")
     results["available_datasets"] = get_available_datasets(overlapping_df)
 

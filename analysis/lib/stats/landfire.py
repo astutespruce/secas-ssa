@@ -1,7 +1,5 @@
 import rasterio
 
-import numpy as np
-
 from analysis.constants import LANDFIRE_INDEXES
 from api.settings import DATA_DIR
 
@@ -21,7 +19,7 @@ def summarize_landfire_evt_in_aoi(rasterized_geometry):
     Returns
     -------
     list
-        {<LANDFIRE label>: <acres>, }
+        {<LANDFIRE index>: <acres>, }
     """
 
     bins = list(LANDFIRE_INDEXES.keys())
@@ -32,10 +30,6 @@ def summarize_landfire_evt_in_aoi(rasterized_geometry):
     # Transpose and convert to dict, only keep those that have areas
     acres = acres.T
 
-    results = {
-        LANDFIRE_INDEXES[i]["label"]: acres[i].tolist()
-        for i in LANDFIRE_INDEXES
-        if acres[i].sum()
-    }
+    results = {i: acres[i].tolist() for i in LANDFIRE_INDEXES if acres[i].sum()}
 
     return results
