@@ -6,9 +6,9 @@ import shapely
 from analysis.constants import (
     SLR_DEPTHS,
     SLR_NODATA_VALUES,
-    SLR_YEARS,
     SLR_PROJ_COLUMNS,
     SLR_PROJ_SCENARIOS,
+    SLR_YEARS,
 )
 from api.settings import SHARED_DATA_DIR
 
@@ -44,7 +44,9 @@ def summarize_slr_in_aoi(rasterized_geometry):
         acres = rasterized_geometry.get_acres_by_bin(src, bins=SLR_BINS)
 
     nodata_acres = (
-        rasterized_geometry.acres - rasterized_geometry.outside_se_acres - acres.sum()
+        rasterized_geometry.acres
+        - rasterized_geometry.outside_extent_acres
+        - acres.sum()
     )
 
     if nodata_acres < 1e-6:

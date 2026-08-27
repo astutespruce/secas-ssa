@@ -1,9 +1,10 @@
 import pandas as pd
 
 from analysis.constants import DATASETS, NLCD_YEARS
-
 from api.report.metadata import add_data_note
 from api.report.style import set_cell_styles, set_column_widths
+
+value_columns = [f"{year} (acres)" for year in NLCD_YEARS]
 
 
 def add_ncld_landcover_sheet(xlsx, df, name_col_width, area_col_width, area_label):
@@ -16,27 +17,24 @@ def add_ncld_landcover_sheet(xlsx, df, name_col_width, area_col_width, area_labe
     breaks = []
     counter = 0
     for id, row in df.iterrows():
-        if row.overlap > 0:
+        if row.overlap_acres > 0:
             for landcover, values in row.nlcd_landcover.items():
-                nlcd.append([id, row.overlap, landcover] + list(values))
+                nlcd.append([id, row.overlap_acres, landcover] + list(values))
                 counter += 1
         else:
-            nlcd.append([id, row.overlap])
+            nlcd.append([id, row.overlap_acres])
             counter += 1
 
         breaks.append(counter)
 
     nlcd = pd.DataFrame(
         nlcd,
-        columns=[df.index.name, area_label, "Land cover type"]
-        + [f"{year} (acres)" for year in NLCD_YEARS],
+        columns=[df.index.name, area_label, "Land cover type"] + value_columns,
     )
 
     nlcd.to_excel(xlsx, sheet_name=sheet_name, index=False)
     ws = xlsx.sheets[sheet_name]
-    set_column_widths(
-        ws, [name_col_width, area_col_width, 30] + ([12] * len(NLCD_YEARS))
-    )
+    set_column_widths(ws, [name_col_width, area_col_width, 30] + ([12] * len(NLCD_YEARS)))
     set_cell_styles(
         ws,
         breaks=breaks,
@@ -52,9 +50,9 @@ def add_ncld_impervious_sheet(xlsx, df, name_col_width, area_col_width, area_lab
     description = dataset["valueDescription"]
 
     nlcd = df.nlcd_impervious.apply(pd.Series)
-    nlcd.columns = [f"{year} (acres)" for year in NLCD_YEARS]
+    nlcd.columns = value_columns
 
-    nlcd = df[["overlap"]].rename(columns={"overlap": area_label}).join(nlcd)
+    nlcd = df[["overlap_acres"]].rename(columns={"overlap_acres": area_label}).join(nlcd)
 
     nlcd.reset_index().to_excel(xlsx, sheet_name=sheet_name, index=False)
     ws = xlsx.sheets[sheet_name]

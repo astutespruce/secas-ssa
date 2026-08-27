@@ -1,30 +1,29 @@
 import geopandas as gp
 import numpy as np
 import pandas as pd
-import shapely
 import rasterio
+import shapely
 
 from analysis.constants import M2_ACRES, SECAS_STATES
 from analysis.lib.geometry import to_dict
-from analysis.lib.raster import WindowGeometryMask, get_window, get_overlapping_windows
+from analysis.lib.raster import WindowGeometryMask, get_overlapping_windows, get_window
 from analysis.lib.stats.inundation_frequency import (
     summarize_nlcd_inundation_frequency_in_aoi,
 )
 from analysis.lib.stats.landfire import summarize_landfire_evt_in_aoi
+from analysis.lib.stats.nlcd import (
+    summarize_nlcd_impervious_in_aoi,
+    summarize_nlcd_landcover_in_aoi,
+)
 from analysis.lib.stats.protected_areas import extract_protected_area_stats
 from analysis.lib.stats.sarp import extract_sarp_huc12_stats
+from analysis.lib.stats.se_blueprint_indicators import summarize_indicator_in_aoi
 from analysis.lib.stats.slr import (
-    summarize_slr_in_aoi,
     extract_slr_projections_by_geometry,
+    summarize_slr_in_aoi,
 )
 from analysis.lib.stats.urban import summarize_urban_in_aoi
-from analysis.lib.stats.nlcd import (
-    summarize_nlcd_landcover_in_aoi,
-    summarize_nlcd_impervious_in_aoi,
-)
-from analysis.lib.stats.se_blueprint_indicators import summarize_indicator_in_aoi
 from api.settings import SHARED_DATA_DIR
-
 
 data_dir = SHARED_DATA_DIR / "inputs"
 bnd_dir = data_dir / "boundaries"
@@ -90,11 +89,11 @@ class RasterizedGeometry(object):
             for mask in self.masks:
                 mask.get_pixel_count_by_bin(src, out=count)
 
-            self.within_se_pixels = count[1]
-            self.within_se_acres = self.within_se_pixels * self.cellsize
+            self.within_extent_pixels = count[1]
+            self.within_extent_acres = self.within_extent_pixels * self.cellsize
 
-            self.outside_se_acres = (
-                self.pixels - self.within_se_pixels
+            self.outside_extent_acres = (
+                self.pixels - self.within_extent_pixels
             ) * self.cellsize
 
     def get_pixel_count_by_bin(self, dataset, bins):
@@ -194,18 +193,17 @@ async def get_analysis_unit_results(df, datasets, progress_callback=None):
     count = 0
 
     for index, row in df.iterrows():
-        print(f"Processing {index}")
         rasterized_geometry = RasterizedGeometry(row.geometry)
 
         result = {
             "pixels": rasterized_geometry.pixels,
             "rasterized_acres": rasterized_geometry.acres,
-            "overlap": rasterized_geometry.within_se_acres,
-            "outside_se": rasterized_geometry.outside_se_acres,
+            "overlap_acres": rasterized_geometry.within_extent_acres,
+            "outside_extent_acres": rasterized_geometry.outside_extent_acres,
         }
 
         # short-circuit if there are no overlapping pixels
-        if rasterized_geometry.within_se_acres == 0:
+        if rasterized_geometry.within_extent_acres == 0:
             results.append(result)
 
             if progress_callback is not None:
@@ -217,7 +215,6 @@ async def get_analysis_unit_results(df, datasets, progress_callback=None):
         # Extract SLR
         if "slr_depth" in datasets or "slr_proj" in datasets:
             result["slr_depth"] = summarize_slr_in_aoi(rasterized_geometry)
-            # extract_slr_depth_by_mask(mask_config)
 
         if "slr_proj" in datasets:
             result["slr_proj"] = extract_slr_projections_by_geometry(row.geometry)

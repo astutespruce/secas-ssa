@@ -1,9 +1,8 @@
-from pathlib import Path
 import os
+from pathlib import Path
 
 from arq.connections import RedisSettings
 from dotenv import load_dotenv
-
 
 load_dotenv()
 TEMP_DIR = Path(os.getenv("TEMP_DIR", "/tmp/ssa-reports"))
@@ -20,13 +19,10 @@ API_TOKEN = os.getenv("API_TOKEN")
 API_SECRET = os.getenv("API_SECRET")
 MAX_JOBS = int(os.getenv("MAX_JOBS", 2))
 MAX_FILE_SIZE = float(os.getenv("MAX_FILE_SIZE", 100))  # MB
-# individual extents
-CUSTOM_REPORT_MAX_EXTENT_ACRES = int(
-    os.getenv("SSA_CUSTOM_REPORT_MAX_EXTENT_ACRES", 15e6)
-)
-CUSTOM_REPORT_MAX_TOTAL_ACRES = int(
-    os.getenv("SSA_CUSTOM_REPORT_MAX_TOTAL_ACRES", 25e6)
-)
+MAX_ACRES = int(os.getenv("MAX_ACRES", 50000000))
+MAX_POLYGONS = int(os.getenv("MAX_POLYGONS", 5000))
+MAX_VERTICES = int(os.getenv("MAX_VERTICES", 2500000))
+
 LOGGING_LEVEL = os.getenv("LOGGING_LEVEL", "DEBUG")
 REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
 REDIS_PORT = os.getenv("REDIS_PORT", 6379)

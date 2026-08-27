@@ -1,57 +1,37 @@
 import logging
 
+import sentry_sdk
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.requests import Request
 from fastapi.responses import Response
-import sentry_sdk
 from sentry_sdk.integrations.asgi import SentryAsgiMiddleware
 
-from api.settings import (
-    LOGGING_LEVEL,
-    ENABLE_CORS,
-    ALLOWED_ORIGINS,
-    SENTRY_DSN,
-)
-from api.routes.health import router as health_router
+from api.logger import log
+from api.routes.jobs import router as jobs_router
 from api.routes.report import router as report_router
-from api.routes.status import router as status_router
-from api.routes.upload import router as upload_router
-
-
-### Setup logging
-logging.config.dictConfig(
-    {
-        "version": 1,
-        "disable_existing_loggers": False,
-        "formatters": {
-            "default": {
-                "()": "uvicorn.logging.DefaultFormatter",
-                "fmt": "%(levelprefix)s %(asctime)s %(message)s",
-                "datefmt": "%Y-%m-%d %H:%M:%S",
-            },
-        },
-        "handlers": {
-            "default": {
-                "formatter": "default",
-                "class": "logging.StreamHandler",
-                "stream": "ext://sys.stderr",
-            },
-        },
-        "loggers": {
-            "api": {"handlers": ["default"], "level": LOGGING_LEVEL},
-        },
-    }
-)
-log = logging.getLogger("api")
-
+from api.settings import ALLOWED_ORIGINS, ENABLE_CORS, SENTRY_DSN
 
 ### Create the main API app and routes
-app = FastAPI()
-app.include_router(health_router)
+app = FastAPI(root_path="/api", redoc_url=None, docs_url=None)
+
+if ENABLE_CORS:
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=ALLOWED_ORIGINS,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+
+
+@app.get("/health", status_code=200)
+@app.head("/health", status_code=200)
+async def health_endpoint():
+    return Response()
+
+
+app.include_router(jobs_router)
 app.include_router(report_router)
-app.include_router(status_router)
-app.include_router(upload_router)
 
 ### Setup middleware
 if SENTRY_DSN:
@@ -80,12 +60,3 @@ async def catch_exceptions_middleware(request: Request, call_next):
     except Exception as ex:
         log.error(f"Error processing request: {ex}")
         return Response("Internal server error", status_code=500)
-
-
-if ENABLE_CORS:
-    app.add_middleware(
-        CORSMiddleware,
-        allow_origins=ALLOWED_ORIGINS,
-        allow_methods=["*"],
-        allow_headers=["*"],
-    )

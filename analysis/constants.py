@@ -1,9 +1,8 @@
-from itertools import product
 import json
+from itertools import product
 from pathlib import Path
 
 import numpy as np
-
 
 DATA_CRS = "EPSG:5070"
 GEO_CRS = "EPSG:4326"
@@ -11,6 +10,7 @@ GEO_CRS = "EPSG:4326"
 # metric to imperial units
 M2_ACRES = 0.000247105
 M_MILES = 0.000621371
+STANDARD_RESOLUTION = 30  # meters
 AREA_PRECISION = 2
 
 # 32 is OK for regional level maps; 16 is more typical for big areas like ACF

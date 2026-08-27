@@ -1,10 +1,8 @@
 import pandas as pd
 
-from analysis.constants import DATASETS, SLR_DEPTHS, SLR_YEARS, SLR_NODATA_VALUES
-
+from analysis.constants import DATASETS, SLR_DEPTHS, SLR_NODATA_VALUES, SLR_YEARS
 from api.report.metadata import add_data_note
 from api.report.style import set_cell_styles, set_column_widths
-
 
 SLR_BINS = SLR_DEPTHS + [v["value"] for v in SLR_NODATA_VALUES]
 
@@ -24,15 +22,15 @@ def add_slr_projection_sheet(xlsx, df, name_col_width, area_col_width, area_labe
     for id, row in df.iterrows():
         # must also have depth to show projection data
         if (
-            row.overlap == 0
+            row.overlap_acres == 0
             or row.get("slr_depth", None) is None
             or row.get("slr_proj", None) is None
         ):
-            slr.append([id, row.overlap, "no", ""] + [""] * len(SLR_YEARS))
+            slr.append([id, row.overlap_acres, "no", ""] + [""] * len(SLR_YEARS))
             counter += 1
         else:
             for scenario, values in row.slr_proj.items():
-                slr.append([id, row.overlap, "yes", scenario] + list(values))
+                slr.append([id, row.overlap_acres, "yes", scenario] + list(values))
                 counter += 1
 
             breaks.append(counter)
@@ -64,8 +62,8 @@ def add_slr_inundation_sheet(xlsx, df, name_col_width, area_col_width, area_labe
 
     slr = []
     for id, row in df.iterrows():
-        out_row = [id, row.overlap]
-        if row.overlap > 0:
+        out_row = [id, row.overlap_acres]
+        if row.overlap_acres > 0:
             out_row += list(row.slr_depth)
 
         slr.append(out_row)

@@ -1,7 +1,6 @@
 import pandas as pd
 
 from analysis.constants import DATASETS
-
 from api.report.metadata import add_data_note
 from api.report.style import CHAR_PER_WIDTH_UNIT, set_cell_styles, set_column_widths
 
@@ -24,21 +23,21 @@ def add_indicator_sheet(
     # split list into columns
     tmp = df[dataset_id].apply(pd.Series)
     tmp.columns = columns
-    tmp = df[["overlap"]].join(tmp)
+    tmp = df[["overlap_acres"]].join(tmp)
 
     # calculate area outside
-    tmp["outside"] = tmp.overlap - tmp[columns].sum(axis=1)
+    tmp["outside"] = tmp.overlap_acres - tmp[columns].sum(axis=1)
     # remove small rounding-related errors
     tmp.loc[tmp.outside < 0, "outside"] = 0
 
     # reorder columns
-    tmp = tmp[["overlap", "outside"] + columns]
+    tmp = tmp[["overlap_acres", "outside"] + columns]
     has_area_outside = tmp.outside.max() > 1e-2
     if not has_area_outside:
         tmp = tmp.drop(columns=["outside"])
 
     tmp.rename(
-        columns={"overlap": area_label, "outside": nodata_label}
+        columns={"overlap_acres": area_label, "outside": nodata_label}
     ).reset_index().to_excel(xlsx, sheet_name=sheet_name, index=False)
 
     ws = xlsx.sheets[sheet_name]

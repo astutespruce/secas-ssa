@@ -1,22 +1,17 @@
-from itertools import product
 import math
+from itertools import product
 
-from affine import Affine
 import numba as nb
 import numpy as np
 import rasterio
+import shapely
+from affine import Affine
 from rasterio.enums import Resampling
 from rasterio.mask import geometry_mask
 from rasterio.vrt import WarpedVRT
 from rasterio.windows import Window
-import shapely
 
-from analysis.constants import OVERVIEW_FACTORS, DATA_CRS
-from api.settings import SHARED_DATA_DIR
-
-data_dir = SHARED_DATA_DIR / "inputs"
-extent_filename = data_dir / "boundaries/blueprint_extent.tif"
-extent_mask_filename = data_dir / "boundaries/blueprint_extent_mask.tif"
+from analysis.constants import DATA_CRS, OVERVIEW_FACTORS
 
 
 @nb.njit(
@@ -222,9 +217,7 @@ def shift_window(window, window_transform, transform):
     """
     col_off = int(round((window_transform.c - transform.c) / transform.a))
     row_off = int(round((window_transform.f - transform.f) / transform.e))
-    return Window(
-        col_off=col_off, row_off=row_off, width=window.width, height=window.height
-    )
+    return Window(col_off=col_off, row_off=row_off, width=window.width, height=window.height)
 
 
 def boundless_raster_geometry_mask(dataset, shapes, bounds, all_touched=False):
@@ -243,68 +236,9 @@ def boundless_raster_geometry_mask(dataset, shapes, bounds, all_touched=False):
 
     transform = dataset.window_transform(window)
     out_shape = (int(window.height), int(window.width))
-    mask = geometry_mask(
-        shapes, transform=transform, out_shape=out_shape, all_touched=all_touched
-    )
+    mask = geometry_mask(shapes, transform=transform, out_shape=out_shape, all_touched=all_touched)
 
     return mask, transform, window
-
-
-def detect_data(datasets, shapes, bounds):
-    """Detect if any data pixels are found in shapes.
-
-    Typically this is performed against a reduced resolution version of a data
-    file as a pre-screening step.
-
-    Parameters
-    ----------
-    datasets : dict
-        {<id>: <filename>, ...}
-    shapes : list-like of GeoJSON features
-    bounds : list-like of [xmin, ymin, xmax, ymax]
-
-    Returns
-    -------
-    dict
-        {<id>: True if there are data pixels present in shapes, otherwise False}
-    """
-
-    with rasterio.open(extent_mask_filename) as src:
-        window = get_window(src, bounds)
-
-        # fail fast if no overlap with data extent
-        clipped_window = clip_window(window, max_width=src.width, max_height=src.height)
-        if clipped_window.width == 0 or clipped_window.height == 0:
-            return {}
-
-        transform = src.window_transform(window)
-
-        # create mask
-        # note: this intentionally uses all_touched=True
-        mask = geometry_mask(
-            shapes,
-            transform=transform,
-            out_shape=(window.height, window.width),
-            all_touched=True,
-        )
-
-    available_datasets = {}
-    for id, filename in datasets.items():
-        with rasterio.open(filename) as src:
-            read_window = shift_window(window, transform, src.transform)
-            clipped_window = clip_window(
-                read_window, max_width=src.width, max_height=src.height
-            )
-            if clipped_window.width == 0 or clipped_window.height == 0:
-                available_datasets[id] = False
-                continue
-
-            data = src.read(1, window=read_window, boundless=True)
-            nodata = getattr(np, src.dtypes[0])(src.nodata)
-
-            available_datasets[id] = np.any(data[(~mask) & (data != nodata)]).item()
-
-    return available_datasets
 
 
 def create_lowres_mask(filename, outfilename, resolution, ignore_zero=False):
@@ -328,9 +262,7 @@ def create_lowres_mask(filename, outfilename, resolution, ignore_zero=False):
     with rasterio.open(filename) as src:
         nodata = src.nodatavals[0]
         # output is still precisely aligned to same upper left coordinate
-        dst_transform = Affine(
-            resolution, 0, src.transform.c, 0, -resolution, src.transform.f
-        )
+        dst_transform = Affine(resolution, 0, src.transform.c, 0, -resolution, src.transform.f)
         width = math.ceil((src.width * src.transform.a) / resolution)
         height = math.ceil((src.height * (-src.transform.e)) / resolution)
 
@@ -471,29 +403,10 @@ def get_overlapping_windows(src, geometry, bounds, window_size):
     # Select all windows that intersect geometry
     res = src.res[0]
     src_bounds = src.bounds
-    start_row = max(
-        math.floor(math.floor((src_bounds[3] - bounds[3]) / res) / window_size)
-        * window_size,
-        0,
-    )
-    end_row = min(
-        math.ceil(math.ceil((src_bounds[3] - bounds[1]) / res) / window_size)
-        * window_size
-        + 1,
-        src.height,
-    )
-
-    start_col = max(
-        math.floor(math.floor((bounds[0] - src_bounds[0]) / res) / window_size)
-        * window_size,
-        0,
-    )
-    end_col = min(
-        math.ceil(math.ceil((bounds[2] - src_bounds[0]) / res) / window_size)
-        * window_size
-        + 1,
-        src.width,
-    )
+    start_row = math.floor(math.floor((src_bounds[3] - bounds[3]) / res) / window_size) * window_size
+    end_row = math.ceil(math.ceil((src_bounds[3] - bounds[1]) / res) / window_size) * window_size + 1
+    start_col = math.floor(math.floor((bounds[0] - src_bounds[0]) / res) / window_size) * window_size
+    end_col = math.ceil(math.ceil((bounds[2] - src_bounds[0]) / res) / window_size) * window_size + 1
 
     windows = [
         Window(row_off=row_off, col_off=col_off, width=window_size, height=window_size)
@@ -559,23 +472,14 @@ class WindowGeometryMask(object):
         bool
             returns True if there are non-NODATA pixel values present
         """
-        # DEBUG: check for implementation errors
-        # FIXME: comment out
-        if (
-            dataset.transform.a != self.dataset_transform.a
-            or dataset.transform.e != self.dataset_transform.e
-        ):
-            raise ValueError(
-                f"{dataset.name} resolution does not match that used for mask windows"
-            )
+        if dataset.transform.a != self.dataset_transform.a or dataset.transform.e != self.dataset_transform.e:
+            raise ValueError(f"{dataset.name} resolution does not match that used for mask windows")
 
         if dataset.transform == self.dataset_transform:
             read_window = self.window
 
         else:
-            read_window = shift_window(
-                self.window, self.window_transform, dataset.transform
-            )
+            read_window = shift_window(self.window, self.window_transform, dataset.transform)
             if not window_overlaps(read_window, dataset):
                 return False
 
@@ -604,13 +508,8 @@ class WindowGeometryMask(object):
             Total number of pixels for each bin
         """
         # DEBUG: check for implementation errors
-        if (
-            dataset.transform.a != self.dataset_transform.a
-            or dataset.transform.e != self.dataset_transform.e
-        ):
-            raise ValueError(
-                f"{dataset.name} resolution does not match that used for mask windows"
-            )
+        if dataset.transform.a != self.dataset_transform.a or dataset.transform.e != self.dataset_transform.e:
+            raise ValueError(f"{dataset.name} resolution does not match that used for mask windows")
 
         read_window = (
             self.window

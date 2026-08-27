@@ -30,13 +30,11 @@
 	})
 
 	const handleSuccess = (reportPath: string) => {
-		const url = `${API_HOST}${reportPath}`
+		const url = `${API_HOST}/api${reportPath}`
 		reportURL = url
 
 		window.location.href = url
 	}
-
-	$inspect('report URL', reportURL)
 </script>
 
 <div class="gap-8 sm:mt-12">
@@ -62,7 +60,7 @@
 		</div>
 	{:else}
 		<Job
-			path="report"
+			path={`report/${uuid}/finalize`}
 			{data}
 			defaultMessage="Creating report..."
 			onSuccess={handleSuccess}

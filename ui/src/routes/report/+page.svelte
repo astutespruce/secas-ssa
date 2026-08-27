@@ -42,19 +42,24 @@
 	type FileUploadSuccessParams = {
 		uuid: string
 		fields: object
-		available_datasets: object
+		datasets: string[]
 	}
 	const handleFileUploadSuccess = ({
 		uuid: uploadUuid,
 		fields: uploadAvailableFields = {},
-		available_datasets: uploadAvailableDatasets = {}
+		datasets: availableDatasetIds = []
 	}: FileUploadSuccessParams) => {
 		stepIndex = 1
 		uuid = uploadUuid
 		attributes = uploadAvailableFields
 		selectedAttribute = ''
-		availableDatasets = uploadAvailableDatasets as Record<string, boolean>
-		selectedDatasets = { ...uploadAvailableDatasets }
+
+		const uploadAvailableDatasets = new Set(availableDatasetIds)
+		availableDatasets = Object.fromEntries(
+			Object.keys(datasets).map((id) => [id, uploadAvailableDatasets.has(id)])
+		)
+
+		selectedDatasets = { ...availableDatasets }
 	}
 
 	const handleStartOver = () => {

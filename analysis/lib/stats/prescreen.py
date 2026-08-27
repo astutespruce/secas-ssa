@@ -1,20 +1,21 @@
 import geopandas as gp
-import shapely
+import rasterio
 
 from analysis.constants import DATASETS
-from analysis.lib.raster import detect_data
 from analysis.lib.geometry import to_dict_all
-from analysis.lib.stats.slr import src_dir as slr_dir
+from analysis.lib.raster import WindowGeometryMask, get_window, window_overlaps
+from analysis.lib.stats.inundation_frequency import inundation_frequency_dir
 from analysis.lib.stats.landfire import src_dir as landfire_dir
 from analysis.lib.stats.nlcd import src_dir as nlcd_dir
-from analysis.lib.stats.urban import src_dir as urban_dir
 from analysis.lib.stats.se_blueprint_indicators import src_dir as indicators_dir
-from analysis.lib.stats.inundation_frequency import inundation_frequency_dir
+from analysis.lib.stats.slr import src_dir as slr_dir
+from analysis.lib.stats.urban import src_dir as urban_dir
 from api.settings import SHARED_DATA_DIR
-
 
 data_dir = SHARED_DATA_DIR / "inputs"
 boundary_filename = data_dir / "boundaries/se_boundary.feather"
+extent_filename = data_dir / "boundaries/blueprint_extent.tif"
+extent_mask_filename = data_dir / "boundaries/blueprint_extent_mask.tif"
 
 
 indicators = [d for d in DATASETS.values() if d["id"].startswith("se_")]
@@ -25,53 +26,58 @@ raster_datasets = {
         d["id"]: indicators_dir / d["filename"].replace(".tif", "_mask.tif")
         for d in indicators
     },
-    "slr_depth": slr_dir / "slr_mask.tif",
-    "urban": urban_dir / "urban_mask.tif",
+    "landfire_evt": landfire_dir / "landfire_evt_mask.tif",
     "nlcd_landcover": nlcd_dir / "landcover_mask.tif",
     "nlcd_impervious": nlcd_dir / "impervious_mask.tif",
     "nlcd_inundation_freq": inundation_frequency_dir
     / "nlcd_inundation_frequency_mask.tif",
-    "landfire_evt": landfire_dir / "landfire_evt_mask.tif",
+    "slr_depth": slr_dir / "slr_mask.tif",
+    "urban": urban_dir / "urban_mask.tif",
 }
 
 
-def get_overlapping_analysis_units(df):
-    """Return analysis units that intersect the Southeast boundary
+def get_available_datasets(df: gp.GeoDataFrame) -> set[str]:
+    """Find all datasets that overlap features in df
 
     Parameters
     ----------
-    df : GeoDataFrame
+    df : gp.GeoDataFrame
 
     Returns
     -------
-    GeoDataFrame
-        data frame containing analysis units that intersect the southeast boundary
+    set[str]
     """
 
-    bnd = gp.read_feather(boundary_filename).geometry.values[0]
-    return df.take(
-        sorted(shapely.STRtree(df.geometry.values).query(bnd, predicate="intersects"))
-    )
+    datasets = set()
 
+    with rasterio.open(extent_mask_filename) as src:
+        window = get_window(src, df.total_bounds)
 
-def get_available_datasets(df):
-    shapes = to_dict_all(df.geometry.values)
+        if not window_overlaps(window, src):
+            return datasets
 
-    available_datasets = detect_data(
-        raster_datasets,
-        shapes,
-        df.total_bounds,
-    )
+        shapes = to_dict_all(df.geometry.values)
+        lowres_mask = WindowGeometryMask(src, window, shapes, all_touched=True)
 
-    # SLR projections available where SLR depth is available
-    available_datasets["slr_proj"] = available_datasets.get("slr_depth", False)
+        if lowres_mask.detect_data(src):
+            # HUC12 data are always available within Southeast boundary
+            datasets.add("sarp_aquatic_barriers")
+            datasets.add("sarp_aquatic_network_alteration")
 
-    # HUC12 data are always available within Southeast boundary
-    available_datasets["sarp_aquatic_barriers"] = True
-    available_datasets["sarp_aquatic_network_alteration"] = True
+            # protected areas are generally available; there is no optimal way to check
+            # this without running the full intersection
+            datasets.add("protected_areas")
 
-    # protected areas are generally available; there is no optimal way to check
-    # this without running the full intersection
-    available_datasets["protected_areas"] = True
+        else:
+            return datasets
 
-    return available_datasets
+    for dataset_id, filename in raster_datasets.items():
+        with rasterio.open(filename) as src:
+            if lowres_mask.detect_data(src):
+                datasets.add(dataset_id)
+
+    if "slr_depth" in datasets:
+        # SLR projections available where SLR depth is available
+        datasets.add("slr_proj")
+
+    return datasets

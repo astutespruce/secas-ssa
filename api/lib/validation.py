@@ -1,14 +1,8 @@
-import logging
-
-from fastapi import (
-    HTTPException,
-    Security,
-)
+from fastapi import HTTPException, Security
 from fastapi.security.api_key import APIKeyQuery
 
+from api.logger import log
 from api.settings import API_TOKEN
-
-log = logging.getLogger("api")
 
 
 def validate_token(token: str = Security(APIKeyQuery(name="token", auto_error=True))):
@@ -40,9 +34,7 @@ def validate_content_type(file):
         }
         or str(file.filename.lower()).endswith(".zip")
     ):
-        log.error(
-            f"{file.filename} has invalid upload content type: {file.content_type}"
-        )
+        log.error(f"{file.filename} has invalid upload content type: {file.content_type}")
 
         raise HTTPException(
             status_code=400,

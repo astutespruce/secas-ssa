@@ -13,7 +13,10 @@
 	const attributes = $derived(
 		[noAttributeOption].concat(
 			Object.entries(rawAttributes)
-				.map(([value, count]) => ({ value, label: `${value} (${count} unique values)` }))
+				.map(([value, count]) => ({
+					value,
+					label: `${value} (${count} unique ${count === 1 ? 'value' : 'values'})`
+				}))
 				.sort(({ value: left }, { value: right }) => (left < right ? -1 : 1))
 		)
 	)

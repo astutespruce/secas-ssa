@@ -1,12 +1,12 @@
 import geopandas as gp
-import pandas as pd
 import numpy as np
+import pandas as pd
 import shapely
 
 from analysis.lib.graph import DirectedGraph
 
 
-def dissolve(df, by, grid_size=None, agg=None, allow_multi=True, op="union"):
+def dissolve(df, by=None, grid_size=None, agg=None, allow_multi=True, op="union"):
     """Dissolve a DataFrame by grouping records using "by".
 
     Contiguous or overlapping geometries will be unioned together.
@@ -15,7 +15,7 @@ def dissolve(df, by, grid_size=None, agg=None, allow_multi=True, op="union"):
     ----------
     df : GeoDataFrame
         geometries must be single-part geometries
-    by : str or list-like
+    by : str or list-like, optional (default None)
         field(s) to dissolve by
     grid_size : float
         precision grid size, will be used in union operation
@@ -35,11 +35,16 @@ def dissolve(df, by, grid_size=None, agg=None, allow_multi=True, op="union"):
 
     agg["geometry"] = lambda g: union_or_combine(g.values, grid_size=grid_size, op=op)
 
-    # Note: this method is 5x faster than geopandas.dissolve (until it is
-    # migrated to use pygeos)
-    dissolved = gp.GeoDataFrame(
-        df.groupby(by).agg(agg).reset_index(), geometry="geometry", crs=df.crs
-    )
+    if by:
+        dissolved = gp.GeoDataFrame(
+            df.groupby(by).agg(agg).reset_index(), geometry="geometry", crs=df.crs
+        )
+    else:
+        dissolved = gp.GeoDataFrame(
+            df.agg(agg).rename("geometry").reset_index(),
+            geometry="geometry",
+            crs=df.crs,
+        )
 
     if not allow_multi:
         # flatten any multipolygons

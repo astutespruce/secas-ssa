@@ -17,7 +17,7 @@
 
 <div class="text-lg sm:mt-12">
 	{#if data !== null}
-		<Job path="upload" {data} defaultMessage="Uploading..." {onSuccess} onCancel={handleReset} />
+		<Job path="report" {data} defaultMessage="Uploading..." {onSuccess} onCancel={handleReset} />
 	{:else}
 		<UploadForm onSubmit={handleSubmit} onReset={handleReset} />
 	{/if}

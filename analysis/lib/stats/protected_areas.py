@@ -1,14 +1,12 @@
 import geopandas as gp
 import pandas as pd
-from pyogrio import read_dataframe
 import shapely
+from pyogrio import read_dataframe
 
 from analysis.constants import M2_ACRES
 from api.settings import DATA_DIR
 
-protected_areas_filename = (
-    DATA_DIR / "inputs/protected_areas/protected_areas_with_gap_status.fgb"
-)
+protected_areas_filename = DATA_DIR / "inputs/protected_areas/protected_areas_with_gap_status.fgb"
 columns = ["name", "owner", "gap_status"]
 
 
@@ -29,12 +27,12 @@ def extract_protected_area_stats(df):
 
     index_name = df.index.name or "index"
 
+    tmp = df.explode(ignore_index=False, index_parts=False)
+    # use union of individual area bounding boxes to read features
+    read_mask = shapely.union_all(shapely.envelope(tmp.geometry.values))
+
     protected_areas = read_dataframe(
-        protected_areas_filename,
-        columns=columns + ["geometry"],
-        # FIXME: use geometry mask or this reads too many features
-        bbox=tuple(df.total_bounds),
-        use_arrow=True,
+        protected_areas_filename, columns=columns + ["geometry"], mask=read_mask, use_arrow=True
     )
 
     if len(protected_areas) == 0:
@@ -42,9 +40,7 @@ def extract_protected_area_stats(df):
 
     # find all protected areas polygons that intersect any part of the AOI
     tmp = df.explode(ignore_index=False, index_parts=False)
-    left, right = shapely.STRtree(protected_areas.geometry.values).query(
-        tmp.geometry.values, predicate="intersects"
-    )
+    left, right = shapely.STRtree(protected_areas.geometry.values).query(tmp.geometry.values, predicate="intersects")
 
     # no intersections
     if len(left) == 0:
@@ -65,28 +61,18 @@ def extract_protected_area_stats(df):
     shapely.prepare(pairs.geometry_right.values)
 
     # if left completely contains right, the right geometry is the intersection
-    left_contains = shapely.contains_properly(
-        pairs.geometry.values, pairs.geometry_right.values
-    )
-    pairs.loc[left_contains, "geometry"] = pairs.loc[
-        left_contains
-    ].geometry_right.values
+    left_contains = shapely.contains_properly(pairs.geometry.values, pairs.geometry_right.values)
+    pairs.loc[left_contains, "geometry"] = pairs.loc[left_contains].geometry_right.values
 
     # if right completely contains the left, the left (geometry) are the intersection
-    right_contains = ~left_contains & shapely.contains_properly(
-        pairs.geometry.values, pairs.geometry_right.values
-    )
+    right_contains = ~left_contains & shapely.contains_properly(pairs.geometry.values, pairs.geometry_right.values)
 
     # any that aren't contained in either direction must be intersected
     ix = ~(left_contains | right_contains)
-    pairs.loc[ix, "geometry"] = shapely.intersection(
-        pairs.loc[ix].geometry.values, pairs.loc[ix].geometry_right.values
-    )
+    pairs.loc[ix, "geometry"] = shapely.intersection(pairs.loc[ix].geometry.values, pairs.loc[ix].geometry_right.values)
 
     # explode and only keep polygons
-    pairs = pairs.drop(columns=["geometry_right"]).explode(
-        ignore_index=False, index_parts=False
-    )
+    pairs = pairs.drop(columns=["geometry_right"]).explode(ignore_index=False, index_parts=False)
     pairs = pairs.loc[shapely.get_type_id(pairs.geometry.values) == 3]
 
     if len(pairs) == 0:
@@ -106,9 +92,7 @@ def extract_protected_area_stats(df):
     protected_areas["acres"] = shapely.area(protected_areas.geometry.values) * M2_ACRES
 
     # transform to dict per original row
-    protected_areas["protected_areas"] = protected_areas[columns + ["acres"]].to_dict(
-        orient="records"
-    )
+    protected_areas["protected_areas"] = protected_areas[columns + ["acres"]].to_dict(orient="records")
     protected_areas = protected_areas["protected_areas"].groupby(index_name).apply(list)
 
     out = df.join(protected_areas)

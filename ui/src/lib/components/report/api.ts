@@ -1,5 +1,4 @@
 /* eslint-disable no-await-in-loop */
-import { browser } from '$app/environment'
 import { API_TOKEN, API_HOST } from '$lib/env'
 import { captureException } from '$lib/util/log'
 
@@ -52,7 +51,7 @@ const pollJob = async (jobId: string, onProgress: ProgressCallback) => {
 
 	while (time < jobTimeout && failedRequests < failedFetchLimit) {
 		try {
-			response = await fetch(`${API_HOST}/api/reports/status/${jobId}`, {
+			response = await fetch(`${API_HOST}/api/jobs/${jobId}`, {
 				cache: 'no-cache'
 			})
 		} catch (ex) {

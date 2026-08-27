@@ -15,13 +15,13 @@ def add_landfire_evt_sheet(xlsx, df, name_col_width, area_col_width, area_label)
     breaks = []
     counter = 0
     for id, row in df.iterrows():
-        if row.overlap > 0:
+        if row.overlap_acres > 0:
             for index, acres in row.landfire_evt.items():
                 evt = LANDFIRE_INDEXES[index]
-                rows.append([id, row.overlap, evt["label"], evt["group"], acres])
+                rows.append([id, row.overlap_acres, evt["label"], evt["group"], acres])
                 counter += 1
         else:
-            rows.append([id, row.overlap])
+            rows.append([id, row.overlap_acres])
             counter += 1
 
         breaks.append(counter)
