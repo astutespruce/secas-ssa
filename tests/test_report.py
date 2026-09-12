@@ -295,9 +295,6 @@ async def test_get_analysis_unit_results_single_area(format):
 @pytest.mark.anyio
 @pytest.mark.parametrize("format", ["shp", "gdb"])
 async def test_get_analysis_unit_results_multiple_areas_partial_overlap(format):
-    # NOTE: this needs to be updated for each blueprint version; this is just a
-    # smoke test that values do not change except during Blueprint version updates
-
     filename = f"{format}_poly_multiple_partial_overlap.zip"
     dataset = filename.replace(f"{format}_", "").replace(".zip", f".{format}")
     df = read_dataframe(f"/vsizip/tests/fixtures/{filename}/{dataset}", columns=[], use_arrow=True).to_crs(DATA_CRS)
@@ -361,9 +358,6 @@ async def test_get_analysis_unit_results_multiple_areas_partial_overlap_dissolve
 @pytest.mark.anyio
 @pytest.mark.parametrize("format", ["shp", "gdb"])
 async def test_get_analysis_unit_results_multiple_areas(format):
-    # NOTE: this needs to be updated for each blueprint version; this is just a
-    # smoke test that values do not change except during Blueprint version updates
-
     filename = f"{format}_poly_multiple.zip"
     dataset = filename.replace(f"{format}_", "").replace(".zip", f".{format}")
     df = read_dataframe(f"/vsizip/tests/fixtures/{filename}/{dataset}", columns=[], use_arrow=True).to_crs(DATA_CRS)
@@ -387,8 +381,10 @@ async def test_get_analysis_unit_results_multiple_areas(format):
     assert np.allclose(results["rasterized_acres"], [312.241878, 40.698, 99.187947, 147.0027645, 5386.1723955])
     assert np.allclose(results["outside_extent_acres"], [0, 0, 0, 0, 0])
 
+    ga_poly = results.iloc[0]
     fl_poly = results.iloc[1]
     pr_poly = results.iloc[3]
+    marine_poly = results.iloc[4]
 
     fl_protected_areas_poly = fl_poly.protected_areas
     assert len(fl_protected_areas_poly) == 3
@@ -410,17 +406,22 @@ async def test_get_analysis_unit_results_multiple_areas(format):
         pr_slr_proj[0]["values"], [0.2625, 0.4921, 0.8202, 1.3123, 2.0669, 3.0512, 4.1995, 5.4462, 6.7913], atol=1e4
     )
 
-    # TODO: urban
+    assert np.allclose(
+        ga_poly.urban["low"],
+        [22.9066, 22.9066, 22.9066, 22.9066, 22.9066, 22.9066, 22.9066, 22.9066, 22.9066, 289.3352, 0.0],
+    )
+    assert np.allclose(
+        ga_poly.urban["high"],
+        [22.9066, 23.1557, 24.1654, 24.3122, 25.5620, 26.68734, 27.2656, 27.5725, 28.0039, 284.2380, 0],
+    )
+
+    assert np.allclose(fl_poly.urban["high"], [0] * 9 + [fl_poly.rasterized_acres] + [0])
+    assert np.allclose(pr_poly.urban["high"], [0] * 10 + [pr_poly.rasterized_acres])
+    assert np.allclose(marine_poly.urban["high"], [0] * 10 + [marine_poly.rasterized_acres])
 
 
 @pytest.mark.anyio
-@pytest.mark.parametrize(
-    "format",
-    [
-        "shp",
-        # "gdb"
-    ],
-)
+@pytest.mark.parametrize("format", ["shp", "gdb"])
 async def test_create_xlsx_file_single_area(format):
     filename = f"{format}_poly_small.zip"
     dataset = filename.replace(f"{format}_", "").replace(".zip", f".{format}")
@@ -520,11 +521,12 @@ async def test_create_xlsx_file_single_area(format):
     assert slr_proj.columns.tolist() == ["Analysis unit", "Analysis acres"] + slr_proj_value_columns
     assert slr_proj.iloc[0]["Has projected SLR?"] == "no"
 
-    urban = reader.parse(sheet_name="Urbanization", nrows=3)
+    urban = reader.parse(sheet_name="Urbanization", nrows=2)
     assert urban.columns.tolist() == ["Analysis unit", "Analysis acres", "Urbanization level"] + urban_value_columns
     assert urban["Urbanization level"].tolist() == ["Low", "High"]
     for i, level in enumerate(urban["Urbanization level"].values):
-        assert np.allclose(urban[urban_value_columns].iloc[i].values, results.urban.iloc[0][level.lower()])
+        # last column is nodata, omitted here
+        assert np.allclose(urban[urban_value_columns].iloc[i].values, results.urban.iloc[0][level.lower()][:-1])
 
 
 @pytest.mark.anyio
@@ -594,6 +596,16 @@ async def test_create_xlsx_file_multiple_areas_partial_overlap(format):
     assert slr_proj.columns.tolist() == ["Analysis unit", "Acres within Southeast data extent"] + slr_proj_value_columns
     assert slr_proj["Has projected SLR?"].iloc[:3].tolist() == ["no"] * 3
 
+    urban = reader.parse(sheet_name="Urbanization", nrows=2)
+    assert (
+        urban.columns.tolist()
+        == ["Analysis unit", "Acres within Southeast data extent", "Urbanization level"] + urban_value_columns
+    )
+    assert urban["Urbanization level"].tolist() == ["Low", "High"]
+    for i, level in enumerate(urban["Urbanization level"].values):
+        # last column is nodata, omitted here
+        assert np.allclose(urban[urban_value_columns].iloc[i].values, results.urban.iloc[0][level.lower()][:-1])
+
 
 @pytest.mark.anyio
 @pytest.mark.parametrize("format", ["shp", "gdb"])
@@ -657,3 +669,14 @@ async def test_create_xlsx_file_multiple_areas(format):
     assert slr_proj.columns.tolist() == ["Analysis unit", "Analysis acres"] + slr_proj_value_columns
     assert slr_proj["Has projected SLR?"].iloc[:15].tolist() == ["yes"] * 15
     assert np.allclose(slr_proj.iloc[0][slr_proj_value_columns[2:]].values, results.slr_proj.iloc[0][0]["values"])
+
+    urban = reader.parse(sheet_name="Urbanization", nrows=2)
+    assert (
+        urban.columns.tolist()
+        == ["Analysis unit", "Analysis acres", "Urbanization level", "Outside extent of this dataset"]
+        + urban_value_columns
+    )
+    assert urban["Urbanization level"].tolist() == ["Low", "High"]
+    for i, level in enumerate(urban["Urbanization level"].values):
+        # last column is nodata, omitted here
+        assert np.allclose(urban[urban_value_columns].iloc[i].values, results.urban.iloc[0][level.lower()][:-1])
