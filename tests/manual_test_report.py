@@ -32,13 +32,13 @@ aois = [
     #     "analysis_unit_label": "Pop A",
     #     # "field": "POP_ID",
     # },
-    {
-        "name": "Test single area",
-        "path": "SingleTest",
-        "field": None,
-        # "analysis_unit_label": "Pop A",
-        "analysis_unit_label": 1,
-    },
+    # {
+    #     "name": "Test single area",
+    #     "path": "SingleTest",
+    #     "field": None,
+    #     # "analysis_unit_label": "Pop A",
+    #     "analysis_unit_label": 1,
+    # },
     # {
     #     "name": "Test no protected areas",
     #     "path": "test_no_protected_areas",
@@ -56,12 +56,12 @@ aois = [
     #     "field": None,
     #     "analysis_unit_label": 1,
     # },
-    # {
-    #     "name": "fl_slr_test",
-    #     "path": "fl_slr_test",
-    #     "field": None,
-    #     "analysis_unit_label": "Test population",
-    # },
+    {
+        "name": "fl_slr_test",
+        "path": "fl_slr_test",
+        "field": None,
+        "analysis_unit_label": "Test population",
+    },
     # {
     #     "name": "big_cypress",
     #     "path": "big_cypress",
@@ -97,7 +97,7 @@ for aoi in aois:
     # dissolve by analysis unit identifier
     df = dissolve(df, by=field).set_index(field)
 
-    datasets = ["protected_areas", "landfire_evt"]
+    datasets = ["protected_areas", "landfire_evt", "urban", "slr_depth", "slr_proj"]
 
     ### calculate results, data must be in DATA_CRS
     print("Calculating results...")

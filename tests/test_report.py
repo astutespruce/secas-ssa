@@ -1,4 +1,5 @@
 import os
+import shutil
 from io import BytesIO
 
 import numpy as np
@@ -14,8 +15,11 @@ from analysis.lib.stats.prescreen import get_available_datasets
 from api.errors import DataError
 from api.logger import log
 from api.report.nlcd import value_columns as nlcd_value_columns
+from api.report.slr import depth_value_columns as slr_depth_value_columns
+from api.report.slr import proj_value_columns as slr_proj_value_columns
 from api.report.urban import value_columns as urban_value_columns
 from api.report.xlsx import create_xlsx
+from api.settings import TEMP_DIR
 from api.tasks.report import get_report_inputs
 
 load_dotenv()
@@ -112,9 +116,10 @@ async def test_get_report_inputs_single_area(format):
     dataset = filename.replace(f"{format}_", "").replace(".zip", f".{format}")
     uuid = "123"
 
-    result, errors = await get_report_inputs(
-        mock_ctx, f"tests/fixtures/{filename}", dataset, layer="poly_small", uuid=uuid
-    )
+    tmp_filename = TEMP_DIR / filename
+    shutil.copy(f"tests/fixtures/{filename}", tmp_filename)
+
+    result, errors = await get_report_inputs(mock_ctx, tmp_filename, dataset, layer="poly_small", uuid=uuid)
 
     assert len(errors) == 0
 
@@ -150,13 +155,16 @@ async def test_get_report_inputs_no_overlap(format):
     dataset = filename.replace(f"{format}_", "").replace(".zip", f".{format}")
     uuid = "123"
 
+    tmp_filename = TEMP_DIR / filename
+    shutil.copy(f"tests/fixtures/{filename}", tmp_filename)
+
     with pytest.raises(
         DataError,
         match="area of interest does not overlap any of the available datasets",
     ):
         await get_report_inputs(
             mock_ctx,
-            f"tests/fixtures/{filename}",
+            tmp_filename,
             dataset,
             layer="poly_no_overlap",
             uuid=uuid,
@@ -170,9 +178,12 @@ async def test_get_report_inputs_multiple_areas_partial_overlap(format):
     dataset = filename.replace(f"{format}_", "").replace(".zip", f".{format}")
     uuid = "123"
 
+    tmp_filename = TEMP_DIR / filename
+    shutil.copy(f"tests/fixtures/{filename}", tmp_filename)
+
     result, errors = await get_report_inputs(
         mock_ctx,
-        f"tests/fixtures/{filename}",
+        tmp_filename,
         dataset,
         layer="poly_multiple_partial_overlap",
         uuid=uuid,
@@ -196,9 +207,12 @@ async def test_get_report_inputs_multiple_areas(format):
     dataset = filename.replace(f"{format}_", "").replace(".zip", f".{format}")
     uuid = "123"
 
+    tmp_filename = TEMP_DIR / filename
+    shutil.copy(f"tests/fixtures/{filename}", tmp_filename)
+
     result, errors = await get_report_inputs(
         mock_ctx,
-        f"tests/fixtures/{filename}",
+        tmp_filename,
         dataset,
         layer="poly_multiple",
         uuid=uuid,
@@ -272,7 +286,7 @@ async def test_get_analysis_unit_results_single_area(format):
     assert np.isclose(row.protected_areas[0]["acres"], 34.5465)
 
     assert len(row.slr_depth) == 14
-    assert np.allclose(row.slr_depth, [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 50.71, 0])
+    assert np.allclose(row.slr_depth, [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 50.705946, 0])
 
     assert list(row.urban.keys()) == ["high", "low"]
     assert np.allclose(row.urban["high"], [0, 0, 0, 0, 0, 0, 0, 0, 0])
@@ -346,6 +360,67 @@ async def test_get_analysis_unit_results_multiple_areas_partial_overlap_dissolve
 
 @pytest.mark.anyio
 @pytest.mark.parametrize("format", ["shp", "gdb"])
+async def test_get_analysis_unit_results_multiple_areas(format):
+    # NOTE: this needs to be updated for each blueprint version; this is just a
+    # smoke test that values do not change except during Blueprint version updates
+
+    filename = f"{format}_poly_multiple.zip"
+    dataset = filename.replace(f"{format}_", "").replace(".zip", f".{format}")
+    df = read_dataframe(f"/vsizip/tests/fixtures/{filename}/{dataset}", columns=[], use_arrow=True).to_crs(DATA_CRS)
+    datasets = set(get_available_datasets(df))
+    results = await get_analysis_unit_results(df, datasets)
+
+    assert len(results) == len(df)
+    for col in [
+        "states",
+        "count",
+        "acres",
+        "rasterized_acres",
+        "overlap_acres",
+        "outside_extent_acres",
+    ]:
+        assert col in results.columns
+
+    assert results.states.fillna("").values.tolist() == ["Georgia", "Florida", "Mississippi", "Puerto Rico", ""]
+    assert results["count"].values.tolist() == [1] * 5
+    assert np.allclose(results["acres"], [313.13876187, 40.55673456, 99.02771972, 147.19913421, 5386.09794185])
+    assert np.allclose(results["rasterized_acres"], [312.241878, 40.698, 99.187947, 147.0027645, 5386.1723955])
+    assert np.allclose(results["outside_extent_acres"], [0, 0, 0, 0, 0])
+
+    fl_poly = results.iloc[1]
+    pr_poly = results.iloc[3]
+
+    fl_protected_areas_poly = fl_poly.protected_areas
+    assert len(fl_protected_areas_poly) == 3
+    assert fl_protected_areas_poly[0]["name"] == "Crystal River Preserve State Park"
+    assert np.isclose(fl_protected_areas_poly[0]["acres"], 27.801745)
+
+    assert np.allclose(
+        fl_poly.slr_depth,
+        [25.1306, 38.9190, 40.6982, 40.6982, 40.6982, 40.6982, 40.6982, 40.6982, 40.6982, 40.6982, 40.6982, 0, 0, 0],
+    )
+
+    assert np.allclose(pr_poly.slr_depth, [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 147.0028, 0, 0])
+
+    pr_slr_proj = pr_poly.slr_proj
+    assert len(pr_slr_proj) == 5
+    assert pr_slr_proj[0]["scenario"] == "l"
+
+    assert np.allclose(
+        pr_slr_proj[0]["values"], [0.2625, 0.4921, 0.8202, 1.3123, 2.0669, 3.0512, 4.1995, 5.4462, 6.7913], atol=1e4
+    )
+
+    # TODO: urban
+
+
+@pytest.mark.anyio
+@pytest.mark.parametrize(
+    "format",
+    [
+        "shp",
+        # "gdb"
+    ],
+)
 async def test_create_xlsx_file_single_area(format):
     filename = f"{format}_poly_small.zip"
     dataset = filename.replace(f"{format}_", "").replace(".zip", f".{format}")
@@ -430,6 +505,21 @@ async def test_create_xlsx_file_single_area(format):
             nlcd_landcover[nlcd_value_columns].iloc[i].values, results.nlcd_landcover.iloc[0][landcover_type], atol=1e-4
         )
 
+    slr_depth = reader.parse(sheet_name="SLR inundation area")
+    # only nodata is areas outside counties
+    slr_depth_col_ix = list(range(11)) + [12]
+    slr_value_cols = np.array(slr_depth_value_columns).take(slr_depth_col_ix).tolist()
+    assert slr_depth.columns.tolist() == ["Analysis unit", "Analysis acres"] + slr_value_cols
+    assert np.allclose(
+        slr_depth[slr_value_cols].iloc[0].values,
+        results.slr_depth.iloc[0].take(list(range(0, 11)) + [12]),
+    )
+
+    slr_proj = reader.parse(sheet_name="Projected SLR")
+
+    assert slr_proj.columns.tolist() == ["Analysis unit", "Analysis acres"] + slr_proj_value_columns
+    assert slr_proj.iloc[0]["Has projected SLR?"] == "no"
+
     urban = reader.parse(sheet_name="Urbanization", nrows=3)
     assert urban.columns.tolist() == ["Analysis unit", "Analysis acres", "Urbanization level"] + urban_value_columns
     assert urban["Urbanization level"].tolist() == ["Low", "High"]
@@ -465,7 +555,7 @@ async def test_create_xlsx_file_multiple_areas_partial_overlap(format):
     ]
 
     results = await get_analysis_unit_results(df, datasets)
-    xlsx = create_xlsx(results, datasets, name="Test area")
+    xlsx = create_xlsx(results, datasets)
 
     if SAVE_XLSX:
         with open("/tmp/test_create_xlsx_file_multiple_areas_partial_overlap.xlsx", "wb") as out:
@@ -484,9 +574,86 @@ async def test_create_xlsx_file_multiple_areas_partial_overlap(format):
         summary["Acres outside Southeast data extent (rasterized to 30m pixels)"], results.outside_extent_acres
     )
     assert np.allclose(summary["Number of 30m pixels in analysis unit"], results.pixels)
-    assert np.allclose(summary["Number of distinct areas in analysis unit"], results["count"])
+    assert np.allclose(summary["Number of areas in analysis unit"], results["count"])
     assert summary["State(s)"].tolist() == results.states.tolist()
 
-    details = reader.parse(sheet_name="Data details", skiprows=2)
+    details = reader.parse(sheet_name="Data details")
     assert len(details) == len(datasets)
     assert details["Name"].tolist() == [d["name"] for id, d in DATASETS.items() if id in datasets]
+
+    slr_depth = reader.parse(sheet_name="SLR inundation area")
+    slr_depth_col_ix = list(range(11)) + [12]
+    slr_value_cols = np.array(slr_depth_value_columns).take(slr_depth_col_ix).tolist()
+    assert slr_depth.columns.tolist() == ["Analysis unit", "Acres within Southeast data extent"] + slr_value_cols
+    assert np.allclose(
+        slr_depth[slr_value_cols].iloc[0].values,
+        results.slr_depth.iloc[0].take(slr_depth_col_ix),
+    )
+
+    slr_proj = reader.parse(sheet_name="Projected SLR")
+    assert slr_proj.columns.tolist() == ["Analysis unit", "Acres within Southeast data extent"] + slr_proj_value_columns
+    assert slr_proj["Has projected SLR?"].iloc[:3].tolist() == ["no"] * 3
+
+
+@pytest.mark.anyio
+@pytest.mark.parametrize("format", ["shp", "gdb"])
+async def test_create_xlsx_file_multiple_areas(format):
+    filename = f"{format}_poly_multiple.zip"
+    dataset = filename.replace(f"{format}_", "").replace(".zip", f".{format}")
+    df = read_dataframe(f"/vsizip/tests/fixtures/{filename}/{dataset}", columns=["Region"], use_arrow=True).to_crs(
+        DATA_CRS
+    )
+    df = dissolve(df.explode(ignore_index=True), by="Region").set_index("Region")
+
+    # representative sample of datasets
+    datasets = [
+        "landfire_evt",
+        "nlcd_impervious",
+        "nlcd_inundation_freq",
+        "nlcd_landcover",
+        "protected_areas",
+        "sarp_aquatic_barriers",
+        "sarp_aquatic_network_alteration",
+        "se_blueprint_firefrequency",
+        "se_blueprint_resilientterrestrialsites",
+        "slr_depth",
+        "slr_proj",
+        "urban",
+    ]
+
+    results = await get_analysis_unit_results(df, datasets)
+    xlsx = create_xlsx(results, datasets)
+
+    if SAVE_XLSX:
+        with open("/tmp/test_create_xlsx_file_multiple_areas.xlsx", "wb") as out:
+            _ = out.write(xlsx)
+
+    reader = pd.ExcelFile(BytesIO(xlsx))
+
+    assert len(reader.sheet_names) == len(datasets) + 2
+    summary = reader.parse(sheet_name="Summary")
+    assert len(summary) == len(df)
+
+    assert np.allclose(summary["GIS acres"], results.acres)
+    assert np.allclose(summary["Analysis acres (rasterized to 30m pixels)"], results.rasterized_acres)
+    assert np.allclose(summary["Number of 30m pixels in analysis unit"], results.pixels)
+    assert np.allclose(summary["Number of areas in analysis unit"], results["count"])
+    assert summary["State(s)"].tolist() == results.states.tolist()
+
+    details = reader.parse(sheet_name="Data details")
+    assert len(details) == len(datasets)
+    assert details["Name"].tolist() == [d["name"] for id, d in DATASETS.items() if id in datasets]
+
+    slr_depth = reader.parse(sheet_name="SLR inundation area")
+    slr_depth_col_ix = [13] + list(range(13))
+    slr_value_cols = np.array(slr_depth_value_columns).take(slr_depth_col_ix).tolist()
+    assert slr_depth.columns.tolist() == ["Analysis unit", "Analysis acres"] + slr_value_cols
+    assert np.allclose(
+        slr_depth[slr_value_cols].iloc[0].values,
+        results.slr_depth.iloc[0].take(slr_depth_col_ix),
+    )
+
+    slr_proj = reader.parse(sheet_name="Projected SLR")
+    assert slr_proj.columns.tolist() == ["Analysis unit", "Analysis acres"] + slr_proj_value_columns
+    assert slr_proj["Has projected SLR?"].iloc[:15].tolist() == ["yes"] * 15
+    assert np.allclose(slr_proj.iloc[0][slr_proj_value_columns[2:]].values, results.slr_proj.iloc[0][0]["values"])

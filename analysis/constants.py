@@ -78,9 +78,7 @@ NLCD_INUNDATION_FREQUENCY = {
         "inundation_frequency": inundation_frequency,
         "nlcd": nlcd,
     }
-    for nlcd, inundation_frequency in product(
-        NLCD_INDEXES.keys(), range(len(INUNDATION_FREQUENCY))
-    )
+    for nlcd, inundation_frequency in product(NLCD_INDEXES.keys(), range(len(INUNDATION_FREQUENCY)))
 }
 
 
@@ -92,8 +90,9 @@ URBAN_PROBABILITIES = np.append(np.arange(0, 51) / 50.0, np.array([1.0]))
 URBAN_BINS = np.arange(0, len(URBAN_PROBABILITIES))
 URBAN_THRESHOLD = 25  # >= 50% probability
 
-# depth in feet
-SLR_DEPTHS = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+# depth in 1 foot increments from 0
+SLR_DEPTH = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+SLR_DEPTH_VALUES = [{"value": v, "label": f"{v} {'foot' if v == 1 else 'feet'}"} for v in SLR_DEPTH if v < 11]
 SLR_NODATA_VALUES = [
     {
         "value": 11,
@@ -115,10 +114,7 @@ SLR_PROJ_SCENARIOS = {
     "ih": "Intermediate-high",
     "h": "High",
 }
-SLR_PROJ_COLUMNS = [
-    f"{decade}_{scenario}"
-    for decade, scenario in product(SLR_YEARS, SLR_PROJ_SCENARIOS)
-]
+SLR_PROJ_COLUMNS = [f"{decade}_{scenario}" for decade, scenario in product(SLR_YEARS, SLR_PROJ_SCENARIOS)]
 
 SLR_COLORS = [
     "#00094E",

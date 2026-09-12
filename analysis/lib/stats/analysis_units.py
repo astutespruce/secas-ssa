@@ -18,10 +18,7 @@ from analysis.lib.stats.nlcd import (
 from analysis.lib.stats.protected_areas import extract_protected_area_stats
 from analysis.lib.stats.sarp import extract_sarp_huc12_stats
 from analysis.lib.stats.se_blueprint_indicators import summarize_indicator_in_aoi
-from analysis.lib.stats.slr import (
-    extract_slr_projections_by_geometry,
-    summarize_slr_in_aoi,
-)
+from analysis.lib.stats.slr import extract_slr_proj_in_analysis_areas, summarize_slr_in_aoi
 from analysis.lib.stats.urban import summarize_urban_in_aoi
 from api.settings import SHARED_DATA_DIR
 
@@ -55,9 +52,7 @@ class RasterizedGeometry(object):
 
         # create masks and windows
         with rasterio.open(extent_filename) as src:
-            windows, ratio = get_overlapping_windows(
-                src, geometry, bounds=self.bounds, window_size=WINDOW_SIZE
-            )
+            windows, ratio = get_overlapping_windows(src, geometry, bounds=self.bounds, window_size=WINDOW_SIZE)
 
             num_windows = len(windows)
             self.masks = []
@@ -92,9 +87,7 @@ class RasterizedGeometry(object):
             self.within_extent_pixels = count[1]
             self.within_extent_acres = self.within_extent_pixels * self.cellsize
 
-            self.outside_extent_acres = (
-                self.pixels - self.within_extent_pixels
-            ) * self.cellsize
+            self.outside_extent_acres = (self.pixels - self.within_extent_pixels) * self.cellsize
 
     def get_pixel_count_by_bin(self, dataset, bins):
         """Get count of pixels in each bin
@@ -154,13 +147,9 @@ async def get_analysis_unit_results(df, datasets, progress_callback=None):
 
     states = gp.read_feather(states_filename, columns=["state", "id", "geometry"])
     states = states.loc[states.id.isin(SECAS_STATES)]
-    left, right = shapely.STRtree(states.geometry.values).query(
-        df.geometry.values, predicate="intersects"
-    )
+    left, right = shapely.STRtree(states.geometry.values).query(df.geometry.values, predicate="intersects")
     state_join = (
-        pd.DataFrame(
-            {"state": states.state.values.take(right)}, index=df.index.values.take(left)
-        )
+        pd.DataFrame({"state": states.state.values.take(right)}, index=df.index.values.take(left))
         .groupby(level=0)
         .state.unique()
         .apply(sorted)
@@ -174,21 +163,6 @@ async def get_analysis_unit_results(df, datasets, progress_callback=None):
     df["bounds"] = shapely.bounds(df.geometry.values).tolist()
 
     results = []
-
-    sarp_huc12_stats = None
-    if (
-        len(
-            set(
-                ["sarp_aquatic_barriers", "sarp_aquatic_network_alteration"]
-            ).intersection(datasets)
-        )
-        > 0
-    ):
-        sarp_huc12_stats = extract_sarp_huc12_stats(df)
-
-    protected_area_stats = None
-    if "protected_areas" in datasets:
-        protected_area_stats = extract_protected_area_stats(df)
 
     count = 0
 
@@ -216,40 +190,29 @@ async def get_analysis_unit_results(df, datasets, progress_callback=None):
         if "slr_depth" in datasets or "slr_proj" in datasets:
             result["slr_depth"] = summarize_slr_in_aoi(rasterized_geometry)
 
-        if "slr_proj" in datasets:
-            result["slr_proj"] = extract_slr_projections_by_geometry(row.geometry)
-
         # Extract urban
         if "urban" in datasets:
             result["urban"] = summarize_urban_in_aoi(rasterized_geometry)
 
         # Extract NLCD
         if "nlcd_landcover" in datasets:
-            result["nlcd_landcover"] = summarize_nlcd_landcover_in_aoi(
-                rasterized_geometry
-            )
+            result["nlcd_landcover"] = summarize_nlcd_landcover_in_aoi(rasterized_geometry)
 
         if "nlcd_impervious" in datasets:
-            result["nlcd_impervious"] = summarize_nlcd_impervious_in_aoi(
-                rasterized_geometry
-            )
+            result["nlcd_impervious"] = summarize_nlcd_impervious_in_aoi(rasterized_geometry)
 
         # Extract LANDFIRE EVT
         if "landfire_evt" in datasets:
             result["landfire_evt"] = summarize_landfire_evt_in_aoi(rasterized_geometry)
 
         # Extract SE Blueprint indicators
-        se_blueprint_indicators = [
-            dataset for dataset in datasets if dataset.startswith("se_blueprint")
-        ]
+        se_blueprint_indicators = [dataset for dataset in datasets if dataset.startswith("se_blueprint")]
         for dataset in se_blueprint_indicators:
             result[dataset] = summarize_indicator_in_aoi(dataset, rasterized_geometry)
 
         # Extract inundation frequency
         if "nlcd_inundation_freq" in datasets:
-            result["nlcd_inundation_freq"] = summarize_nlcd_inundation_frequency_in_aoi(
-                rasterized_geometry
-            )
+            result["nlcd_inundation_freq"] = summarize_nlcd_inundation_frequency_in_aoi(rasterized_geometry)
 
         results.append(result)
 
@@ -258,12 +221,21 @@ async def get_analysis_unit_results(df, datasets, progress_callback=None):
 
         count += 1
 
-    df = df[["states", "count", "acres"]].join(pd.DataFrame(results, index=df.index))
+    out = df[["states", "count", "acres"]].join(pd.DataFrame(results, index=df.index))
 
-    if sarp_huc12_stats is not None:
-        df = df.join(sarp_huc12_stats)
+    if len(set(["sarp_aquatic_barriers", "sarp_aquatic_network_alteration"]).intersection(datasets)) > 0:
+        sarp_huc12_stats = extract_sarp_huc12_stats(df)
+        if sarp_huc12_stats is not None:
+            out = out.join(sarp_huc12_stats)
 
-    if protected_area_stats is not None:
-        df = df.join(protected_area_stats)
+    if "protected_areas" in datasets:
+        protected_area_stats = extract_protected_area_stats(df)
+        if protected_area_stats is not None:
+            out = out.join(protected_area_stats)
 
-    return df
+    if "slr_proj" in datasets:
+        slr_proj = extract_slr_proj_in_analysis_areas(df)
+        if slr_proj is not None:
+            out = out.join(slr_proj)
+
+    return out

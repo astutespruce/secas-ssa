@@ -84,9 +84,7 @@ def unique(arr):
 
 @nb.njit(
     [
-        "int8[:,:](int8[:,:],int8[:,:],int8,int8)",
         "uint8[:,:](uint8[:,:],uint8[:,:],uint8,uint8)",
-        "int16[:,:](int16[:,:],int16[:,:],int16,int16)",
         "uint16[:,:](uint16[:,:],uint16[:,:],uint16,uint16)",
     ],
     cache=True,
