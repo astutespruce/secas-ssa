@@ -289,7 +289,7 @@ async def test_get_analysis_unit_results_single_area(format):
     assert np.allclose(row.slr_depth, [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 50.705946, 0])
 
     assert list(row.urban.keys()) == ["high", "low"]
-    assert np.allclose(row.urban["high"], [0, 0, 0, 0, 0, 0, 0, 0, 0])
+    assert np.allclose(row.urban["high"], [0, 0, 0, 0, 0, 0, 0, 0, 0, 50.705946, 0])
 
 
 @pytest.mark.anyio

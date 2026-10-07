@@ -1,3 +1,5 @@
+# ruff:disable[ERA001]
+
 import asyncio
 import subprocess
 from pathlib import Path
@@ -9,7 +11,6 @@ from pyogrio.geopandas import read_dataframe
 from analysis.constants import DATA_CRS
 from analysis.lib.geometry import dissolve, make_valid
 from analysis.lib.stats.analysis_units import get_analysis_unit_results
-from analysis.lib.stats.prescreen import get_available_datasets
 from api.report.xlsx import create_xlsx
 
 ### Create XLSX reports for an AOI

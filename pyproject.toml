@@ -44,8 +44,6 @@ dev = [
     "httpx[http2]",
     "ruff",
     "setuptools",
-    "watchgod",
-    "watchfiles",
     "pytest>=9.1.1",
 ]
 
