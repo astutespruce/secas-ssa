@@ -35,7 +35,7 @@ SECAS_STATES = [
     "TN",
     "TX",
     "VA",
-    "USVI",
+    "VI",
     "WV",
 ]
 

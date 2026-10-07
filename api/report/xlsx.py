@@ -20,9 +20,7 @@ def create_xlsx(df, datasets):
     outside_extent_acres = df.outside_extent_acres.sum() > 1e-2
 
     name_col_width = max(
-        min(
-            pd.Series(df.index).astype("str").apply(len).max() * CHAR_PER_WIDTH_UNIT, 28
-        ),
+        min(pd.Series(df.index).astype("str").apply(len).max() * CHAR_PER_WIDTH_UNIT, 28),
         14,
     )
     area_col_width = max(
@@ -30,30 +28,23 @@ def create_xlsx(df, datasets):
         10,
     )
 
-    area_label = (
-        "Acres within Southeast data extent"
-        if outside_extent_acres
-        else "Analysis acres"
-    )
+    area_label = "Acres within Southeast data extent" if outside_extent_acres else "Analysis acres"
 
     ### Create XLSX file and write to memory buffer
     buffer = BytesIO()
     with pd.ExcelWriter(buffer) as xlsx:
+        # Data details sheet
+        add_data_details_sheet(xlsx, datasets)
+
         # Summary sheet
-        add_summary_sheet(
-            xlsx, df, name_col_width, area_col_width, area_label, outside_extent_acres
-        )
+        add_summary_sheet(xlsx, df, name_col_width, area_col_width, area_label, outside_extent_acres)
 
         # NLCD sheets
         if "nlcd_landcover" in datasets:
-            add_ncld_landcover_sheet(
-                xlsx, df, name_col_width, area_col_width, area_label
-            )
+            add_ncld_landcover_sheet(xlsx, df, name_col_width, area_col_width, area_label)
 
         if "nlcd_impervious" in datasets:
-            add_ncld_impervious_sheet(
-                xlsx, df, name_col_width, area_col_width, area_label
-            )
+            add_ncld_impervious_sheet(xlsx, df, name_col_width, area_col_width, area_label)
 
         # LANDFIRE EVT sheet
         if "landfire_evt" in datasets:
@@ -65,23 +56,15 @@ def create_xlsx(df, datasets):
 
         # SLR projection sheet
         if "slr_proj" in datasets:
-            add_slr_projection_sheet(
-                xlsx, df, name_col_width, area_col_width, area_label
-            )
+            add_slr_projection_sheet(xlsx, df, name_col_width, area_col_width, area_label)
 
         # SLR inundation sheet
         if "slr_depth" in datasets:
-            add_slr_inundation_sheet(
-                xlsx, df, name_col_width, area_col_width, area_label
-            )
+            add_slr_inundation_sheet(xlsx, df, name_col_width, area_col_width, area_label)
 
-        se_blueprint_indicators = [
-            dataset for dataset in datasets if dataset.startswith("se_blueprint")
-        ]
+        se_blueprint_indicators = [dataset for dataset in datasets if dataset.startswith("se_blueprint")]
         for dataset in se_blueprint_indicators:
-            add_indicator_sheet(
-                xlsx, df, dataset, name_col_width, area_col_width, area_label
-            )
+            add_indicator_sheet(xlsx, df, dataset, name_col_width, area_col_width, area_label)
 
         if "sarp_aquatic_barriers" in datasets:
             add_sarp_barriers_sheet(xlsx, df, name_col_width)
@@ -90,15 +73,10 @@ def create_xlsx(df, datasets):
             add_sarp_network_alteration_sheet(xlsx, df, name_col_width)
 
         if "nlcd_inundation_freq" in datasets:
-            add_nlcd_inundation_frequency_sheet(
-                xlsx, df, name_col_width, area_col_width, area_label
-            )
+            add_nlcd_inundation_frequency_sheet(xlsx, df, name_col_width, area_col_width, area_label)
 
         if "protected_areas" in datasets:
             add_protected_areas_sheet(xlsx, df, name_col_width, area_col_width)
-
-        # Data details sheet
-        add_data_details_sheet(xlsx, datasets)
 
     # rewind buffer and read data
     buffer.seek(0)
