@@ -35,9 +35,11 @@
 	let allDatasets: Record<string, boolean> = Object.fromEntries(
 		Object.keys(datasets).map((id) => [id, true])
 	)
-	// by default assume all are available and selected (as separate copies)
+	// by default assume all are available but none selected (as separate copies)
 	let availableDatasets: Record<string, boolean> = $state(allDatasets)
-	let selectedDatasets: Record<string, boolean> = $state({ ...allDatasets })
+	let selectedDatasets: Record<string, boolean> = $state(
+		Object.fromEntries(Object.keys(datasets).map((id) => [id, false]))
+	)
 
 	type FileUploadSuccessParams = {
 		uuid: string
@@ -59,7 +61,8 @@
 			Object.keys(datasets).map((id) => [id, uploadAvailableDatasets.has(id)])
 		)
 
-		selectedDatasets = { ...availableDatasets }
+		// per direction from Jessica Gilbert (9/29/2026) set all to false
+		selectedDatasets = Object.fromEntries(Object.keys(datasets).map((id) => [id, false]))
 	}
 
 	const handleStartOver = () => {

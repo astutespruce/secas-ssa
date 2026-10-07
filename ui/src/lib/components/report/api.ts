@@ -1,5 +1,5 @@
 /* eslint-disable no-await-in-loop */
-import { API_TOKEN, API_HOST } from '$lib/env'
+import { API_TOKEN, API_HOST } from '$app/env/public'
 import { captureException } from '$lib/util/log'
 
 import type { ProgressCallback } from './types'

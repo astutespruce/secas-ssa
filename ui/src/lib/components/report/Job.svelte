@@ -7,7 +7,7 @@
 	import { Button } from '$lib/components/ui/button'
 	import { Progress } from '$lib/components/ui/progress'
 
-	import { CONTACT_EMAIL } from '$lib/env'
+	import { CONTACT_EMAIL } from '$app/env/public'
 	import { captureException, logGAEvent } from '$lib/util/log'
 	import { submitJob } from './api'
 

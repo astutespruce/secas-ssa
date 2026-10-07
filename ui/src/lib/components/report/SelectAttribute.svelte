@@ -4,7 +4,7 @@
 	import { Badge } from '$lib/components/ui/badge'
 	import { Button } from '$lib/components/ui/button'
 	import * as Select from '$lib/components/ui/select'
-	import { CONTACT_EMAIL } from '$lib/env'
+	import { CONTACT_EMAIL } from '$app/env/public'
 
 	let { attributes: rawAttributes, selectedAttribute = $bindable(''), onBack, onNext } = $props()
 

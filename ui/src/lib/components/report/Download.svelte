@@ -1,7 +1,7 @@
 <script lang="ts">
 	import DownloadIcon from '~icons/fa-solid/download'
 	import ReplyAllIcon from '~icons/fa-solid/reply-all'
-	import { API_HOST } from '$lib/env'
+	import { API_HOST } from '$app/env/public'
 	import { Button } from '$lib/components/ui/button'
 	import Job from './Job.svelte'
 

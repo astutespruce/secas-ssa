@@ -3,8 +3,8 @@
 	import sourceSansPro from '@fontsource/source-sans-pro/files/source-sans-pro-latin-400-normal.woff2?url'
 	import sourceSansProBold from '@fontsource/source-sans-pro/files/source-sans-pro-latin-900-normal.woff2?url'
 
-	import { browser } from '$app/environment'
-	import { GOOGLE_ANALYTICS_ID } from '$lib/env'
+	import { browser } from '$app/env'
+	import { GOOGLE_ANALYTICS_ID } from '$app/env/public'
 	import { Header, Footer } from '$lib/components/layout'
 
 	import '../app.css'
@@ -19,6 +19,7 @@
 	})
 
 	const handleGTAGLoad = () => {
+		// @ts-expect-error Google Analytics dynamically located
 		if (!window.dataLayer) {
 			console.warn('GTAG not properly initialized')
 			return
@@ -27,11 +28,15 @@
 		console.debug('setting up GTAG')
 
 		function gtag() {
+			// @ts-expect-error Google Analytics dynamically located
 			dataLayer.push(arguments)
 		}
 
+		// @ts-expect-error Google Analytics dynamically located
 		gtag('js', new Date())
+		// @ts-expect-error Google Analytics dynamically located
 		gtag('config', GOOGLE_ANALYTICS_ID)
+		// @ts-expect-error Google Analytics dynamically located
 		window.gtag = gtag
 	}
 </script>

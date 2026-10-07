@@ -1,12 +1,14 @@
 <script>
-	import { browser } from '$app/environment'
+	import { browser } from '$app/env'
 	import { page } from '$app/state'
-	import { CONTACT_EMAIL } from '$lib/env'
+	import { CONTACT_EMAIL } from '$app/env/public'
 
 	console.error(page.status)
 	console.error(page.error)
 
+	// @ts-expect-error Sentry is dynamically defined
 	if (page.status !== 404 && browser && window.Sentry) {
+		// @ts-expect-error Sentry is dynamically defined
 		window.Sentry.captureException(page.error)
 	}
 </script>
