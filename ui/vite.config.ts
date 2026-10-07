@@ -10,6 +10,9 @@ import { config as dotEnvConfig } from 'dotenv'
 // have to configure dotenv to load correct .env file
 dotEnvConfig({ path: `.env.${process.env.NODE_ENV}` })
 
+// only proxy API in development; in production it is proxied by Caddy
+const proxyAPI = !!process.env.VITE_PROXY_API
+
 export default defineConfig({
 	build: {
 		rollupOptions: {
@@ -22,6 +25,17 @@ export default defineConfig({
 				}
 			}
 		}
+	},
+	server: {
+		proxy: proxyAPI
+			? {
+					// proxy API endpoint to FastAPI
+					'/api': {
+						target: 'http://localhost:5000',
+						changeOrigin: true
+					}
+				}
+			: undefined
 	},
 	plugins: [
 		tailwindcss(),

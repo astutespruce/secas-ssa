@@ -1,8 +1,15 @@
 /* eslint-disable no-await-in-loop */
-import { API_TOKEN, API_HOST } from '$app/env/public'
+import { browser } from '$app/env'
+import { API_TOKEN, DEPLOY_PATH } from '$app/env/public'
 import { captureException } from '$lib/util/log'
 
-import type { ProgressCallback } from './types'
+import type { ProgressCallback } from './components/report/types'
+
+const deploy_path = DEPLOY_PATH || ''
+const root_url = browser
+	? `${window.location.protocol}//${window.location.host}${deploy_path}`
+	: deploy_path
+export const API_URL = `${root_url}/api`
 
 const pollInterval = 1000 // milliseconds; 1 second
 const jobTimeout = 600000 // milliseconds; 10 minutes
@@ -14,7 +21,7 @@ export const submitJob = async (path: string, data: object, onProgress: Progress
 		formData.append(key, value)
 	})
 
-	const response = await fetch(`${API_HOST}/api/${path}?token=${API_TOKEN}`, {
+	const response = await fetch(`${API_URL}/${path}?token=${API_TOKEN}`, {
 		method: 'POST',
 		body: formData
 	})
@@ -51,7 +58,7 @@ const pollJob = async (jobId: string, onProgress: ProgressCallback) => {
 
 	while (time < jobTimeout && failedRequests < failedFetchLimit) {
 		try {
-			response = await fetch(`${API_HOST}/api/jobs/${jobId}`, {
+			response = await fetch(`${API_URL}/jobs/${jobId}`, {
 				cache: 'no-cache'
 			})
 		} catch (ex) {

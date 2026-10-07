@@ -9,7 +9,7 @@
 
 	import { CONTACT_EMAIL } from '$app/env/public'
 	import { captureException, logGAEvent } from '$lib/util/log'
-	import { submitJob } from './api'
+	import { submitJob } from '$lib/api'
 
 	const { data, path, defaultMessage, onCancel, onSuccess } = $props()
 

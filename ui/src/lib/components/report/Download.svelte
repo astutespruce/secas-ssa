@@ -1,7 +1,7 @@
 <script lang="ts">
 	import DownloadIcon from '~icons/fa-solid/download'
 	import ReplyAllIcon from '~icons/fa-solid/reply-all'
-	import { API_HOST } from '$app/env/public'
+	import { API_URL } from '$lib/api'
 	import { Button } from '$lib/components/ui/button'
 	import Job from './Job.svelte'
 
@@ -30,7 +30,7 @@
 	})
 
 	const handleSuccess = (reportPath: string) => {
-		const url = `${API_HOST}/api${reportPath}`
+		const url = `${API_URL}${reportPath}`
 		reportURL = url
 
 		window.location.href = url
