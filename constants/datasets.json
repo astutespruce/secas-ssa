@@ -64,7 +64,7 @@
       "citation": "U.S. Geological Survey (USGS), 2024, Annual NLCD Collection 1 Science Products: U.S. Geological Survey data release, https://doi.org/10.5066/P94UXNTS.",
       "url": "https://www.mrlc.gov/data",
       "description": "This dataset shows the amount of area in each major land cover class for 1985, 2000, 2015, 2020, and 2024 based on the NLCD Annual data product.  Land cover classes include open water, perennial ice/snow, developed (multiple intensities), barren land, deciduous forest, evergreen forest, mixed forest, shrub/scrub, grassland/herbaceous, pasture/hay, cultivated crops, woody wetlands, and emergent herbaceous wetlands.  Data are only available for Southeastern states within the contiguous U.S.",
-      "valueDescription": "Values show the amount of each land cover class that is present within each analysis area for each year data are available from NLCD.  Only those land cover classes that are present within a given analysis area are shown.",
+      "valueDescription": "Values show the amount of each land cover class that is present within each analysis area for selected years from NLCD.  Only those land cover classes that are present within a given analysis area are shown.",
       "methods": "Land cover data for each year were reprojected to match the standard grid used in this tool and clipped to Southeastern states."
     },
     {
@@ -76,7 +76,7 @@
       "citation": "U.S. Geological Survey (USGS), 2024, Annual NLCD Collection 1 Science Products: U.S. Geological Survey data release, https://doi.org/10.5066/P94UXNTS.",
       "url": "https://www.mrlc.gov/data",
       "description": "This dataset shows percent impervious surface for 1985, 2000, 2015, 2020, and 2024 based on the NLCD Annual data product.",
-      "valueDescription": "Values show the total amount of impervious surface each analysis area for each year data are available from NLCD.  These are calculated as the total amount of area in each percent level of impervious surface times the percent.",
+      "valueDescription": "Values show the total amount of impervious surface each analysis area for selected years from NLCD.  These are calculated as the total amount of area in each percent level of impervious surface times the percent.",
       "methods": "Impervious surface data were reprojected to match the standard grid used in this tool and clipped to Southeastern states."
     },
     {

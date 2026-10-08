@@ -1,8 +1,7 @@
 import pandas as pd
 
 from analysis.constants import DATASETS, SLR_DEPTH_VALUES, SLR_NODATA_VALUES, SLR_PROJ_SCENARIOS, SLR_YEARS
-from api.report.metadata import add_data_note
-from api.report.style import set_cell_styles, set_column_widths
+from api.report.writer import write_excel
 
 SLR_BINS = SLR_DEPTH_VALUES + [v["value"] for v in SLR_NODATA_VALUES]
 
@@ -20,8 +19,6 @@ def add_slr_projection_sheet(
     there is SLR at 10ft within the analysis unit.
     """
     dataset = DATASETS["slr_proj"]
-    sheet_name = dataset["sheet_name"]
-    description = dataset["valueDescription"]
 
     # transform data into one row per SLR scenario per analysis unit
     slr = []
@@ -46,19 +43,22 @@ def add_slr_projection_sheet(
         columns=[df.index.name, area_label] + proj_value_columns,
     )
 
-    slr.to_excel(xlsx, sheet_name=sheet_name, index=False)
-    ws = xlsx.sheets[sheet_name]
-    set_column_widths(ws, [name_col_width, area_col_width, 10, 18] + ([12] * len(SLR_YEARS)))
+    column_widths = [name_col_width, area_col_width, 10, 18] + ([12] * len(SLR_YEARS))
     # SLR values are not really areas but we want 2 decimal places
-    set_cell_styles(ws, breaks=breaks, area_columns=[1] + list(range(4, len(SLR_YEARS) + 5)))
-
-    add_data_note(ws, description)
+    area_columns = area_columns = [1] + list(range(4, len(SLR_YEARS) + 5))
+    write_excel(
+        xlsx,
+        slr,
+        sheet_name=dataset["sheet_name"],
+        caption=f"{dataset['name']}.\n{dataset['valueDescription']}",
+        column_widths=column_widths,
+        area_columns=area_columns,
+        breaks=breaks,
+    )
 
 
 def add_slr_inundation_sheet(xlsx, df, name_col_width, area_col_width, area_label):
     dataset = DATASETS["slr_depth"]
-    sheet_name = dataset["sheet_name"]
-    description = dataset["valueDescription"]
 
     # split values into columns
     slr = df.slr_depth.apply(pd.Series)
@@ -88,9 +88,14 @@ def add_slr_inundation_sheet(xlsx, df, name_col_width, area_col_width, area_labe
 
     num_value_cols = len(slr.columns) - 2
 
-    slr.to_excel(xlsx, sheet_name=sheet_name, index=False)
-    ws = xlsx.sheets[sheet_name]
-    set_column_widths(ws, [name_col_width, area_col_width] + ([18] * (num_value_cols + 1)))
-    set_cell_styles(ws, area_columns=[1] + list(range(2, num_value_cols + 3)))
+    column_widths = [name_col_width, area_col_width] + ([18] * num_value_cols)
 
-    add_data_note(ws, description)
+    area_columns = [1] + list(range(2, num_value_cols + 3))
+    write_excel(
+        xlsx,
+        slr,
+        sheet_name=dataset["sheet_name"],
+        caption=f"{dataset['name']}.\n{dataset['valueDescription']}",
+        column_widths=column_widths,
+        area_columns=area_columns,
+    )
