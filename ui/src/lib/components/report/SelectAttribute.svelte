@@ -1,6 +1,7 @@
 <script lang="ts">
-	import ReplyAllIcon from '~icons/fa-solid/reply-all'
 	import NextIcon from '~icons/fa-solid/angle-double-right'
+	import ReplyAllIcon from '~icons/fa-solid/reply-all'
+
 	import { CONTACT_EMAIL } from '$app/env/public'
 	import { Badge } from '#lib/components/ui/badge/index.js'
 	import { Button } from '#lib/components/ui/button/index.js'

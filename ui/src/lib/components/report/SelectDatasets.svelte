@@ -1,20 +1,21 @@
 <script lang="ts">
+	import BackIcon from '~icons/fa-solid/angle-double-left'
 	import CaretDown from '~icons/fa-solid/caret-down'
 	import CaretRight from '~icons/fa-solid/caret-right'
-	import BackIcon from '~icons/fa-solid/angle-double-left'
 	import FileIcon from '~icons/fa-solid/file-alt'
+
+	import CoastalIcon from '#images/coastal.svg'
+	import FreshwaterIcon from '#images/freshwater.svg'
+	import LandIcon from '#images/land.svg'
+	import TrendsIcon from '#images/trends.svg'
+	import { InfoTooltip } from '#lib/components/tooltip/index.js'
 	import { Badge } from '#lib/components/ui/badge/index.js'
 	import { Button } from '#lib/components/ui/button/index.js'
 	import { Checkbox } from '#lib/components/ui/checkbox/index.js'
 	import * as Collapsible from '#lib/components/ui/collapsible/index.js'
 	import { Label } from '#lib/components/ui/label/index.js'
-	import { InfoTooltip } from '#lib/components/tooltip/index.js'
-	import { cn } from '#lib/utils.js'
 	import { categories } from '#lib/config/constants.js'
-	import FreshwaterIcon from '#images/freshwater.svg'
-	import CoastalIcon from '#images/coastal.svg'
-	import LandIcon from '#images/land.svg'
-	import TrendsIcon from '#images/trends.svg'
+	import { cn } from '#lib/utils.js'
 
 	const icons = {
 		freshwater: FreshwaterIcon,

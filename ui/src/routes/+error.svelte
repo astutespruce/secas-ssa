@@ -1,7 +1,7 @@
 <script>
 	import { browser } from '$app/env'
-	import { page } from '$app/state'
 	import { CONTACT_EMAIL } from '$app/env/public'
+	import { page } from '$app/state'
 
 	console.error(page.status)
 	console.error(page.error)

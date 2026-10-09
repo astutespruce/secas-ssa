@@ -1,9 +1,5 @@
 <script lang="ts">
 	import Check from '~icons/fa-solid/check'
-	import { cn } from '#lib/utils.js'
-
-	import { Badge } from '#lib/components/ui/badge/index.js'
-	import { Button } from '#lib/components/ui/button/index.js'
 
 	import {
 		Download,
@@ -11,7 +7,10 @@
 		SelectDatasets,
 		Upload
 	} from '#lib/components/report/index.js'
+	import { Badge } from '#lib/components/ui/badge/index.js'
+	import { Button } from '#lib/components/ui/button/index.js'
 	import { categories, datasets } from '#lib/config/constants.js'
+	import { cn } from '#lib/utils.js'
 
 	const steps = [
 		{ id: 'upload', label: 'Upload' },

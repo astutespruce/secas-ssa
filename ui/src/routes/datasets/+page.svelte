@@ -1,5 +1,6 @@
 <script lang="ts">
 	import ExternalLinkAlt from '~icons/fa-solid/external-link-alt'
+
 	import { categories } from '#lib/config/constants.js'
 </script>
 
@@ -65,10 +66,10 @@
 		CONUS Albers (NAD83) spatial projection.
 		<br />
 		<br />
-		Analysis unit boundaries uploaded by the user are rasterized to match these rasters, which means
-		that the resulting data queried from each dataset is an approximation based on these rasterized boundaries.
-		Analysis units that are very spatially detailed, small, or highly linear may not be approximated
-		as well as analysis units that are fairly large or less detailed.
+		Analysis unit boundaries uploaded by the user are rasterized to match these rasters, which means that
+		the resulting data queried from each dataset is an approximation based on these rasterized boundaries.
+		Analysis units that are very spatially detailed, small, or highly linear may not be approximated as
+		well as analysis units that are fairly large or less detailed.
 	</p>
 
 	{#each categories as category (category.id)}

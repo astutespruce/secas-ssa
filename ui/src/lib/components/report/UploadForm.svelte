@@ -3,16 +3,16 @@
 	import { superForm, fileProxy, defaults } from 'sveltekit-superforms'
 	import { zod4, zod4Client } from 'sveltekit-superforms/adapters'
 	import { z } from 'zod'
-
 	import DownloadIcon from '~icons/fa-solid/download'
-	import UploadIcon from '~icons/fa-solid/upload'
 	import ExclamationTriangle from '~icons/fa-solid/exclamation-triangle'
 	import ReplyAllIcon from '~icons/fa-solid/reply-all'
-	import { cn } from '#lib/utils.js'
-	import { Field, Control, Label, Button as SubmitButton } from '#lib/components/ui/form/index.js'
+	import UploadIcon from '~icons/fa-solid/upload'
+
 	import { Badge } from '#lib/components/ui/badge/index.js'
 	import { Button } from '#lib/components/ui/button/index.js'
+	import { Field, Control, Label, Button as SubmitButton } from '#lib/components/ui/form/index.js'
 	import { Input } from '#lib/components/ui/input/index.js'
+	import { cn } from '#lib/utils.js'
 
 	const MAXSIZE_MB = 100
 	const MIME_TYPES = new Set([

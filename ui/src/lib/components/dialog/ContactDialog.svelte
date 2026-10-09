@@ -1,7 +1,7 @@
 <script lang="ts">
+	import { CONTACT_EMAIL } from '$app/env/public'
 	import { Root, Trigger, Content, Header, Title } from '#lib/components/ui/dialog/index.js'
 	import { cn } from '#lib/utils.js'
-	import { CONTACT_EMAIL } from '$app/env/public'
 
 	let { children, triggerClass = '' } = $props()
 </script>

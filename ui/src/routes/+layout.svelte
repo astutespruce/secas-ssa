@@ -1,12 +1,11 @@
 <script lang="ts">
-	import { onMount } from 'svelte'
 	import sourceSansPro from '@fontsource/source-sans-pro/files/source-sans-pro-latin-400-normal.woff2?url'
 	import sourceSansProBold from '@fontsource/source-sans-pro/files/source-sans-pro-latin-900-normal.woff2?url'
+	import { onMount } from 'svelte'
 
 	import { browser } from '$app/env'
 	import { GOOGLE_ANALYTICS_ID } from '$app/env/public'
 	import { Header, Footer } from '#lib/components/layout/index.js'
-
 	import '../app.css'
 
 	let { params, children } = $props()

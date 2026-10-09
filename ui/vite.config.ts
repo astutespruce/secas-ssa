@@ -1,12 +1,12 @@
 import path from 'path'
 import adapter from '@sveltejs/adapter-static'
+import { enhancedImages } from '@sveltejs/enhanced-img'
 import { sveltekit } from '@sveltejs/kit/vite'
 import { vitePreprocess } from '@sveltejs/vite-plugin-svelte'
-import { defineConfig } from 'vite'
-import { enhancedImages } from '@sveltejs/enhanced-img'
-import Icons from 'unplugin-icons/vite'
 import tailwindcss from '@tailwindcss/vite'
 import { config as dotEnvConfig } from 'dotenv'
+import Icons from 'unplugin-icons/vite'
+import { defineConfig } from 'vite'
 
 // have to configure dotenv to load correct .env file
 dotEnvConfig({ path: `.env.${process.env.NODE_ENV}` })

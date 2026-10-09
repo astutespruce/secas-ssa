@@ -1,11 +1,11 @@
 <script lang="ts">
+	import FileAlt from '~icons/fa-regular/file-alt'
+	import ExclamationTriangle from '~icons/fa-solid/exclamation-triangle'
+
 	import { resolve } from '$app/paths'
 	import { Root as Alert } from '#lib/components/ui/alert/index.js'
 	import { Badge } from '#lib/components/ui/badge/index.js'
 	import { Button } from '#lib/components/ui/button/index.js'
-
-	import ExclamationTriangle from '~icons/fa-solid/exclamation-triangle'
-	import FileAlt from '~icons/fa-regular/file-alt'
 
 	const steps = [
 		{
