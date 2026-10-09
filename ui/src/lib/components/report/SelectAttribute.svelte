@@ -1,10 +1,10 @@
 <script lang="ts">
 	import ReplyAllIcon from '~icons/fa-solid/reply-all'
 	import NextIcon from '~icons/fa-solid/angle-double-right'
-	import { Badge } from '$lib/components/ui/badge'
-	import { Button } from '$lib/components/ui/button'
-	import * as Select from '$lib/components/ui/select'
 	import { CONTACT_EMAIL } from '$app/env/public'
+	import { Badge } from '#lib/components/ui/badge/index.js'
+	import { Button } from '#lib/components/ui/button/index.js'
+	import * as Select from '#lib/components/ui/select/index.js'
 
 	let { attributes: rawAttributes, selectedAttribute = $bindable(''), onBack, onNext } = $props()
 

@@ -1,3 +1,4 @@
+import path from 'path'
 import adapter from '@sveltejs/adapter-static'
 import { sveltekit } from '@sveltejs/kit/vite'
 import { vitePreprocess } from '@sveltejs/vite-plugin-svelte'
@@ -26,6 +27,11 @@ export default defineConfig({
 			}
 		}
 	},
+	resolve: {
+		alias: {
+			$constants: path.resolve(import.meta.dirname, '../constants')
+		}
+	},
 	server: {
 		proxy: proxyAPI
 			? {
@@ -52,12 +58,6 @@ export default defineConfig({
 			}),
 			paths: {
 				base: process.env.DEPLOY_PATH || ''
-			},
-			alias: {
-				$constants: '../constants',
-				$images: 'src/images',
-				// TODO: migrate to #lib: https://svelte.dev/docs/kit/migrating-to-sveltekit-3
-				$lib: 'src/lib'
 			}
 		}),
 		Icons({ compiler: 'svelte' })

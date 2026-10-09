@@ -5,7 +5,7 @@
 
 	import { browser } from '$app/env'
 	import { GOOGLE_ANALYTICS_ID } from '$app/env/public'
-	import { Header, Footer } from '$lib/components/layout'
+	import { Header, Footer } from '#lib/components/layout/index.js'
 
 	import '../app.css'
 

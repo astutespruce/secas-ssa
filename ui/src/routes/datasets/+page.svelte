@@ -1,6 +1,6 @@
 <script lang="ts">
 	import ExternalLinkAlt from '~icons/fa-solid/external-link-alt'
-	import { categories } from '$lib/config/constants'
+	import { categories } from '#lib/config/constants.js'
 </script>
 
 <svelte:head>
@@ -11,7 +11,7 @@
 	<div class="relative overflow-hidden h-48">
 		<div class="z-1 absolute top-0 md:top-[-75%]">
 			<enhanced:img
-				src="$images/5142785230_69f04b6562_o.jpg"
+				src="#images/5142785230_69f04b6562_o.jpg"
 				class="h-auto min-w-180 object-cover brightness-70"
 				alt=""
 				fetchpriority="high"
@@ -65,10 +65,10 @@
 		CONUS Albers (NAD83) spatial projection.
 		<br />
 		<br />
-		Analysis unit boundaries uploaded by the user are rasterized to match these rasters, which means that
-		the resulting data queried from each dataset is an approximation based on these rasterized boundaries.
-		Analysis units that are very spatially detailed, small, or highly linear may not be approximated as
-		well as analysis units that are fairly large or less detailed.
+		Analysis unit boundaries uploaded by the user are rasterized to match these rasters, which means
+		that the resulting data queried from each dataset is an approximation based on these rasterized boundaries.
+		Analysis units that are very spatially detailed, small, or highly linear may not be approximated
+		as well as analysis units that are fairly large or less detailed.
 	</p>
 
 	{#each categories as category (category.id)}

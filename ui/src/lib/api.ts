@@ -1,7 +1,7 @@
 /* eslint-disable no-await-in-loop */
 import { browser } from '$app/env'
 import { API_TOKEN, DEPLOY_PATH } from '$app/env/public'
-import { captureException } from '$lib/util/log'
+import { captureException } from '#lib/util/log.js'
 
 import type { ProgressCallback } from './components/report/types'
 

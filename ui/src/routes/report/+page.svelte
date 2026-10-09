@@ -1,12 +1,17 @@
 <script lang="ts">
 	import Check from '~icons/fa-solid/check'
-	import { cn } from '$lib/utils'
+	import { cn } from '#lib/utils.js'
 
-	import { Badge } from '$lib/components/ui/badge'
-	import { Button } from '$lib/components/ui/button'
+	import { Badge } from '#lib/components/ui/badge/index.js'
+	import { Button } from '#lib/components/ui/button/index.js'
 
-	import { Download, SelectAttribute, SelectDatasets, Upload } from '$lib/components/report'
-	import { categories, datasets } from '$lib/config/constants'
+	import {
+		Download,
+		SelectAttribute,
+		SelectDatasets,
+		Upload
+	} from '#lib/components/report/index.js'
+	import { categories, datasets } from '#lib/config/constants.js'
 
 	const steps = [
 		{ id: 'upload', label: 'Upload' },
@@ -112,7 +117,7 @@
 	<div class="relative overflow-hidden h-48 md:h-64">
 		<div class="z-1 absolute top-0">
 			<enhanced:img
-				src="$images/5494812678_3849557155_o.jpg"
+				src="#images/5494812678_3849557155_o.jpg"
 				class="h-auto min-w-180 object-cover brightness-70"
 				alt=""
 				fetchpriority="high"

@@ -8,7 +8,3 @@ export const indexBy = (records: { [key: string]: any }, field: string) =>
 		(prev: {}, record: { [key: string]: any }) => Object.assign(prev, { [record[field]]: record }),
 		{}
 	)
-
-	const numericRegex = /\d+/
-
-

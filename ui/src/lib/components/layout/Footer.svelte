@@ -2,7 +2,7 @@
 	import Envelope from '~icons/fa-solid/envelope'
 	import ExclamationCircle from '~icons/fa-solid/ExclamationCircle'
 
-	import { ContactDialog, ReportProblemDialog } from '$lib/components/dialog'
+	import { ContactDialog, ReportProblemDialog } from '#lib/components/dialog/index.js'
 </script>
 
 <footer

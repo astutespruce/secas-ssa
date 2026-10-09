@@ -2,7 +2,7 @@
 	import { resolve } from '$app/paths'
 
 	import FileUpload from '~icons/fa-solid/file-upload'
-	import { cn } from '$lib/utils'
+	import { cn } from '#lib/utils.js'
 
 	let { hasData = false } = $props()
 </script>

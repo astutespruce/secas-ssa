@@ -3,13 +3,12 @@
 	import ExclamationTriangle from '~icons/fa-solid/exclamation-triangle'
 	import ReplyAllIcon from '~icons/fa-solid/reply-all'
 
-	import { Root as Alert } from '$lib/components/ui/alert'
-	import { Button } from '$lib/components/ui/button'
-	import { Progress } from '$lib/components/ui/progress'
-
 	import { CONTACT_EMAIL } from '$app/env/public'
-	import { captureException, logGAEvent } from '$lib/util/log'
-	import { submitJob } from '$lib/api'
+	import { submitJob } from '#lib/api.js'
+	import { Root as Alert } from '#lib/components/ui/alert/index.js'
+	import { Button } from '#lib/components/ui/button/index.js'
+	import { Progress } from '#lib/components/ui/progress/index.js'
+	import { captureException, logGAEvent } from '#lib/util/log.js'
 
 	const { data, path, defaultMessage, onCancel, onSuccess } = $props()
 

@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { resolve } from '$app/paths'
-	import { Root as Alert } from '$lib/components/ui/alert'
-	import { Badge } from '$lib/components/ui/badge'
-	import { Button } from '$lib/components/ui/button'
+	import { Root as Alert } from '#lib/components/ui/alert/index.js'
+	import { Badge } from '#lib/components/ui/badge/index.js'
+	import { Button } from '#lib/components/ui/button/index.js'
 
 	import ExclamationTriangle from '~icons/fa-solid/exclamation-triangle'
 	import FileAlt from '~icons/fa-regular/file-alt'
@@ -41,7 +41,7 @@
 	<div class="relative overflow-hidden h-48 sm:h-64 md:h-80">
 		<div class="z-1 absolute top-0">
 			<enhanced:img
-				src="$images/robert-thiemann-1bj4WGNDFHw-unsplash.jpg"
+				src="#images/robert-thiemann-1bj4WGNDFHw-unsplash.jpg"
 				class="h-auto min-w-180 object-cover brightness-80"
 				alt=""
 				fetchpriority="high"
@@ -125,7 +125,7 @@
 
 		<figure class="hidden sm:block">
 			<enhanced:img
-				src="$images/4971502145_03d6b78f28_o.jpg"
+				src="#images/4971502145_03d6b78f28_o.jpg"
 				alt="Key Deer at Key Deer NWR"
 				loading="lazy"
 			/>
@@ -234,7 +234,7 @@
 		</ul>
 		<figure class="hidden sm:block">
 			<enhanced:img
-				src="$images/5142785872_b34caf59e3_h.jpg"
+				src="#images/5142785872_b34caf59e3_h.jpg"
 				alt="Prescribed fire, Mississippi Sandhill Crane NWR 2004"
 				loading="lazy"
 			/>
@@ -258,7 +258,7 @@
 	<div class="grid sm:grid-cols-[1fr_2fr] gap-8">
 		<figure class="hidden sm:block">
 			<enhanced:img
-				src="$images/5149490458_5ffcce6c44_c.jpg"
+				src="#images/5149490458_5ffcce6c44_c.jpg"
 				alt="Looking for mussels on the Little Tennessee River"
 				loading="lazy"
 			/>
@@ -301,7 +301,7 @@
 		</div>
 		<figure class="hidden sm:block">
 			<enhanced:img
-				src="$images/8027062941_e8fcdf1247_c.jpg"
+				src="#images/8027062941_e8fcdf1247_c.jpg"
 				alt="Endangered mussels for release in the Powell River"
 				loading="lazy"
 			/>

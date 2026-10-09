@@ -8,11 +8,11 @@
 	import UploadIcon from '~icons/fa-solid/upload'
 	import ExclamationTriangle from '~icons/fa-solid/exclamation-triangle'
 	import ReplyAllIcon from '~icons/fa-solid/reply-all'
-	import { cn } from '$lib/utils.js'
-	import { Field, Control, Label, Button as SubmitButton } from '$lib/components/ui/form'
-	import { Badge } from '$lib/components/ui/badge'
-	import { Button } from '$lib/components/ui/button'
-	import { Input } from '$lib/components/ui/input'
+	import { cn } from '#lib/utils.js'
+	import { Field, Control, Label, Button as SubmitButton } from '#lib/components/ui/form/index.js'
+	import { Badge } from '#lib/components/ui/badge/index.js'
+	import { Button } from '#lib/components/ui/button/index.js'
+	import { Input } from '#lib/components/ui/input/index.js'
 
 	const MAXSIZE_MB = 100
 	const MIME_TYPES = new Set([
