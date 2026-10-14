@@ -55,11 +55,3 @@ def add_data_details_sheet(xlsx, datasets):
         caption="Details for datasets included in this analysis.",
         column_widths=column_widths,
     )
-
-    # .to_excel(xlsx, sheet_name="Data details", index=False)
-    # ws = xlsx.sheets["Data details"]
-    # set_column_widths(ws, [24, 18, 24, 8, 48, 48, 40, 40])
-    # set_cell_styles(ws)
-    # for cell in list(ws.columns)[-1][1:]:
-    #     cell.hyperlink = cell.value
-    #     cell.font = Font(color=Color(index=4))
