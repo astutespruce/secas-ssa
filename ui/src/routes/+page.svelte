@@ -148,7 +148,7 @@
 	<div class="grid gap-8 sm:grid-cols-[2fr_1fr] mt-2 text-lg">
 		<ul>
 			<li class="[&_ul_li]:leading-tight">
-				Terrestrial and freshwater indicators created as part of the Southeast Blueprint 2025,
+				Terrestrial and freshwater indicators created as part of the Southeast Blueprint 2026,
 				including
 
 				<div class="grid gap-px sm:grid-cols-3 mt-2 sm:bg-grey-2 sm:border sm:border-grey-2">
