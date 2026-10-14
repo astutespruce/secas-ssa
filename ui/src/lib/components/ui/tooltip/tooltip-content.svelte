@@ -3,10 +3,10 @@
 	// content, change to: bg-white text-foreground border border-grey-8/50
 	// arrow, change to: bg-grey size-4 border border-grey-8/50 [clip-path:polygon(100%_100%,100%_0%,0%_100%,10%_100%)] data-[side=right]:translate-x-[calc(50%_+_3px)]
 	import { Tooltip as TooltipPrimitive } from 'bits-ui'
-	import { cn } from '$lib/utils.js'
+	import { cn } from '#lib/utils.js'
 	import TooltipPortal from './tooltip-portal.svelte'
 	import type { ComponentProps } from 'svelte'
-	import type { WithoutChildrenOrChild } from '$lib/utils.js'
+	import type { WithoutChildrenOrChild } from '#lib/utils.js'
 
 	let {
 		ref = $bindable(null),

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import ExternalLinkAlt from '~icons/fa-solid/external-link-alt'
-	import { categories } from '$lib/config/constants'
+
+	import { categories } from '#lib/config/constants.js'
 </script>
 
 <svelte:head>
@@ -11,7 +12,7 @@
 	<div class="relative overflow-hidden h-48">
 		<div class="z-1 absolute top-0 md:top-[-75%]">
 			<enhanced:img
-				src="$images/5142785230_69f04b6562_o.jpg"
+				src="#images/5142785230_69f04b6562_o.jpg"
 				class="h-auto min-w-180 object-cover brightness-70"
 				alt=""
 				fetchpriority="high"

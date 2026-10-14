@@ -1,6 +1,5 @@
 import datasetsJSON from '$constants/datasets.json'
-
-import { indexBy } from '$lib/util/data'
+import { indexBy } from '#lib/util/data.js'
 
 const { categories: rawCategories, datasets: rawDatasets } = datasetsJSON
 

@@ -1,14 +1,11 @@
 import pandas as pd
 
 from analysis.constants import DATASETS, LANDFIRE_INDEXES
-from api.report.metadata import add_data_note
-from api.report.style import set_cell_styles, set_column_widths
+from api.report.writer import write_excel
 
 
 def add_landfire_evt_sheet(xlsx, df, name_col_width, area_col_width, area_label):
     dataset = DATASETS["landfire_evt"]
-    sheet_name = dataset["sheet_name"]
-    description = dataset["valueDescription"]
 
     # transform data into one row per land cover type per analysis unit
     rows = []
@@ -37,13 +34,12 @@ def add_landfire_evt_sheet(xlsx, df, name_col_width, area_col_width, area_label)
         ],
     )
 
-    landfire_evt.to_excel(xlsx, sheet_name=sheet_name, index=False)
-    ws = xlsx.sheets[sheet_name]
-    set_column_widths(ws, [name_col_width, area_col_width, 30, 30, 12])
-    set_cell_styles(
-        ws,
-        breaks=breaks,
+    write_excel(
+        xlsx,
+        landfire_evt,
+        sheet_name=dataset["sheet_name"],
+        caption=f"{dataset['name']}.\n{dataset['valueDescription']}",
+        column_widths=[name_col_width, area_col_width, 30, 30, 12],
         area_columns=[1, 4],
+        breaks=breaks,
     )
-
-    add_data_note(ws, description)

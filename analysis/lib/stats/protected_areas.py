@@ -31,9 +31,9 @@ def extract_protected_area_stats(df):
     # use union of individual area bounding boxes to read features
     read_mask = shapely.union_all(shapely.envelope(tmp.geometry.values))
 
-    protected_areas = read_dataframe(
-        protected_areas_filename, columns=columns + ["geometry"], mask=read_mask, use_arrow=True
-    )
+    # NOTE: pyogrio does not currently work properly for use_arrow=True if the
+    # mask does not overlap and returns no features, so we can't use it here.
+    protected_areas = read_dataframe(protected_areas_filename, columns=columns + ["geometry"], mask=read_mask)
 
     if len(protected_areas) == 0:
         return None

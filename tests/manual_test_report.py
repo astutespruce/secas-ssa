@@ -1,3 +1,5 @@
+# ruff:disable[ERA001]
+
 import asyncio
 import subprocess
 from pathlib import Path
@@ -9,7 +11,6 @@ from pyogrio.geopandas import read_dataframe
 from analysis.constants import DATA_CRS
 from analysis.lib.geometry import dissolve, make_valid
 from analysis.lib.stats.analysis_units import get_analysis_unit_results
-from analysis.lib.stats.prescreen import get_available_datasets
 from api.report.xlsx import create_xlsx
 
 ### Create XLSX reports for an AOI
@@ -49,19 +50,19 @@ aois = [
     #     "path": "test_with_some_protected_areas",
     #     "field": "id",
     # },
-    # {"name": "Lousiana COAs", "path": "Combined_COAsv1_dis", "field": "COAName"},
+    {"name": "Lousiana COAs", "path": "Combined_COAsv1_dis", "field": "COAName"},
     # {
     #     "name": "San Juan area, PR",
     #     "path": "SanJuan",
     #     "field": None,
     #     "analysis_unit_label": 1,
     # },
-    {
-        "name": "fl_slr_test",
-        "path": "fl_slr_test",
-        "field": None,
-        "analysis_unit_label": "Test population",
-    },
+    # {
+    #     "name": "fl_slr_test",
+    #     "path": "fl_slr_test",
+    #     "field": None,
+    #     "analysis_unit_label": "Test population",
+    # },
     # {
     #     "name": "big_cypress",
     #     "path": "big_cypress",
@@ -97,7 +98,18 @@ for aoi in aois:
     # dissolve by analysis unit identifier
     df = dissolve(df, by=field).set_index(field)
 
-    datasets = ["protected_areas", "landfire_evt", "urban", "slr_depth", "slr_proj"]
+    datasets = [
+        "protected_areas",
+        "landfire_evt",
+        "urban",
+        "slr_depth",
+        "slr_proj",
+        "se_blueprint_firefrequency",
+        "nlcd_inundation_freq",
+        "sarp_aquatic_barriers",
+        "nlcd_landcover",
+        "nlcd_impervious",
+    ]
 
     ### calculate results, data must be in DATA_CRS
     print("Calculating results...")

@@ -1,15 +1,8 @@
 import pandas as pd
 
-from openpyxl.styles import Font, Color
-
 from analysis.constants import DATASETS
-
-from api.report.style import (
-    description_font,
-    alignment_left_wrap,
-    set_cell_styles,
-    set_column_widths,
-)
+from api.report.style import alignment_left_wrap, description_font
+from api.report.writer import write_excel
 
 
 def add_data_note(ws, content, columns=None):
@@ -30,7 +23,7 @@ def add_data_note(ws, content, columns=None):
 
 def add_data_details_sheet(xlsx, datasets):
     # Keep original order so it matches sheets
-    pd.DataFrame([DATASETS[dataset] for dataset in DATASETS if dataset in datasets])[
+    metadata = pd.DataFrame([DATASETS[dataset] for dataset in DATASETS if dataset in datasets])[
         [
             "name",
             "sheet_name",
@@ -52,10 +45,21 @@ def add_data_details_sheet(xlsx, datasets):
             "citation": "Citation",
             "url": "URL",
         }
-    ).to_excel(xlsx, sheet_name="Data details", index=False)
-    ws = xlsx.sheets["Data details"]
-    set_column_widths(ws, [24, 18, 24, 8, 48, 48, 40, 40])
-    set_cell_styles(ws)
-    for cell in list(ws.columns)[-1][1:]:
-        cell.hyperlink = cell.value
-        cell.font = Font(color=Color(index=4))
+    )
+
+    column_widths = [24, 18, 24, 8, 48, 48, 40, 40]
+    write_excel(
+        xlsx,
+        metadata,
+        sheet_name="Data details",
+        caption="Details for datasets included in this analysis.",
+        column_widths=column_widths,
+    )
+
+    # .to_excel(xlsx, sheet_name="Data details", index=False)
+    # ws = xlsx.sheets["Data details"]
+    # set_column_widths(ws, [24, 18, 24, 8, 48, 48, 40, 40])
+    # set_cell_styles(ws)
+    # for cell in list(ws.columns)[-1][1:]:
+    #     cell.hyperlink = cell.value
+    #     cell.font = Font(color=Color(index=4))

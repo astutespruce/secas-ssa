@@ -1,12 +1,16 @@
 <script lang="ts">
 	import Check from '~icons/fa-solid/check'
-	import { cn } from '$lib/utils'
 
-	import { Badge } from '$lib/components/ui/badge'
-	import { Button } from '$lib/components/ui/button'
-
-	import { Download, SelectAttribute, SelectDatasets, Upload } from '$lib/components/report'
-	import { categories, datasets } from '$lib/config/constants'
+	import {
+		Download,
+		SelectAttribute,
+		SelectDatasets,
+		Upload
+	} from '#lib/components/report/index.js'
+	import { Badge } from '#lib/components/ui/badge/index.js'
+	import { Button } from '#lib/components/ui/button/index.js'
+	import { categories, datasets } from '#lib/config/constants.js'
+	import { cn } from '#lib/utils.js'
 
 	const steps = [
 		{ id: 'upload', label: 'Upload' },
@@ -35,9 +39,11 @@
 	let allDatasets: Record<string, boolean> = Object.fromEntries(
 		Object.keys(datasets).map((id) => [id, true])
 	)
-	// by default assume all are available and selected (as separate copies)
+	// by default assume all are available but none selected (as separate copies)
 	let availableDatasets: Record<string, boolean> = $state(allDatasets)
-	let selectedDatasets: Record<string, boolean> = $state({ ...allDatasets })
+	let selectedDatasets: Record<string, boolean> = $state(
+		Object.fromEntries(Object.keys(datasets).map((id) => [id, false]))
+	)
 
 	type FileUploadSuccessParams = {
 		uuid: string
@@ -59,7 +65,8 @@
 			Object.keys(datasets).map((id) => [id, uploadAvailableDatasets.has(id)])
 		)
 
-		selectedDatasets = { ...availableDatasets }
+		// per direction from Jessica Gilbert (9/29/2026) set all to false
+		selectedDatasets = Object.fromEntries(Object.keys(datasets).map((id) => [id, false]))
 	}
 
 	const handleStartOver = () => {
@@ -109,7 +116,7 @@
 	<div class="relative overflow-hidden h-48 md:h-64">
 		<div class="z-1 absolute top-0">
 			<enhanced:img
-				src="$images/5494812678_3849557155_o.jpg"
+				src="#images/5494812678_3849557155_o.jpg"
 				class="h-auto min-w-180 object-cover brightness-70"
 				alt=""
 				fetchpriority="high"

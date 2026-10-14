@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { Root, Trigger, Content, Header, Title } from '$lib/components/ui/dialog'
-	import { cn } from '$lib/utils'
-	import { CONTACT_EMAIL } from '$lib/env'
+	import { CONTACT_EMAIL } from '$app/env/public'
+	import { Root, Trigger, Content, Header, Title } from '#lib/components/ui/dialog/index.js'
+	import { cn } from '#lib/utils.js'
 
 	let { children, triggerClass = '' } = $props()
 </script>

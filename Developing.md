@@ -28,13 +28,6 @@ uv pip list --outdated
 uv sync --upgrade --all-extras
 ```
 
-To update the requirements.txt file used to build these dependencies into the API
-Docker container for deployment, run:
-
-```bash
-uv pip compile -U pyproject.toml -o ../secas-docker/docker/api/secas-ssa-requirements.txt
-```
-
 See [api/README.md](./api/README.md) for more information about running the API locally.
 
 ## User Interface Development

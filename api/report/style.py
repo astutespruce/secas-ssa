@@ -1,10 +1,12 @@
+from math import ceil
+
 from openpyxl.styles import (
     Alignment,
+    Border,
     Font,
     NamedStyle,
-    Border,
-    Side,
     PatternFill,
+    Side,
 )
 from openpyxl.utils.cell import get_column_letter
 
@@ -14,17 +16,12 @@ CHAR_PER_WIDTH_UNIT = 1.7
 ### Create named styles for formatting cells
 font_bold = Font(bold=True)
 
-
 alignment_left_wrap = Alignment(horizontal="left", wrap_text=True)
 alignment_center_wrap = Alignment(horizontal="center", wrap_text=True)
 
 default_header_border = Border(
+    top=Side(border_style="medium", color="000000"),
     bottom=Side(border_style="medium", color="000000"),
-)
-default_cell_border = Border(
-    bottom=Side(border_style="thin", color="AAAAAA"),
-    left=Side(border_style="thin", color="DDDDDD"),
-    right=Side(border_style="thin", color="DDDDDD"),
 )
 
 # Note: all cells are setup to wrap text
@@ -42,13 +39,13 @@ center_header_style = NamedStyle(
     border=default_header_border,
 )
 
-value_style = NamedStyle(
-    name="Value Style",
-    alignment=alignment_left_wrap,
-    border=default_cell_border,
+table_caption_style = NamedStyle(
+    name="Table Header Style",
+    font=Font(italic=True),
+    alignment=Alignment(vertical="top", horizontal="left", wrap_text=True),
 )
 
-even_row_bg = PatternFill("solid", fgColor="00F6F6F6")
+value_style = NamedStyle(name="Value Style", alignment=alignment_left_wrap)
 
 analysis_unit_divider = Border(
     bottom=Side(border_style="medium", color="AAAAAA"),
@@ -59,42 +56,28 @@ analysis_unit_divider = Border(
 description_font = Font(color="999999")
 
 
-def set_cell_styles(ws, breaks=None, area_columns=None, percent_columns=None):
-    area_columns = area_columns or []
-    percent_columns = percent_columns or []
+def add_caption(ws, table_counter, caption):
+    """Add a table caption in the first cell of the table, and merge all cells
+    of that row together.
 
-    for col_idx, col in enumerate(ws.columns):
-        col[0].style = center_header_style
+    Parameters
+    ----------
+    ws : Worksheet
+    table_counter : int
+    caption : str
+    """
 
-        for i, cell in enumerate(col[1:]):
-            cell.style = value_style
-            value = cell.value
-            is_int = isinstance(value, (float, int)) and int(value) == value
+    cell = ws["A1"]
+    cell.value = f"Table {table_counter}: {caption}"
+    cell.style = table_caption_style
 
-            if col_idx in area_columns:
-                if is_int:
-                    cell.number_format = "#,##0"
-                else:
-                    cell.number_format = "#,##0.00"
-            elif col_idx in percent_columns:
-                if is_int:
-                    cell.number_format = "0%"
-                else:
-                    cell.number_format = "0.00%"
+    end_col = get_column_letter(ws.max_column)
+    ws.merge_cells(f"A1:{end_col}1")
 
-            if i % 2 == 1:
-                cell.fill = even_row_bg
-
-    ws["A1"].style = left_header_style
-
-    if breaks is not None:
-        # add a stronger line between analysis units
-        for col in ws.columns:
-            for line in breaks:
-                col[line].border = analysis_unit_divider
-
-
-def set_column_widths(ws, widths):
-    for i, width in enumerate(widths):
-        letter = get_column_letter(i + 1)
-        ws.column_dimensions[letter].width = width
+    # Excel does not auto-calculate the height properly for merged cells with wrapping
+    # so we calculate the height based on the approx number of lines of text for the width
+    width = sum(ws.column_dimensions[get_column_letter(i)].width for i in range(1, ws.max_column + 1))
+    chars_per_line = width * CHAR_PER_WIDTH_UNIT
+    total_line_height = sum([max(1, ceil(len(line) / chars_per_line)) * 16 for line in caption.split("\n")])
+    # default is height 20, but extend up to 16 units per line of text
+    ws.row_dimensions[1].height = max(20, total_line_height)

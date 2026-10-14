@@ -1,7 +1,7 @@
 <script lang="ts" module>
 	// overrides: add text-lg, cursor-pointer to base,
 	// add change text-primary text-link for link
-	import { cn, type WithElementRef } from '$lib/utils.js'
+	import { cn, type WithElementRef } from '#lib/utils.js'
 	import type { HTMLAnchorAttributes, HTMLButtonAttributes } from 'svelte/elements'
 	import { type VariantProps, tv } from 'tailwind-variants'
 
