@@ -39,7 +39,7 @@ SECAS_STATES = [
     "WV",
 ]
 
-NLCD_YEARS = [1985, 2000, 2015, 2020, 2024]
+NLCD_YEARS = [1985, 2000, 2015, 2020, 2025]
 
 # Original codes
 NLCD_CODES = {

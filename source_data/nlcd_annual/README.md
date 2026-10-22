@@ -1,13 +1,13 @@
 # NLCD Annual Data product
 
 NLCD land cover and percent impervious were downloaded from https://www.mrlc.gov/data
-on 5/19/2026 for the following periods:
+on 5/19/2026 for 1985-2020 and 10/6/2026 for 2025:
 
 - 1985
 - 2000
 - 2015
 - 2020
-- 2024 (to be replaced by 2025 when available)
+- 2025
 
 These are processed separately from the NLCD legacy data product versions prepared
 in the `secas-blueprint` project.

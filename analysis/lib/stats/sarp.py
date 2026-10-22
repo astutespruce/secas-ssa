@@ -1,10 +1,10 @@
 import pandas as pd
 import shapely
+from pyogrio import read_dataframe
 
-from analysis.lib.io import read_feather_by_bounds
 from api.settings import DATA_DIR
 
-huc12_filename = DATA_DIR / "inputs/sarp_huc12_stats.feather"
+huc12_filename = DATA_DIR / "inputs/sarp_huc12_stats.fgb"
 
 
 def extract_sarp_huc12_stats(df):
@@ -13,29 +13,24 @@ def extract_sarp_huc12_stats(df):
     Parameters
     ----------
     df : GeoDataFrame
-        contains ceometries that define the analysis units.
+        contains geometries that define the analysis units.
 
     Returns
     -------
     DataFrame
         contains a record with statistics for each record in df
-
     """
 
-    huc12 = read_feather_by_bounds(
-        huc12_filename,
-        shapely.bounds(df.geometry.values),
-        columns=[
-            "geometry",
-            "HUC12",
-            "dams",
-            "crossings",
-            "altered_miles",
-            "total_miles",
-        ],
+    tmp = df.explode(ignore_index=False, index_parts=False)
+    # use union of individual area bounding boxes to read features
+    read_mask = shapely.union_all(shapely.envelope(tmp.geometry.values))
+    # NOTE: pyogrio does not currently work properly for use_arrow=True if the
+    # mask does not overlap and returns no features, so we can't use it here.
+    huc12 = read_dataframe(
+        huc12_filename, columns=["HUC12", "dams", "crossings", "altered_miles", "total_miles"], mask=read_mask
     )
-    tree = shapely.STRtree(huc12.geometry.values)
-    left, right = tree.query(df.geometry.values, predicate="intersects")
+
+    left, right = shapely.STRtree(huc12.geometry.values).query(df.geometry.values, predicate="intersects")
 
     if len(df) == 0:
         return None

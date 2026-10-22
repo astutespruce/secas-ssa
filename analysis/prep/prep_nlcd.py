@@ -1,5 +1,5 @@
-from pathlib import Path
 import math
+from pathlib import Path
 from time import time
 
 import numpy as np
@@ -9,9 +9,9 @@ from rasterio.vrt import WarpedVRT
 from rasterio.warp import transform_bounds
 from rasterio.windows import Window
 
-from analysis.constants import DATA_CRS, NLCD_CODES, NLCD_INDEXES, MASK_RESOLUTION
+from analysis.constants import DATA_CRS, MASK_RESOLUTION, NLCD_CODES, NLCD_INDEXES
 from analysis.lib.colors import hex_to_uint8, interpolate_colormap
-from analysis.lib.raster import add_overviews, write_raster, remap, create_lowres_mask
+from analysis.lib.raster import add_overviews, create_lowres_mask, remap, write_raster
 
 NODATA = 255
 
@@ -31,12 +31,8 @@ bnd_raster = rasterio.open(bnd_dir / "contiguous_southeast_inland_mask.tif")
 print("Processing landcover")
 
 # values are remapped to contiguous integers starting from 0
-landcover_colormap = {
-    i: hex_to_uint8(e["color"]) + (255,) for i, e in enumerate(NLCD_INDEXES.values())
-}
-landcover_remap_table = np.array(
-    [(k, i) for i, k in enumerate(NLCD_CODES.keys())], dtype="uint8"
-)
+landcover_colormap = {i: hex_to_uint8(e["color"]) + (255,) for i, e in enumerate(NLCD_INDEXES.values())}
+landcover_remap_table = np.array([(k, i) for i, k in enumerate(NLCD_CODES.keys())], dtype="uint8")
 
 for infile in sorted(src_dir.glob("landcover/*/*.tif")):
     year = int(infile.stem.split("_")[3])
@@ -61,9 +57,7 @@ for infile in sorted(src_dir.glob("landcover/*/*.tif")):
 
         data = src.read(1, window=window)
         tmp_filename = tmp_dir / f"nlcd_landcover_{year}.tif"
-        write_raster(
-            tmp_filename, data, transform=transform, crs=src.crs, nodata=int(src.nodata)
-        )
+        write_raster(tmp_filename, data, transform=transform, crs=src.crs, nodata=int(src.nodata))
         del data
 
     ### Warp to match the Blueprint
@@ -115,7 +109,7 @@ outfilename = out_dir / "landcover_mask.tif"
 if not outfilename.exists():
     print("Creating mask")
     create_lowres_mask(
-        out_dir / "landcover_2024.tif",
+        out_dir / "landcover_2025.tif",
         outfilename,
         resolution=MASK_RESOLUTION,
         ignore_zero=False,
@@ -158,9 +152,7 @@ for infile in sorted(src_dir.glob("impervious/*/*.tif")):
         data = src.read(1, window=window)
 
         tmp_filename = tmp_dir / f"nlcd_impervious_{year}.tif"
-        write_raster(
-            tmp_filename, data, transform=transform, crs=src.crs, nodata=int(src.nodata)
-        )
+        write_raster(tmp_filename, data, transform=transform, crs=src.crs, nodata=int(src.nodata))
 
     ### Warp to match the SE Blueprint
     # This is a very minor shift because projections are very similar (WGS84 => NAD83)
@@ -203,7 +195,7 @@ outfilename = out_dir / "impervious_mask.tif"
 if not outfilename.exists():
     print("Creating mask")
     create_lowres_mask(
-        out_dir / "impervious_2024.tif",
+        out_dir / "impervious_2025.tif",
         outfilename,
         resolution=MASK_RESOLUTION,
         ignore_zero=False,
