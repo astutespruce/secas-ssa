@@ -4,9 +4,9 @@ from analysis.constants import DATASETS, URBAN_YEARS
 from api.report.writer import write_excel
 
 value_columns = (
-    ["Urban in 2021 (acres)"]
-    + [f"{year} (acres)" for year in URBAN_YEARS]
-    + ["Not projected to urbanize by 2100 (acres)"]
+    ["Urban in 2021\n(acres)"]
+    + [f"{year}\n(acres)" for year in URBAN_YEARS]
+    + ["Not projected to urbanize by 2100\n(acres)"]
 )
 
 
@@ -18,33 +18,33 @@ def add_urbanization_sheet(xlsx, df, name_col_width, area_col_width, area_label)
     breaks = []
     counter = 0
     for id, row in df.iterrows():
-        if row.overlap_acres > 0:
+        if row["urban"]:
             for level in ["low", "high"]:
                 values = row["urban"][level]
-                urban.append([id, row.overlap_acres, level.capitalize()] + list(values))
+                urban.append([id, row.rasterized_acres, level.capitalize()] + list(values))
                 counter += 1
         else:
-            urban.append([id, row.overlap_acres])
+            urban.append([id, row.rasterized_acres] + [""] * len(values))
             counter += 1
 
         breaks.append(counter)
 
-    columns = value_columns + ["outside_acres"]
+    columns = value_columns + ["outside_dataset_acres"]
     urban = pd.DataFrame(
         urban,
         columns=[df.index.name, area_label, "Urbanization level"] + columns,
     )
     # move nodata to left
-    urban = urban[[df.index.name, area_label, "Urbanization level", "outside_acres"] + value_columns]
+    urban = urban[[df.index.name, area_label, "outside_dataset_acres", "Urbanization level"] + value_columns]
 
-    has_area_outside_dataset = urban.outside_acres.max() > 1e-2
+    has_area_outside_dataset = urban.outside_dataset_acres.max() > 1e-2
     if not has_area_outside_dataset:
-        urban = urban.drop(columns=["outside_acres"])
+        urban = urban.drop(columns=["outside_dataset_acres"])
 
-    urban = urban.rename(columns={"outside_acres": "Outside extent of this dataset"})
+    urban = urban.rename(columns={"outside_dataset_acres": "Area outside extent of this dataset\n(acres)"})
 
-    column_widths = [name_col_width, area_col_width, 14] + ([18] * (len(urban.columns) - 3))
-    area_columns = [1] + list(range(3, len(value_columns) + 4))
+    column_widths = [name_col_width] + ([18] * (len(urban.columns) - 1))
+    area_columns = [i for i, c in enumerate(urban.columns) if "acres" in c]
     write_excel(
         xlsx,
         urban,

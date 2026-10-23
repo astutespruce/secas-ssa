@@ -1,21 +1,15 @@
 import geopandas as gp
-import numpy as np
 import pandas as pd
-import rasterio
 import shapely
 
 from analysis.constants import M2_ACRES, SECAS_STATES
-from analysis.lib.geometry import to_dict
-from analysis.lib.raster import WindowGeometryMask, get_overlapping_windows, get_window
 from analysis.lib.stats.inundation_frequency import (
     summarize_nlcd_inundation_frequency_in_aoi,
 )
 from analysis.lib.stats.landfire import summarize_landfire_evt_in_aoi
-from analysis.lib.stats.nlcd import (
-    summarize_nlcd_impervious_in_aoi,
-    summarize_nlcd_landcover_in_aoi,
-)
+from analysis.lib.stats.nlcd import summarize_nlcd_impervious_in_aoi, summarize_nlcd_landcover_in_aoi
 from analysis.lib.stats.protected_areas import extract_protected_area_stats
+from analysis.lib.stats.rasterized_geometry import RasterizedGeometry
 from analysis.lib.stats.sarp import extract_sarp_huc12_stats
 from analysis.lib.stats.se_blueprint_indicators import summarize_indicator_in_aoi
 from analysis.lib.stats.slr import extract_slr_proj_in_analysis_areas, summarize_slr_in_aoi
@@ -24,104 +18,7 @@ from api.settings import SHARED_DATA_DIR
 
 data_dir = SHARED_DATA_DIR / "inputs"
 bnd_dir = data_dir / "boundaries"
-boundary_filename = bnd_dir / "se_boundary.feather"
-extent_filename = bnd_dir / "blueprint_extent.tif"
-extent_mask_filename = bnd_dir / "blueprint_extent_mask.tif"
 states_filename = bnd_dir / "states.feather"
-
-
-WINDOW_SIZE = 2048  # approx 16 MB for 8 bit data
-
-
-class RasterizedGeometry(object):
-    """Helper class to detect and extract data for a rasterized geometry
-    Similar to RasterizedGeometry in secas-blueprint respository but without a
-    low resolution mask for detecting datasets (handled prior to calling here)
-    """
-
-    def __init__(self, geometry):
-        """_summary_
-
-        Parameters
-        ----------
-        geometry : shapely geometry
-        """
-        self.bounds = shapely.bounds(geometry)
-
-        all_shapes = [to_dict(geometry)]
-
-        # create masks and windows
-        with rasterio.open(extent_filename) as src:
-            windows, ratio = get_overlapping_windows(src, geometry, bounds=self.bounds, window_size=WINDOW_SIZE)
-
-            num_windows = len(windows)
-            self.masks = []
-
-            # threshold for using windows determined by testing performance
-            if num_windows >= 50 or (num_windows > 1 and ratio <= 0.25):
-                for window in windows:
-                    # clip geometry to window then rasterize
-                    clipped = shapely.clip_by_rect(geometry, *src.window_bounds(window))
-                    mask = WindowGeometryMask(src, window, shapes=[to_dict(clipped)])
-                    self.masks.append(mask)
-
-            else:
-                window = get_window(src, self.bounds)
-                mask = WindowGeometryMask(src, window, all_shapes)
-                self.masks.append(mask)
-
-            # cell size in acres
-            self.cellsize = src.res[0] * src.res[1] * M2_ACRES
-
-            self.pixels = sum(mask.shape_mask.sum() for mask in self.masks)
-            self.acres = self.pixels * self.cellsize
-
-            count = np.zeros((2,), dtype="uint64")
-            for mask in self.masks:
-                mask.get_pixel_count_by_bin(src, out=count)
-
-            self.within_extent_pixels = count[1]
-            self.within_extent_acres = self.within_extent_pixels * self.cellsize
-
-            self.outside_extent_acres = (self.pixels - self.within_extent_pixels) * self.cellsize
-
-    def get_pixel_count_by_bin(self, dataset, bins):
-        """Get count of pixels in each bin
-
-        Parameters
-        ----------
-        dataset : open rasterio dataset
-        bins : list-like
-            List-like of values ranging from 0 to max value (not sparse!).
-            Counts will be generated that correspond to this list of bins.
-
-        Returns
-        -------
-        ndarray
-            Total number of pixels for each bin
-        """
-        count = np.zeros((len(bins),), dtype="uint64")
-        for mask in self.masks:
-            mask.get_pixel_count_by_bin(dataset, out=count)
-
-        return count
-
-    def get_acres_by_bin(self, dataset, bins):
-        """Get acres in each bin
-
-        Parameters
-        ----------
-        dataset : open rasterio dataset
-        bins : list-like
-            List-like of values ranging from 0 to max value (not sparse!).
-            Counts will be generated that correspond to this list of bins.
-
-        Returns
-        -------
-        ndarray
-            Total number of acres for each bin
-        """
-        return self.get_pixel_count_by_bin(dataset, bins) * self.cellsize
 
 
 async def get_analysis_unit_results(df, datasets, progress_callback=None):
@@ -168,12 +65,10 @@ async def get_analysis_unit_results(df, datasets, progress_callback=None):
         result = {
             "pixels": rasterized_geometry.pixels,
             "rasterized_acres": rasterized_geometry.acres,
-            "overlap_acres": rasterized_geometry.within_extent_acres,
-            "outside_extent_acres": rasterized_geometry.outside_extent_acres,
         }
 
-        # short-circuit if there are no overlapping pixels
-        if rasterized_geometry.within_extent_acres == 0:
+        # short-circuit if there are no rasterized pixels
+        if rasterized_geometry.acres == 0:
             results.append(result)
 
             if progress_callback is not None:

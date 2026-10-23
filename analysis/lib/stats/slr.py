@@ -44,10 +44,14 @@ def summarize_slr_in_aoi(rasterized_geometry):
     with rasterio.open(depth_filename) as src:
         acres = rasterized_geometry.get_acres_by_bin(src, bins=SLR_BINS)
 
+    slr_nodata_acres = rasterized_geometry.acres - acres.sum()
+    if slr_nodata_acres < 1e-6:
+        slr_nodata_acres = 0
+
     # accumulate values for depths 0-10ft
     acres[:11] = np.cumsum(acres[:11])
 
-    return acres
+    return np.append(acres, [slr_nodata_acres])
 
 
 def extract_slr_proj_in_analysis_areas(df: gp.GeoDataFrame) -> pd.DataFrame:

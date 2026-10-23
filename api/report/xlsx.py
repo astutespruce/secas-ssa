@@ -17,18 +17,11 @@ from api.report.urban import add_urbanization_sheet
 
 def create_xlsx(df, datasets):
     df.index.name = "Analysis unit"
-    outside_extent_acres = df.outside_extent_acres.sum() > 1e-2
 
-    name_col_width = max(
-        min(pd.Series(df.index).astype("str").apply(len).max() * CHAR_PER_WIDTH_UNIT, 28),
-        14,
-    )
-    area_col_width = max(
-        df.overlap_acres.apply(lambda x: len("{x:,.2f}")).max() * CHAR_PER_WIDTH_UNIT,
-        10,
-    )
+    name_col_width = max(min(pd.Series(df.index).astype("str").apply(len).max() * CHAR_PER_WIDTH_UNIT, 28), 14)
+    area_col_width = max(df.rasterized_acres.apply(lambda x: len("{x:,.2f}")).max() * CHAR_PER_WIDTH_UNIT, 10)
 
-    area_label = "Acres within Southeast data extent" if outside_extent_acres else "Analysis acres"
+    area_label = "Analysis area\n(acres)"
 
     ### Create XLSX file and write to memory buffer
     buffer = BytesIO()
@@ -37,7 +30,7 @@ def create_xlsx(df, datasets):
         add_data_details_sheet(xlsx, datasets)
 
         # Summary sheet
-        add_summary_sheet(xlsx, df, name_col_width, area_col_width, area_label, outside_extent_acres)
+        add_summary_sheet(xlsx, df, name_col_width, area_col_width)
 
         # NLCD sheets
         if "nlcd_landcover" in datasets:
@@ -56,15 +49,15 @@ def create_xlsx(df, datasets):
 
         # SLR projection sheet
         if "slr_proj" in datasets:
-            add_slr_projection_sheet(xlsx, df, name_col_width, area_col_width, area_label)
+            add_slr_projection_sheet(xlsx, df, name_col_width)
 
         # SLR inundation sheet
         if "slr_depth" in datasets:
-            add_slr_inundation_sheet(xlsx, df, name_col_width, area_col_width, area_label)
+            add_slr_inundation_sheet(xlsx, df, name_col_width, area_label)
 
         se_blueprint_indicators = [dataset for dataset in datasets if dataset.startswith("se_blueprint")]
         for dataset in se_blueprint_indicators:
-            add_indicator_sheet(xlsx, df, dataset, name_col_width, area_col_width, area_label)
+            add_indicator_sheet(xlsx, df, dataset, name_col_width, area_label)
 
         if "sarp_aquatic_barriers" in datasets:
             add_sarp_barriers_sheet(xlsx, df, name_col_width)

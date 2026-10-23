@@ -19,17 +19,7 @@ log = logging.getLogger("api")
 
 
 # valid data types for fields that can be used to identify groups of data within a dataset
-VALID_DTYPES = {
-    "object",
-    "int8",
-    "uint8",
-    "int16",
-    "uint16",
-    "int32",
-    "uint32",
-    "int64",
-    "uint64",
-}
+VALID_DTYPES = {"object", "int8", "uint8", "int16", "uint16", "int32", "uint32", "int64", "uint64"}
 
 
 async def record_progress_callback(ctx, percent, min_progress=0, max_progress=100, message=""):
@@ -129,6 +119,7 @@ async def create_report(ctx, uuid, datasets, field=None, name=None):
 
     await set_progress(ctx["redis"], ctx["job_id"], progress_scale[0], message)
 
+    # FIXME:
     results = await get_analysis_unit_results(df, datasets, progress_callback=progress_callback)
     if results is None:
         raise DataError("Dataset does not overlap Southeast states")

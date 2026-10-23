@@ -57,7 +57,7 @@ def summarize_urban_in_aoi(rasterized_geometry):
         elif year == 2100:
             # important: we calculate nodata area based on all pixels that had >= 0 probability;
             # for most other layer we just sum their acres to calculate this
-            urban_nodata = rasterized_geometry.acres - rasterized_geometry.outside_extent_acres - urban_prob_acres.sum()
+            urban_nodata = rasterized_geometry.acres - urban_prob_acres.sum()
 
             high_noturban_2100 = urban_prob_acres.sum() - high_urban_acres[year_index + 1]
             if high_noturban_2100 < 1e-6:

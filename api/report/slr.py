@@ -5,16 +5,14 @@ from api.report.writer import write_excel
 
 SLR_BINS = SLR_DEPTH_VALUES + [v["value"] for v in SLR_NODATA_VALUES]
 
-depth_value_columns = [f"Inundated at {v['label']} (acres)" for v in SLR_DEPTH_VALUES] + [
-    f"{v['label']} (acres)" for v in SLR_NODATA_VALUES
+depth_value_columns = [f"Inundated at {v['label']}\n(acres)" for v in SLR_DEPTH_VALUES] + [
+    f"{v['label']}\n(acres)" for v in SLR_NODATA_VALUES
 ]
 
-proj_value_columns = ["Has projected SLR?", "SLR scenario"] + [f"{year} (feet)" for year in SLR_YEARS]
+proj_value_columns = ["Has projected SLR?", "SLR scenario"] + [f"{year}\n(feet)" for year in SLR_YEARS]
 
 
-def add_slr_projection_sheet(
-    xlsx: pd.ExcelWriter, df: pd.DataFrame, name_col_width: float, area_col_width: float, area_label: str
-):
+def add_slr_projection_sheet(xlsx: pd.ExcelWriter, df: pd.DataFrame, name_col_width: float):
     """Add sheet with decadal projections for each analysis unit, only if
     there is SLR at 10ft within the analysis unit.
     """
@@ -26,24 +24,22 @@ def add_slr_projection_sheet(
     counter = 0
     for id, row in df.iterrows():
         # must also have depth to show projection data
-        if row.overlap_acres == 0 or row.get("slr_depth", None) is None or not len(row.get("slr_proj", [])):
-            slr.append([id, row.overlap_acres, "no", ""] + [""] * len(SLR_YEARS))
+        if row.rasterized_acres == 0 or row.get("slr_depth", None) is None or not len(row.get("slr_proj", [])):
+            slr.append([id, "no", ""] + [""] * len(SLR_YEARS))
             counter += 1
         else:
             for scenario in row.slr_proj:
-                slr.append(
-                    [id, row.overlap_acres, "yes", SLR_PROJ_SCENARIOS[scenario["scenario"]]] + list(scenario["values"])
-                )
+                slr.append([id, "yes", SLR_PROJ_SCENARIOS[scenario["scenario"]]] + list(scenario["values"]))
                 counter += 1
 
             breaks.append(counter)
 
     slr = pd.DataFrame(
         slr,
-        columns=[df.index.name, area_label] + proj_value_columns,
+        columns=[df.index.name] + proj_value_columns,
     )
 
-    column_widths = [name_col_width, area_col_width, 10, 18] + ([12] * len(SLR_YEARS))
+    column_widths = [name_col_width, 10, 18] + ([12] * len(SLR_YEARS))
     # SLR values are not really areas but we want 2 decimal places
     area_columns = area_columns = [1] + list(range(4, len(SLR_YEARS) + 5))
     write_excel(
@@ -57,39 +53,35 @@ def add_slr_projection_sheet(
     )
 
 
-def add_slr_inundation_sheet(xlsx, df, name_col_width, area_col_width, area_label):
+def add_slr_inundation_sheet(xlsx, df, name_col_width, area_label):
     dataset = DATASETS["slr_depth"]
 
     # split values into columns
-    slr = df.slr_depth.apply(pd.Series)
+    slr = df[["rasterized_acres"]].join(df.slr_depth.apply(pd.Series))
+    slr.columns = ["rasterized_acres"] + depth_value_columns + ["outside_dataset_acres"]
 
-    # set NODATA into value 13
-    outside_acres = df.overlap_acres - slr.sum(axis=1)
-    outside_acres.loc[outside_acres < 0] = 0
-    slr[13] += outside_acres
-
-    slr = df[["overlap_acres"]].join(slr)
-    slr.columns = ["overlap_acres"] + depth_value_columns
-
-    # reorder columns so that SLR not available (last column) comes first
+    # reorder columns so that nodata comes first
     slr = (
-        slr[["overlap_acres", depth_value_columns[-1]] + depth_value_columns[:-1]]
-        .rename(columns={"overlap_acres": area_label})
+        slr[["rasterized_acres", "outside_dataset_acres"] + depth_value_columns]
         .reset_index()
+        .rename(
+            columns={
+                "rasterized_acres": area_label,
+                "outside_dataset_acres": "Area outside extent of this dataset\n(acres)",
+            }
+        )
     )
 
     # drop unnecessary nodata
     remove_cols = []
-    for col in depth_value_columns[-3:]:
+    for col in depth_value_columns[-len(SLR_NODATA_VALUES) :]:
         if slr[col].sum() == 0:
             remove_cols.append(col)
     if remove_cols:
         slr = slr.drop(columns=remove_cols)
 
     num_value_cols = len(slr.columns) - 2
-
-    column_widths = [name_col_width, area_col_width] + ([18] * num_value_cols)
-
+    column_widths = [name_col_width] + ([18] * (num_value_cols + 1))
     area_columns = [1] + list(range(2, num_value_cols + 3))
     write_excel(
         xlsx,

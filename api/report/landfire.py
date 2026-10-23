@@ -12,13 +12,14 @@ def add_landfire_evt_sheet(xlsx, df, name_col_width, area_col_width, area_label)
     breaks = []
     counter = 0
     for id, row in df.iterrows():
-        if row.overlap_acres > 0:
+        if row.landfire_evt:
+            outside_dataset_acres = max(row.rasterized_acres - sum(row.landfire_evt.values()), 0)
             for index, acres in row.landfire_evt.items():
                 evt = LANDFIRE_INDEXES[index]
-                rows.append([id, row.overlap_acres, evt["label"], evt["group"], acres])
+                rows.append([id, row.rasterized_acres, outside_dataset_acres, acres, evt["label"], evt["group"]])
                 counter += 1
         else:
-            rows.append([id, row.overlap_acres])
+            rows.append([id, row.rasterized_acres, row.rasterized_acres, "", "", ""])
             counter += 1
 
         breaks.append(counter)
@@ -28,18 +29,29 @@ def add_landfire_evt_sheet(xlsx, df, name_col_width, area_col_width, area_label)
         columns=[
             df.index.name,
             area_label,
+            "outside_dataset_acres",
+            "Acres",
             "Existing Vegetation Type",
             "Group",
-            "Acres",
         ],
     )
+
+    has_area_outside_dataset = landfire_evt.outside_dataset_acres.max() > 1e-2
+    if not has_area_outside_dataset:
+        landfire_evt = landfire_evt.drop(columns=["outside_dataset_acres"])
+
+    landfire_evt = landfire_evt.rename(
+        columns={"outside_dataset_acres": "Area outside extent of this dataset\n(acres)"}
+    )
+
+    num_area_columns = len([c for c in landfire_evt.columns if "acres" in c.lower()])
 
     write_excel(
         xlsx,
         landfire_evt,
         sheet_name=dataset["sheet_name"],
         caption=f"{dataset['name']}.\n{dataset['valueDescription']}",
-        column_widths=[name_col_width, area_col_width, 30, 30, 12],
-        area_columns=[1, 4],
+        column_widths=[name_col_width] + [area_col_width] * num_area_columns + [30, 30],
+        area_columns=list(range(1, num_area_columns + 1)),
         breaks=breaks,
     )
