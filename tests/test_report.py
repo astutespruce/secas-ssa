@@ -256,8 +256,8 @@ async def test_get_analysis_unit_results_single_area(format):
     assert np.isclose(row.rasterized_acres, 50.9283)
 
     # Landfire EVT is stored as a dict of indexes and acres
-    assert list(row.landfire_evt.keys()) == [64, 93, 133, 496]
-    assert np.allclose(list(row.landfire_evt.values()), [10.8973, 3.1135, 36.2503, 0.6672], atol=1e-4)
+    assert list(row.landfire_evt.keys()) == [656, 658, 706, 714]
+    assert np.allclose(list(row.landfire_evt.values()), [3.1135, 0.6672, 36.2503, 10.8973], atol=1e-4)
 
     # NLCD landcover is stored as a dict of arrays
     assert list(row.nlcd_landcover.keys()) == ["Deciduous forest", "Evergreen forest", "Mixed forest"]
@@ -290,7 +290,7 @@ async def test_get_analysis_unit_results_multiple_areas_partial_overlap(format):
     for col in ["states", "count", "acres", "rasterized_acres"]:
         assert col in results.columns
 
-    assert results.states.fillna("").values.tolist() == ["North Carolina", "", "Missouri"]
+    assert results.states.fillna("").values.tolist() == ["North Carolina", "Minnesota", "Missouri"]
 
     assert results["count"].values.tolist() == [1] * 3
     assert np.allclose(results["acres"], [280.4020, 394.7394, 68.8730])
@@ -377,6 +377,74 @@ async def test_get_analysis_unit_results_multiple_areas(format):
 
 
 @pytest.mark.anyio
+@pytest.mark.parametrize("format", ["shp"])
+async def test_get_analysis_unit_results_west_coast(format):
+    filename = f"{format}_poly_west_coast.zip"
+    dataset = filename.replace(f"{format}_", "").replace(".zip", f".{format}")
+    df = read_dataframe(f"/vsizip/tests/fixtures/{filename}/{dataset}", columns=[], use_arrow=True).to_crs(DATA_CRS)
+
+    datasets = get_available_datasets(df)
+
+    unexpected_datasets = ["slr_depth", "slr_proj"]
+    for dataset in unexpected_datasets:
+        assert dataset not in datasets
+
+    results = await get_analysis_unit_results(df, datasets)
+
+    assert len(results) == len(df)
+    for col in ["states", "count", "acres", "rasterized_acres"]:
+        assert col in results.columns
+
+    row = results.iloc[0]
+
+    assert row.states == "California"
+    assert row["count"] == 1
+    assert np.isclose(row.acres, 5294.93)
+    assert np.isclose(row.pixels, 23853)
+    assert np.isclose(row.rasterized_acres, 5304.78)
+
+    # Landfire EVT is stored as a dict of indexes and acres
+    assert len(row.landfire_evt.keys()) == 30
+    assert list(row.landfire_evt.keys())[:4] == [56, 58, 62, 67]
+    assert np.allclose(list(row.landfire_evt.values())[:4], [7.1166, 1982.4246, 2.8911, 60.4913], atol=1e-4)
+
+    # NLCD landcover is stored as a dict of arrays
+    assert list(row.nlcd_landcover.keys()) == [
+        "Open water",
+        "Developed (open space)",
+        "Developed (low intensity)",
+        "Developed (medium intensity)",
+        "Developed (high intensity)",
+        "Barren land",
+        "Deciduous forest",
+        "Evergreen forest",
+        "Mixed forest",
+        "Shrub/scrub",
+        "Grassland/herbaceous",
+        "Pasture/hay",
+        "Cultivated crops",
+        "Woody wetlands",
+        "Emergent herbaceous wetlands",
+    ]
+    assert np.allclose(
+        row.nlcd_landcover["Evergreen forest"], [2699.202, 2626.0343, 2559.9831, 2620.252, 2588.2272], atol=1e-4
+    )
+
+    assert len(row.protected_areas) == 10
+    assert (
+        row.protected_areas[0]["name"]
+        == "Agricultural Conservation Easement Program - Wetland Reserve Easements (ACEP-WRE), Humboldt, CA"
+    )
+    assert row.protected_areas[0]["owner"] == ""
+    assert row.protected_areas[0]["gap_status"] == "2"
+    assert np.isclose(row.protected_areas[0]["acres"], 12.8445)
+
+    # TODO: urban will be added
+    # assert list(row.urban.keys()) == ["high", "low"]
+    # assert np.allclose(row.urban["high"], [0, 0, 0, 0, 0, 0, 0, 0, 0, row.rasterized_acres, 0])
+
+
+@pytest.mark.anyio
 @pytest.mark.parametrize("format", ["shp", "gdb"])
 async def test_create_xlsx_file_single_area(format):
     filename = f"{format}_poly_small.zip"
@@ -438,16 +506,16 @@ async def test_create_xlsx_file_single_area(format):
         "Group",
     ]
     assert landfire_evt["Existing Vegetation Type"].tolist() == [
-        "Southern Piedmont Mesic Forest",
         "Southeastern Interior Longleaf Pine Woodland",
-        "Southern Piedmont Dry Oak Forest",
         "Southeastern Native Ruderal Forest",
+        "Southern Piedmont Dry Oak Forest",
+        "Southern Piedmont Mesic Forest",
     ]
     assert landfire_evt["Group"].tolist() == [
-        "White Oak-Beech Forest and Woodland",
         "Longleaf Pine Woodland",
-        "Chestnut Oak-Virginia Pine Forest and Woodland",
         "Introduced Upland Vegetation-Treed",
+        "Chestnut Oak-Virginia Pine Forest and Woodland",
+        "White Oak-Beech Forest and Woodland",
     ]
     assert np.allclose(landfire_evt["Acres"], list(results.iloc[0].landfire_evt.values()))
 
@@ -656,10 +724,12 @@ async def test_create_xlsx_file_multiple_areas(format):
 
 
 @pytest.mark.anyio
-async def test_create_xlsx_file_west_coast():
-    filename = "shp_poly_west_coast.zip"
-    dataset = filename.replace("shp_", "").replace(".zip", ".shp")
+@pytest.mark.parametrize("format", ["shp"])
+async def test_create_xlsx_file_west_coast(format):
+    filename = f"{format}_poly_west_coast.zip"
+    dataset = filename.replace(f"{format}_", "").replace(".zip", f".{format}")
     df = read_dataframe(f"/vsizip/tests/fixtures/{filename}/{dataset}", columns=["id"], use_arrow=True).to_crs(DATA_CRS)
+
     df = dissolve(df.explode(ignore_index=True), by="id").set_index("id")
 
     # representative sample of datasets
@@ -685,3 +755,46 @@ async def test_create_xlsx_file_west_coast():
             _ = out.write(xlsx)
 
     reader = pd.ExcelFile(BytesIO(xlsx))
+
+    assert len(reader.sheet_names) == len(datasets) + 2
+    summary = reader.parse(sheet_name="Summary", skiprows=2)
+    assert len(summary) == len(df)
+
+    assert np.allclose(summary["GIS acres"], results.acres)
+    assert np.allclose(summary["Analysis acres (rasterized to 30m pixels)"], results.rasterized_acres)
+    assert np.allclose(summary["Number of 30m pixels in analysis unit"], results.pixels)
+    assert np.allclose(summary["Number of areas in analysis unit"], results["count"])
+    assert summary["State(s)"].tolist() == results.states.tolist()
+
+    slr_depth = reader.parse(sheet_name="SLR inundation area", skiprows=2)
+    # drops inland counties because not applicable
+    slr_depth_col_ix = list(range(11))
+    slr_value_cols = np.array(slr_depth_value_columns).take(slr_depth_col_ix).tolist()
+    assert (
+        slr_depth.columns.tolist()
+        == ["Analysis unit", "Analysis area\n(acres)", "Area outside extent of this dataset\n(acres)"] + slr_value_cols
+    )
+    assert np.allclose(
+        slr_depth[slr_value_cols].iloc[0].values,
+        results.slr_depth.iloc[0].take(slr_depth_col_ix),
+    )
+
+    slr_proj = reader.parse(sheet_name="Projected SLR", skiprows=2)
+    assert slr_proj.columns.tolist() == ["Analysis unit"] + slr_proj_value_columns
+    assert slr_proj["Has projected SLR?"].iloc[:3].tolist() == ["no"]
+
+    urban = reader.parse(sheet_name="Urbanization", skiprows=2, nrows=2)
+    assert (
+        urban.columns.tolist()
+        == [
+            "Analysis unit",
+            "Analysis area\n(acres)",
+            "Area outside extent of this dataset\n(acres)",
+            "Urbanization level",
+        ]
+        + urban_value_columns
+    )
+    assert urban["Urbanization level"].tolist() == ["Low", "High"]
+    for i, level in enumerate(urban["Urbanization level"].values):
+        # last column is nodata, omitted here
+        assert np.allclose(urban[urban_value_columns].iloc[i].values, results.urban.iloc[0][level.lower()][:-1])

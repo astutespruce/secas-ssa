@@ -1,8 +1,8 @@
-import geopandas as gp
 import pandas as pd
 import shapely
+from pyogrio import read_dataframe
 
-from analysis.constants import M2_ACRES, SECAS_STATES
+from analysis.constants import M2_ACRES
 from analysis.lib.stats.inundation_frequency import (
     summarize_nlcd_inundation_frequency_in_aoi,
 )
@@ -14,11 +14,9 @@ from analysis.lib.stats.sarp import extract_sarp_huc12_stats
 from analysis.lib.stats.se_blueprint_indicators import summarize_indicator_in_aoi
 from analysis.lib.stats.slr import extract_slr_proj_in_analysis_areas, summarize_slr_in_aoi
 from analysis.lib.stats.urban import summarize_urban_in_aoi
-from api.settings import SHARED_DATA_DIR
+from api.settings import DATA_DIR
 
-data_dir = SHARED_DATA_DIR / "inputs"
-bnd_dir = data_dir / "boundaries"
-states_filename = bnd_dir / "states.feather"
+states_filename = DATA_DIR / "inputs/boundaries/states.fgb"
 
 
 async def get_analysis_unit_results(df, datasets, progress_callback=None):
@@ -38,8 +36,12 @@ async def get_analysis_unit_results(df, datasets, progress_callback=None):
     DataFrame
     """
 
-    states = gp.read_feather(states_filename, columns=["state", "id", "geometry"])
-    states = states.loc[states.id.isin(SECAS_STATES)]
+    # use union of individual area bounding boxes to read features
+    read_mask = shapely.union_all(shapely.envelope(df.explode(ignore_index=False, index_parts=False).geometry.values))
+
+    # NOTE: pyogrio does not currently work properly for use_arrow=True if the
+    # mask does not overlap and returns no features, so we can't use it here.
+    states = read_dataframe(states_filename, columns=["state", "id", "geometry"], mask=read_mask)
     left, right = shapely.STRtree(states.geometry.values).query(df.geometry.values, predicate="intersects")
     state_join = (
         pd.DataFrame({"state": states.state.values.take(right)}, index=df.index.values.take(left))
@@ -56,7 +58,6 @@ async def get_analysis_unit_results(df, datasets, progress_callback=None):
     df["bounds"] = shapely.bounds(df.geometry.values).tolist()
 
     results = []
-
     count = 0
 
     for index, row in df.iterrows():
@@ -115,12 +116,12 @@ async def get_analysis_unit_results(df, datasets, progress_callback=None):
     out = df[["states", "count", "acres"]].join(pd.DataFrame(results, index=df.index))
 
     if len(set(["sarp_aquatic_barriers", "sarp_aquatic_network_alteration"]).intersection(datasets)) > 0:
-        sarp_huc12_stats = extract_sarp_huc12_stats(df)
+        sarp_huc12_stats = extract_sarp_huc12_stats(df, read_mask=read_mask)
         if sarp_huc12_stats is not None:
             out = out.join(sarp_huc12_stats)
 
     if "protected_areas" in datasets:
-        protected_area_stats = extract_protected_area_stats(df)
+        protected_area_stats = extract_protected_area_stats(df, read_mask=read_mask)
         if protected_area_stats is not None:
             out = out.join(protected_area_stats)
 

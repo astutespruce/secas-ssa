@@ -1,3 +1,4 @@
+import numpy as np
 import pandas as pd
 
 from analysis.constants import DATASETS, URBAN_YEARS
@@ -13,38 +14,49 @@ value_columns = (
 def add_urbanization_sheet(xlsx, df, name_col_width, area_col_width, area_label):
     dataset = DATASETS["urban"]
 
-    # transform data into one row for high and low urbanization per analysis unit
-    urban = []
-    breaks = []
-    counter = 0
-    for id, row in df.iterrows():
-        if row["urban"]:
-            for level in ["low", "high"]:
-                values = row["urban"][level]
-                urban.append([id, row.rasterized_acres, level.capitalize()] + list(values))
-                counter += 1
-        else:
-            urban.append([id, row.rasterized_acres] + [""] * len(values))
-            counter += 1
-
-        breaks.append(counter)
-
-    columns = value_columns + ["outside_dataset_acres"]
-    urban = pd.DataFrame(
-        urban,
-        columns=[df.index.name, area_label, "Urbanization level"] + columns,
+    urban = (
+        df[["rasterized_acres"]]
+        .join(
+            df.urban.apply(pd.Series)[["low", "high"]]
+            .melt(var_name="urban_level", value_name="acres", ignore_index=False)
+            .dropna(subset="acres")
+        )
+        .set_index("urban_level", append=True)
     )
-    # move nodata to left
-    urban = urban[[df.index.name, area_label, "outside_dataset_acres", "Urbanization level"] + value_columns]
+    urban["acres"] = urban.acres.astype(object)
+    ix = urban.acres.isnull()
+    urban.loc[ix, "acres"] = urban.loc[ix].acres.apply(lambda x: [0] * len(value_columns))
 
+    # convert acres from list into DataFrame and join (nodata already calculated in last position)
+    acres = pd.DataFrame(urban.acres.tolist(), index=urban.index, columns=value_columns + ["outside_dataset_acres"])
+    urban = urban.drop(columns=["acres"]).join(acres).reset_index(level=-1)
+
+    urban["urban_level"] = urban.urban_level.map({"high": "High", "low": "Low"})
+
+    breaks = np.arange(1, len(urban))[urban.index[1:] != urban.index[:-1]].tolist()
+
+    urban = urban[["rasterized_acres", "outside_dataset_acres", "urban_level"] + value_columns]
+
+    num_left_area_columns = 2
     has_area_outside_dataset = urban.outside_dataset_acres.max() > 1e-2
     if not has_area_outside_dataset:
         urban = urban.drop(columns=["outside_dataset_acres"])
+        num_left_area_columns -= 1
 
-    urban = urban.rename(columns={"outside_dataset_acres": "Area outside extent of this dataset\n(acres)"})
+    urban = urban.rename(
+        columns={
+            "rasterized_acres": area_label,
+            "outside_dataset_acres": "Area outside extent of this dataset\n(acres)",
+            "urban_level": "Urbanization level",
+        }
+    ).reset_index()
 
-    column_widths = [name_col_width] + ([18] * (len(urban.columns) - 1))
-    area_columns = [i for i, c in enumerate(urban.columns) if "acres" in c]
+    area_columns = list(range(1, num_left_area_columns + 1)) + list(
+        range(1 + num_left_area_columns + 1, len(value_columns) + num_left_area_columns + 3)
+    )
+
+    column_widths = [name_col_width] + [area_col_width] * num_left_area_columns + [12] + ([18] * (len(value_columns)))
+
     write_excel(
         xlsx,
         urban,

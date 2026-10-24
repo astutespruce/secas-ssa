@@ -1,3 +1,4 @@
+import numpy as np
 import pandas as pd
 
 from analysis.constants import DATASETS
@@ -7,48 +8,35 @@ from api.report.writer import write_excel
 def add_protected_areas_sheet(xlsx, df, name_col_width, area_col_width):
     dataset = DATASETS["protected_areas"]
 
-    # transform data into one row per per protected area per analysis unit
-    protected_areas = []
-    breaks = []
-    counter = 0
-    for id, row in df.iterrows():
-        if hasattr(row, "protected_areas") and row.protected_areas:
-            for pa in row.protected_areas:
-                protected_areas.append(
-                    [
-                        id,
-                        f"{row.acres:.2f}",
-                        f"{pa['acres']:.2f}",
-                        pa["name"],
-                        pa["owner"],
-                        pa["gap_status"],
-                    ]
-                )
-        else:
-            protected_areas.append(
-                [
-                    id,
-                    f"{row.acres:.2f}",
-                    "0",
-                    "no protected areas at this location",
-                    "",
-                    "",
-                ]
-            )
-            counter += 1
+    if "protected_areas" in df.columns:
+        protected_areas = df.protected_areas.explode()
+        ix = protected_areas.isnull()
+        protected_areas.loc[ix] = protected_areas.loc[ix].apply(
+            lambda x: {"name": "", "owner": "", "gap_status": "", "acres": 0}
+        )
+        protected_areas = protected_areas.apply(pd.Series)
 
-        breaks.append(counter)
+    else:
+        protected_areas = pd.DataFrame(
+            [{"name": "", "owner": "", "gap_status": "", "acres": 0}] * len(df), index=df.index
+        )
 
-    protected_areas = pd.DataFrame(
-        protected_areas,
-        columns=[
-            df.index.name,
-            "GIS Acres",
-            "Overlap acres",
-            "Protected area name",
-            "Owner",
-            "GAP status",
-        ],
+    protected_areas = df[["acres"]].rename(columns={"acres": "total_acres"}).join(protected_areas)
+
+    breaks = np.arange(1, len(protected_areas))[protected_areas.index[1:] != protected_areas.index[:-1]].tolist()
+
+    protected_areas = (
+        protected_areas[["total_acres", "acres", "name", "owner", "gap_status"]]
+        .rename(
+            columns={
+                "total_acres": "GIS Acres",
+                "acres": "Overlap acres",
+                "name": "Protected area name",
+                "owner": "Owner",
+                "gap_status": "GAP status",
+            }
+        )
+        .reset_index()
     )
 
     column_widths = [name_col_width, area_col_width, area_col_width, 40, 30, 10]

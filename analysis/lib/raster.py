@@ -11,7 +11,7 @@ from rasterio.mask import geometry_mask
 from rasterio.vrt import WarpedVRT
 from rasterio.windows import Window
 from rasterio.windows import bounds as window_bounds
-from rasterio.windows import transform as window_transform
+from rasterio.windows import transform as transform_for_window
 
 from analysis.constants import DATA_CRS, OVERVIEW_FACTORS
 
@@ -87,6 +87,7 @@ def unique(arr):
 @nb.njit(
     [
         "uint8[:,:](uint8[:,:],uint8[:,:],uint8,uint8)",
+        "int16[:,:](int16[:,:],int16[:,:],int16,int16)",
         "uint16[:,:](uint16[:,:],uint16[:,:],uint16,uint16)",
     ],
     cache=True,
@@ -122,7 +123,7 @@ def remap(arr, remap_table, nodata, fill):
     for i in range(len(remap_table)):
         table[remap_table[i][0]] = remap_table[i][1]
 
-    out = np.ones_like(arr) * fill
+    out = np.full(shape=arr.shape, fill_value=fill)
 
     for i in range(rows):
         for j in range(cols):
@@ -345,7 +346,7 @@ class WindowGeometryMask(object):
         """
         self.transform = transform
         self.window = window
-        self.window_transform = window_transform(window, transform)
+        self.window_transform = transform_for_window(window, transform)
         self.shape_mask = geometry_mask(
             shapes,
             transform=self.window_transform,
@@ -452,7 +453,7 @@ class RasterExtent:
         return window_bounds(window, self.transform)
 
     def window_transform(self, window: Window):
-        return window_transform(window, self.transform)
+        return transform_for_window(window, self.transform)
 
     def get_overlapping_windows(self, geometry, bounds, window_size):
         """Extract windows of window_size for reading within extent that overlap with

@@ -70,8 +70,8 @@ def extract_slr_proj_in_analysis_areas(df: gp.GeoDataFrame) -> pd.DataFrame:
         by decade (in order of SLR_YEARS)
     """
     index_name = df.index.name or "index"
-    tmp = df.explode(ignore_index=False, index_parts=False)
     out_name = "slr_proj"
+    tmp = df.explode(ignore_index=False, index_parts=False)
 
     slr_proj = gp.read_feather(proj_filename)
     left, right = shapely.STRtree(slr_proj.geometry.values).query(tmp.geometry.values, predicate="intersects")

@@ -23,26 +23,6 @@ OVERVIEW_FACTORS = [2, 4, 8, 16, 32]
 
 MASK_RESOLUTION = 480  # meters
 
-SECAS_STATES = [
-    "AL",
-    "AR",
-    "FL",
-    "GA",
-    "KY",
-    "LA",
-    "MS",
-    "MO",
-    "MS",
-    "NC",
-    "OK",
-    "PR",
-    "SC",
-    "TN",
-    "TX",
-    "VA",
-    "VI",
-    "WV",
-]
 
 NLCD_YEARS = [1985, 2000, 2015, 2020, 2025]
 
@@ -141,5 +121,5 @@ datasets_json = json.loads(open(json_dir / "datasets.json").read())
 DATASETS = {e["id"]: e for e in datasets_json["datasets"]}
 CATEGORIES = {e["id"]: e for e in datasets_json["categories"]}
 
-LANDFIRE_CODES = json.loads(open(json_dir / "landfire_evt.json").read())
-LANDFIRE_INDEXES = {i: e for i, e in enumerate(LANDFIRE_CODES.values())}
+# this is calculated after extracting LANDFIRE data and used for indexes
+NUM_LANDFIRE_VALUES = 862

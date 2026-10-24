@@ -63,9 +63,9 @@
       "date": "2025",
       "citation": "U.S. Geological Survey (USGS), 2025, Annual NLCD Collection 1 Science Products: U.S. Geological Survey data release, https://doi.org/10.5066/P94UXNTS.",
       "url": "https://www.mrlc.gov/data",
-      "description": "This dataset shows the amount of area in each major land cover class for 1985, 2000, 2015, 2020, and 2025 based on the NLCD Annual data product.  Land cover classes include open water, perennial ice/snow, developed (multiple intensities), barren land, deciduous forest, evergreen forest, mixed forest, shrub/scrub, grassland/herbaceous, pasture/hay, cultivated crops, woody wetlands, and emergent herbaceous wetlands.  Data are only available for Southeastern states within the contiguous U.S.",
+      "description": "This dataset shows the amount of area in each major land cover class for 1985, 2000, 2015, 2020, and 2025 based on the NLCD Annual data product.  Land cover classes include open water, perennial ice/snow, developed (multiple intensities), barren land, deciduous forest, evergreen forest, mixed forest, shrub/scrub, grassland/herbaceous, pasture/hay, cultivated crops, woody wetlands, and emergent herbaceous wetlands.  Data are only available for the contiguous U.S.",
       "valueDescription": "Values show the amount of each land cover class that is present within each analysis area for selected years from NLCD.  Only those land cover classes that are present within a given analysis area are shown.",
-      "methods": "Land cover data for each year were reprojected to match the standard grid used in this tool and clipped to Southeastern states."
+      "methods": "Values were remapped to contiguous integers for use in this tool."
     },
     {
       "id": "nlcd_impervious",
@@ -76,8 +76,8 @@
       "citation": "U.S. Geological Survey (USGS), 2025, Annual NLCD Collection 1 Science Products: U.S. Geological Survey data release, https://doi.org/10.5066/P94UXNTS.",
       "url": "https://www.mrlc.gov/data",
       "description": "This dataset shows percent impervious surface for 1985, 2000, 2015, 2020, and 2025 based on the NLCD Annual data product.",
-      "valueDescription": "Values show the total amount of impervious surface each analysis area for selected years from NLCD.  These are calculated as the total amount of area in each percent level of impervious surface times the percent.",
-      "methods": "Impervious surface data were reprojected to match the standard grid used in this tool and clipped to Southeastern states."
+      "valueDescription": "Values show the total amount of impervious surface each analysis area for selected years from NLCD.  These are calculated as the total amount of area in each percent level of impervious surface times the percent.  Data are only available for the contiguous U.S.",
+      "methods": "Data were used without additional modification."
     },
     {
       "id": "landfire_evt",
@@ -111,9 +111,9 @@
       "citation": "NOAA Office for Coastal Management Sea Level Rise Data: 1-10 ft Sea Level Rise Inundation Extent (2017-2026)",
       "url": "https://coast.noaa.gov/slrdata/",
       "date": "2026",
-      "description": "Sea-level rise inundation area data are provided by NOAA in 1 foot increments, based on available digital elevation model data.  These data are used to show the amount of each analysis unit that would be covered by that level of sea-level rise.",
-      "valueDescription": "Sea-level rise inundation area data are provided by NOAA in 1 foot increments, based on available digital elevation model data.  Values show the amount of area that would be inundated by that amount of sea-level rise depth based on the number of 30-meter pixels rasterized from NOAA inundation depth polygons that overlap with each analysis unit.",
-      "methods": "Sea-level rise polygons were downloaded from NOAA and rasterized to 30m resolution and aligned to match the standard grid used in this tool and clipped to Southeastern states; polygons and holes within polygons smaller than 1/2 pixel were dropped.  Additional areas characterizing the sea-level rise modeling extent were obtained separately from NOAA and used to define areas where data are unavailable, areas where sea-level rise is unlikely to be a threat (inland counties), and areas not projected to be inundated by up to 10ft sea-level rise."
+      "description": "Sea-level rise inundation area data are provided by NOAA in 1 foot increments, based on available digital elevation model data.  These data are used to show the amount of each analysis unit that would be covered by that level of sea-level rise.  Note: these data were only extracted for Southeastern states, Puerto Rico, and U.S. Virgin Islands.",
+      "valueDescription": "Sea-level rise inundation area data are provided by NOAA in 1 foot increments, based on available digital elevation model data.  Values show the amount of area that would be inundated by that amount of sea-level rise depth based on the number of 30-meter pixels rasterized from NOAA inundation depth polygons that overlap with each analysis unit.  Note: these data were only extracted for Southeastern states, Puerto Rico, and U.S. Virgin Islands.",
+      "methods": "Sea-level rise polygons were downloaded from NOAA and rasterized to 30m resolution and aligned to match the standard grid used in this tool and clipped to Southeastern states; polygons and holes within polygons smaller than 1/2 pixel were dropped.  Additional areas characterizing the sea-level rise modeling extent were obtained separately from NOAA and used to define areas where data are unavailable, areas where sea-level rise is unlikely to be a threat (inland counties), and areas not projected to be inundated by up to 10ft sea-level rise.  Note: these data were only extracted for Southeastern states, Puerto Rico, and U.S. Virgin Islands."
     },
     {
       "id": "slr_proj",
@@ -123,9 +123,9 @@
       "citation": "Sweet, W.V., B.D. Hamlington, R.E. Kopp, C.P. Weaver, P.L.Barnard, D. Bekaert, W. Brooks, M. Craghan, G. Dusek, T. Frederikse, G.Garner, A.S. Genz, J.P. Krasting, E. Larour, D. Marcy,J.J. Marra, J.Obeysekera, M. Osler, M. Pendleton, D. Roman, L. Schmied, W. Veatch, K.D.White, and C. Zuzak, 2022: Global and Regional Sea Level Rise Scenarios for the United States: Updated Mean Projections and Extreme Water Level Probabilities Along U.S. Coastlines. NOAA Technical Report NOS 01. National Oceanic and Atmospheric Administration, National Ocean Service, Silver Spring, MD",
       "url": "https://oceanservice.noaa.gov/hazards/sealevelrise/sealevelrise-tech-report.html",
       "date": "2022",
-      "description": "Sea-level rise projections are derived from 1-degree grid cells that accompany the 2022 Sea Level Rise Technical Report by NOAA.  Values show the area-weighted mean of 1-degree grid cells that overlap each analysis unit based on a baseline of 2000.  Sea-level rise scenarios correspond to a global sea level rise of between 1, 1.64, 3.2, 4.9, and 6.56 feet.",
-      "valueDescription": "Sea-level rise projections are derived from 1-degree grid cells that accompany the 2022 Sea Level Rise Technical Report by NOAA.  Values show the area-weighted mean of 1-degree grid cells that overlap each analysis unit based on a baseline of 2000.  Sea-level rise scenarios correspond to a global sea level rise of between 1, 1.64, 3.2, 4.9, and 6.56 feet.",
-      "methods": "1-degree grid cell sea-level rise projection data were downloaded from NOAA and limited to those that overlap with areas where sea-level rise inundation depth were modeled by NOAA."
+      "description": "Sea-level rise projections are derived from 1-degree grid cells that accompany the 2022 Sea Level Rise Technical Report by NOAA.  Values show the area-weighted mean of 1-degree grid cells that overlap each analysis unit based on a baseline of 2000.  Sea-level rise scenarios correspond to a global sea level rise of between 1, 1.64, 3.2, 4.9, and 6.56 feet.  Note: these data were only extracted for Southeastern states, Puerto Rico, and U.S. Virgin Islands.",
+      "valueDescription": "Sea-level rise projections are derived from 1-degree grid cells that accompany the 2022 Sea Level Rise Technical Report by NOAA.  Values show the area-weighted mean of 1-degree grid cells that overlap each analysis unit based on a baseline of 2000.  Sea-level rise scenarios correspond to a global sea level rise of between 1, 1.64, 3.2, 4.9, and 6.56 feet. Note: these data were only extracted for Southeastern states, Puerto Rico, and U.S. Virgin Islands.\n",
+      "methods": "1-degree grid cell sea-level rise projection data were downloaded from NOAA and limited to those that overlap with areas where sea-level rise inundation depth were modeled by NOAA.  Note: these data were only extracted for Southeastern states, Puerto Rico, and U.S. Virgin Islands."
     },
 
     {
@@ -187,7 +187,7 @@
           "color": "#428200"
         }
       ],
-      "description": "This indicator assesses shoreline alteration based on the presence of hardened structures like seawalls, groins, and riprap at the dynamic interface between land and water along the U.S. Caribbean coast. By restricting the natural movement of sediment, shoreline armoring increases erosion, prevents the inland migration of coastal ecosystems in response to sea level rise, and degrades habitat for birds, sea turtles, fish, plants, and other species both on and offshore. This indicator originates from the National Oceanic and Atmospheric Administration's Continually Updated Shoreline Product.",
+      "description": "This indicator assesses shoreline alteration based on the presence of hardened structures like seawalls, groins, and riprap at the dynamic interface between land and water along the U.S. Caribbean coast. By restricting the natural movement of sediment, shoreline armoring increases erosion, prevents the inland migration of coastal ecosystems in response to sea level rise, and degrades habitat for birds, sea turtles, fish, plants, and other species both on and offshore. This indicator originates from the National Oceanic and Atmospheric Administration's Continually Updated Shoreline Product.  Data are only available within the extent of the Southeast Conservation Blueprint.",
       "methods": "Data were used without additional modification.",
       "url": "https://secas-fws.hub.arcgis.com/maps/fws::caribbean-coastal-shoreline-condition-southeast-blueprint-indicator-2023/about"
     },
@@ -241,7 +241,7 @@
           "color": "#205905"
         }
       ],
-      "description": "This indicator depicts the capacity of coastal habitats to migrate to adjacent lowlands in order to sustain biodiversity and natural services under increasing inundation from sea level rise. It is based on the physical and condition characteristics of current tidal complexes, their predicted migration space, and surrounding buffer areas. These characteristics include marsh complex size, shared edge with migration space, sediment balance, water quality, natural landcover, landform diversity, and more. This indicator originates from The Nature Conservancy's Resilient Coastal Sites project.",
+      "description": "This indicator depicts the capacity of coastal habitats to migrate to adjacent lowlands in order to sustain biodiversity and natural services under increasing inundation from sea level rise. It is based on the physical and condition characteristics of current tidal complexes, their predicted migration space, and surrounding buffer areas. These characteristics include marsh complex size, shared edge with migration space, sediment balance, water quality, natural landcover, landform diversity, and more. This indicator originates from The Nature Conservancy's Resilient Coastal Sites project.  Data are only available within the extent of the Southeast Conservation Blueprint.",
       "methods": "Data were used without additional modification.",
       "url": "https://secas-fws.hub.arcgis.com/maps/2ea2c0d83ec24c91b53a1179a5ce7b18/about"
     },
@@ -271,7 +271,7 @@
         }
       ],
       "nodata_label": "Not within a stable coastal wetland",
-      "description": "This indicator uses remote sensing to calculate the unvegetated-vegetated ratio of tidal wetlands, which compares how much of a wetland is not covered by plants (e.g., sediment, rocks, open water) to how much is covered by plants. Marshes that maintain a higher proportion of vegetation tend to be more stable and resilient to threats like sea level rise, erosion, and coastal development. This ratio, and how it changes over time, is a good surrogate for salt marsh degradation processes like sediment loss and conversion to open water. This indicator originates from a U.S. Geological Survey project on an unvegetated to vegetated ratio for coastal wetlands.",
+      "description": "This indicator uses remote sensing to calculate the unvegetated-vegetated ratio of tidal wetlands, which compares how much of a wetland is not covered by plants (e.g., sediment, rocks, open water) to how much is covered by plants. Marshes that maintain a higher proportion of vegetation tend to be more stable and resilient to threats like sea level rise, erosion, and coastal development. This ratio, and how it changes over time, is a good surrogate for salt marsh degradation processes like sediment loss and conversion to open water. This indicator originates from a U.S. Geological Survey project on an unvegetated to vegetated ratio for coastal wetlands.  Data are only available within the extent of the Southeast Conservation Blueprint.",
       "methods": "Data were used without additional modification.",
       "url": "https://secas-fws.hub.arcgis.com/maps/fws::stable-coastal-wetlands-southeast-blueprint-indicator-2023/about"
     },
@@ -316,7 +316,7 @@
         }
       ],
       "nodata_label": "Not within an estimated floodplain or outside floodplain natural landcover data extent",
-      "description": "This indicator measures the amount of natural landcover in the estimated floodplain of rivers and streams within each catchment. It assesses the stream channel and its surrounding riparian buffer, measuring the percent of unaltered habitat like forests, wetlands, or open water (rather than agriculture or development). Intact vegetated buffers within the floodplain of rivers and streams provide aquatic habitat, improve water quality, reduce erosion and flooding, recharge groundwater, and more. This indicator originates from the National Land Cover Database and applies to the Environmental Protection Agency's estimated floodplain, which spatially defines areas estimated to be inundated by a 100-year flood (also known as the 1% annual chance flood).",
+      "description": "This indicator measures the amount of natural landcover in the estimated floodplain of rivers and streams within each catchment. It assesses the stream channel and its surrounding riparian buffer, measuring the percent of unaltered habitat like forests, wetlands, or open water (rather than agriculture or development). Intact vegetated buffers within the floodplain of rivers and streams provide aquatic habitat, improve water quality, reduce erosion and flooding, recharge groundwater, and more. This indicator originates from the National Land Cover Database and applies to the Environmental Protection Agency's estimated floodplain, which spatially defines areas estimated to be inundated by a 100-year flood (also known as the 1% annual chance flood).  Data are only available within the extent of the Southeast Conservation Blueprint.",
       "methods": "Data were used without additional modification.",
       "url": "https://secas-fws.hub.arcgis.com/maps/fws::natural-landcover-in-floodplains-southeast-blueprint-indicator/about"
     },
@@ -362,7 +362,7 @@
         }
       ],
       "nodata_label": "Not within an estimated floodplain or outside floodplain natural landcover data extent",
-      "description": "This indicator measures the amount of natural landcover in the estimated floodplain of rivers and streams within each catchment in the U.S. Caribbean. It assesses the stream channel and its surrounding riparian buffer, measuring the percent of unaltered habitat like forests, wetlands, or open water (rather than agriculture or development) in the floodplain. Intact vegetated buffers within the floodplain of rivers and streams provide aquatic habitat, improve water quality, reduce erosion and flooding, recharge groundwater, and more. This indicator originates from LANDFIRE land cover. It applies to the floodplain predicted to be inundated by a 100-year flood (also known as the 1% annual chance flood), derived from the Federal Emergency Management Agency's National Flood Hazard Layer, and buffered flowlines representing other streams.",
+      "description": "This indicator measures the amount of natural landcover in the estimated floodplain of rivers and streams within each catchment in the U.S. Caribbean. It assesses the stream channel and its surrounding riparian buffer, measuring the percent of unaltered habitat like forests, wetlands, or open water (rather than agriculture or development) in the floodplain. Intact vegetated buffers within the floodplain of rivers and streams provide aquatic habitat, improve water quality, reduce erosion and flooding, recharge groundwater, and more. This indicator originates from LANDFIRE land cover. It applies to the floodplain predicted to be inundated by a 100-year flood (also known as the 1% annual chance flood), derived from the Federal Emergency Management Agency's National Flood Hazard Layer, and buffered flowlines representing other streams.  Data are only available within the extent of the Southeast Conservation Blueprint.",
       "methods": "Data were used without additional modification.",
       "url": "https://secas-fws.hub.arcgis.com/maps/fws::caribbean-natural-landcover-in-floodplains-southeast-blueprint-indicator-2023/about"
     },
@@ -418,7 +418,7 @@
         }
       ],
       "nodata_label": "Not within an estimated floodplain or outside aquatic network complexity data extent",
-      "description": "This indicator depicts the number of connected stream size classes in a river network between dams or waterfalls. River networks with a variety of connected stream classes help retain aquatic biodiversity in a changing climate by allowing species to access climate refugia and move between habitats. This indicator originates from the Southeast Aquatic Resources Partnership and applies to the Environmental Protection Agency's estimated floodplain, which spatially defines areas estimated to be inundated by a 100-year flood (also known as the 1% annual chance flood).",
+      "description": "This indicator depicts the number of connected stream size classes in a river network between dams or waterfalls. River networks with a variety of connected stream classes help retain aquatic biodiversity in a changing climate by allowing species to access climate refugia and move between habitats. This indicator originates from the Southeast Aquatic Resources Partnership and applies to the Environmental Protection Agency's estimated floodplain, which spatially defines areas estimated to be inundated by a 100-year flood (also known as the 1% annual chance flood).  Data are only available within the extent of the Southeast Conservation Blueprint.",
       "methods": "Data were used without additional modification.",
       "url": "https://secas-fws.hub.arcgis.com/maps/fws::network-complexity-southeast-blueprint-indicator-2024/about"
     },
@@ -459,7 +459,7 @@
         }
       ],
       "nodata_label": "Not within an estimated floodplain or outside aquatic network complexity data extent",
-      "description": "This indicator depicts the number of connected stream size classes in a river network between dams or waterfalls in the U.S. Caribbean. River networks with a variety of connected stream classes help retain aquatic biodiversity in a changing climate by allowing species to access climate refugia and move between habitats. This indicator originates from the Southeast Aquatic Resources Partnership. It applies to the estimated floodplain, which spatially defines areas predicted to be inundated by a 100-year flood (also known as the 1% annual chance flood), based on the Federal Emergency Management Agency's National Flood Hazard Layer, and buffered flowlines representing other streams.",
+      "description": "This indicator depicts the number of connected stream size classes in a river network between dams or waterfalls in the U.S. Caribbean. River networks with a variety of connected stream classes help retain aquatic biodiversity in a changing climate by allowing species to access climate refugia and move between habitats. This indicator originates from the Southeast Aquatic Resources Partnership. It applies to the estimated floodplain, which spatially defines areas predicted to be inundated by a 100-year flood (also known as the 1% annual chance flood), based on the Federal Emergency Management Agency's National Flood Hazard Layer, and buffered flowlines representing other streams.  Data are only available within the extent of the Southeast Conservation Blueprint.",
       "methods": "Data were used without additional modification.",
       "url": "https://secas-fws.hub.arcgis.com/maps/fws::caribbean-network-complexity-southeast-blueprint-indicator-2023/about"
     },
@@ -509,7 +509,7 @@
           "color": "#FE5110"
         }
       ],
-      "description": "This indicator uses remote sensing, fire treatment data, and historical landcover models to assess whether an area matches its historical fire regime now and in the recent past (1984-2024). It focuses on fire-adapted forests and grasslands that historically burned at least once every 20 years, which rely on regular, low-intensity fires to maintain habitat, support native plant growth, and reduce wildfire risk. It evaluates departure from historical conditions based on the U.S. Forest Service's fire regime condition classes. This indicator combines Landsat-based fire history metrics from the U.S. Geological Survey, fire treatment data from LANDFIRE, and historical fire regime estimates from LANDFIRE. Development of fire history metrics was supported by Southeast FireMap.",
+      "description": "This indicator uses remote sensing, fire treatment data, and historical landcover models to assess whether an area matches its historical fire regime now and in the recent past (1984-2024). It focuses on fire-adapted forests and grasslands that historically burned at least once every 20 years, which rely on regular, low-intensity fires to maintain habitat, support native plant growth, and reduce wildfire risk. It evaluates departure from historical conditions based on the U.S. Forest Service's fire regime condition classes. This indicator combines Landsat-based fire history metrics from the U.S. Geological Survey, fire treatment data from LANDFIRE, and historical fire regime estimates from LANDFIRE. Development of fire history metrics was supported by Southeast FireMap.  Data are only available within the extent of the Southeast Conservation Blueprint.",
       "methods": "Data were used without additional modification.",
       "url": "https://secas-fws.hub.arcgis.com/datasets/3f19a2af24aa4a54b350896908911927"
     },
@@ -543,7 +543,7 @@
           "color": "#00441B"
         }
       ],
-      "description": "This indicator represents the size of large, unfragmented patches of natural habitat. It identifies minimally disturbed natural areas at least 100 acres in size and greater than 200 meters wide. Large areas of intact natural habitat are important for many wildlife species, including reptiles and amphibians, birds, and large mammals. This indicator originates from Esri's green infrastructure data.",
+      "description": "This indicator represents the size of large, unfragmented patches of natural habitat. It identifies minimally disturbed natural areas at least 100 acres in size and greater than 200 meters wide. Large areas of intact natural habitat are important for many wildlife species, including reptiles and amphibians, birds, and large mammals. This indicator originates from Esri's green infrastructure data.  Data are only available within the extent of the Southeast Conservation Blueprint.",
       "methods": "Data were used without additional modification.",
       "url": "https://secas-fws.hub.arcgis.com/maps/fws::intact-habitat-cores-southeast-blueprint-indicator-2024/about"
     },
@@ -597,7 +597,7 @@
           "color": "#205905"
         }
       ],
-      "description": "This indicator depicts an area's capacity to maintain species diversity and ecosystem function in the face of climate change. It measures two factors that influence resilience. The first, landscape diversity, reflects the number of microhabitats and climatic gradients created by topography, elevation, and hydrology. The second, local connectedness, reflects the degree of habitat fragmentation and strength of barriers to species movement. Highly resilient sites contain many different habitat niches that support biodiversity, and allow species to move freely through the landscape to find suitable microclimates as the climate changes. This indicator originates from The Nature Conservancy's Resilient Land data.",
+      "description": "This indicator depicts an area's capacity to maintain species diversity and ecosystem function in the face of climate change. It measures two factors that influence resilience. The first, landscape diversity, reflects the number of microhabitats and climatic gradients created by topography, elevation, and hydrology. The second, local connectedness, reflects the degree of habitat fragmentation and strength of barriers to species movement. Highly resilient sites contain many different habitat niches that support biodiversity, and allow species to move freely through the landscape to find suitable microclimates as the climate changes. This indicator originates from The Nature Conservancy's Resilient Land data.  Data are only available within the extent of the Southeast Conservation Blueprint.",
       "methods": "Data were used without additional modification.",
       "url": "https://secas-fws.hub.arcgis.com/maps/2db724a1cac14e43a2acc9bc0a33be47/about"
     },
@@ -633,9 +633,9 @@
       "date": "2022",
       "citation": "Allen, Y. 2016. Landscape Scale Assessment of Floodplain Inundation Frequency Using Landsat Imagery. River Research and Applications 32:1609-1620.",
       "url": "https://www.sciencebase.gov/catalog/item/64073c5fd34e76f5f75e379e",
-      "description": "This dataset characterizes the landscape-scale relative inundation frequency. These data can provide information about ecological processes as well as hydrologic alteration in the floodplain. Landsat imagery acquired from 1984-2002 were used to generate multiple observations of inundation extent under varying hydrologic conditions. These data were composited into a landscape mosaic to depict relative inundation frequency over the entire Southeast US. Relative inundation frequency was combined with NLCD 2021 to depict inundation frequency by land cover type.",
-      "valueDescription": "Values show the amount of each land cover class that is in each inundation frequency class within each analysis area.  Only those land cover classes that are present within a given analysis area are shown.",
-      "methods": "Relative inundation frequency was binned into 5 classes and combined with NLCD 2021 land cover classes in order to describe inundation frequency by land cover class.  Data were reprojected from WGS 1984 to match the standard grid used in this tool and clipped to Southeastern states."
+      "description": "This dataset characterizes the landscape-scale relative inundation frequency. These data can provide information about ecological processes as well as hydrologic alteration in the floodplain. Landsat imagery acquired from 1984-2002 were used to generate multiple observations of inundation extent under varying hydrologic conditions. These data were composited into a landscape mosaic to depict relative inundation frequency over the entire Southeast US. Relative inundation frequency was combined with NLCD 2021 to depict inundation frequency by land cover type.  Note: these data are only available for the Southeast Conservation Blueprint extent.",
+      "valueDescription": "Values show the amount of each land cover class that is in each inundation frequency class within each analysis area.  Only those land cover classes that are present within a given analysis area are shown.  Note: these data are only available for the Southeast Conservation Blueprint extent.",
+      "methods": "Relative inundation frequency was binned into 5 classes and combined with NLCD 2021 land cover classes in order to describe inundation frequency by land cover class.  Data were reprojected from WGS 1984 to match the standard grid used in this tool and clipped to Southeastern states.  Note: these data are only available for the Southeast Conservation Blueprint extent."
     },
     {
       "id": "protected_areas",

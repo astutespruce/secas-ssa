@@ -15,6 +15,10 @@ which is available online at https://blueprint.geoplatform.gov/southeast/
 
 See [local development instructions](./Developing.md) for more information.
 
+## Data preparation
+
+See [data preparation methods](./analysis/README.md) for more information.
+
 ## Credits
 
 This project is developed under a grant from the U.S. Fish and Wildlife Service

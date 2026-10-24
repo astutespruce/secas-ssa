@@ -1,3 +1,4 @@
+import numpy as np
 import pandas as pd
 
 from analysis.constants import DATASETS, SLR_DEPTH_VALUES, SLR_NODATA_VALUES, SLR_PROJ_SCENARIOS, SLR_YEARS
@@ -18,25 +19,31 @@ def add_slr_projection_sheet(xlsx: pd.ExcelWriter, df: pd.DataFrame, name_col_wi
     """
     dataset = DATASETS["slr_proj"]
 
-    # transform data into one row per SLR scenario per analysis unit
-    slr = []
-    breaks = []
-    counter = 0
-    for id, row in df.iterrows():
-        # must also have depth to show projection data
-        if row.rasterized_acres == 0 or row.get("slr_depth", None) is None or not len(row.get("slr_proj", [])):
-            slr.append([id, "no", ""] + [""] * len(SLR_YEARS))
-            counter += 1
-        else:
-            for scenario in row.slr_proj:
-                slr.append([id, "yes", SLR_PROJ_SCENARIOS[scenario["scenario"]]] + list(scenario["values"]))
-                counter += 1
+    if "slr_proj" in df.columns:
+        slr_proj = df.slr_proj.explode()
+        ix = slr_proj.isnull()
+        slr_proj.loc[ix] = slr_proj.loc[ix].apply(
+            lambda x: {"scenario": "", "values": [np.nan] * len(proj_value_columns[2:])}
+        )
+        slr_proj = slr_proj.apply(pd.Series).set_index("scenario", append=True)
 
-            breaks.append(counter)
+    else:
+        slr_proj = pd.DataFrame(
+            [{"scenario": "", "values": [np.nan] * len(proj_value_columns[2:])}] * len(df), index=df.index
+        ).set_index("scenario", append=True)
 
-    slr = pd.DataFrame(
-        slr,
-        columns=[df.index.name] + proj_value_columns,
+    values = pd.DataFrame(slr_proj["values"].tolist(), index=slr_proj.index, columns=proj_value_columns[2:])
+    slr_proj = slr_proj.drop(columns=["values"]).join(values).reset_index(level=-1)
+
+    breaks = np.arange(1, len(slr_proj))[slr_proj.index[1:] != slr_proj.index[:-1]].tolist()
+
+    slr_proj["scenario"] = slr_proj.scenario.map(SLR_PROJ_SCENARIOS).fillna("")
+    slr_proj["has_scenario"] = (slr_proj.scenario == "").map({False: "yes", True: "no"})
+
+    slr_proj = (
+        slr_proj[["has_scenario", "scenario"] + proj_value_columns[2:]]
+        .rename(columns={"has_scenario": "Has projected SLR?", "scenario": "SLR scenario"})
+        .reset_index()
     )
 
     column_widths = [name_col_width, 10, 18] + ([12] * len(SLR_YEARS))
@@ -44,7 +51,7 @@ def add_slr_projection_sheet(xlsx: pd.ExcelWriter, df: pd.DataFrame, name_col_wi
     area_columns = area_columns = [1] + list(range(4, len(SLR_YEARS) + 5))
     write_excel(
         xlsx,
-        slr,
+        slr_proj,
         sheet_name=dataset["sheet_name"],
         caption=f"{dataset['name']}.\n{dataset['valueDescription']}",
         column_widths=column_widths,

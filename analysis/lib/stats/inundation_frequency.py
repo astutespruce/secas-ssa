@@ -2,16 +2,14 @@ from collections import defaultdict
 
 import rasterio
 
-from analysis.constants import NLCD_INUNDATION_FREQUENCY, NLCD_INDEXES
+from analysis.constants import NLCD_INDEXES, NLCD_INUNDATION_FREQUENCY
 from api.settings import DATA_DIR
 
 BINS = list(NLCD_INUNDATION_FREQUENCY.keys())
 
 inundation_frequency_dir = DATA_DIR / "inputs/inundation_frequency"
 
-inundation_frequency_filename = (
-    inundation_frequency_dir / "nlcd_inundation_frequency.tif"
-)
+inundation_frequency_filename = inundation_frequency_dir / "nlcd_inundation_frequency.tif"
 
 
 def summarize_nlcd_inundation_frequency_in_aoi(rasterized_geometry):
@@ -33,7 +31,7 @@ def summarize_nlcd_inundation_frequency_in_aoi(rasterized_geometry):
     """
 
     with rasterio.open(inundation_frequency_filename) as src:
-        acres = rasterized_geometry.get_acres_by_bin(src, BINS).round(2)
+        acres = rasterized_geometry.get_acres_by_bin(src, BINS)
 
     results = defaultdict(list)
     for key, entry in NLCD_INUNDATION_FREQUENCY.items():
