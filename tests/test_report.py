@@ -1,11 +1,8 @@
-import os
 import shutil
-from io import BytesIO
 
 import numpy as np
 import pandas as pd
 import pytest
-from dotenv import load_dotenv
 from pyogrio.geopandas import read_dataframe
 
 from analysis.constants import DATA_CRS, DATASETS
@@ -22,10 +19,7 @@ from api.report.xlsx import create_xlsx
 from api.settings import TEMP_DIR
 from api.tasks.report import get_report_inputs
 
-load_dotenv()
-
-# add to .env file to name saving test files
-SAVE_XLSX = bool(os.getenv("TEST_SAVE_XLSX", False))
+pd.options.io.excel.xlsx.reader = "calamine"
 
 
 # mock redis context for set progress
@@ -477,14 +471,14 @@ async def test_create_xlsx_file_single_area(format):
     results = await get_analysis_unit_results(df, datasets)
     xlsx = create_xlsx(results, datasets)
 
-    if SAVE_XLSX:
-        with open("/tmp/test_create_xlsx_file_single_area.xlsx", "wb") as out:
-            _ = out.write(xlsx)
+    filename = "/tmp/test_create_xlsx_file_single_area.xlsx"
+    with open(filename, "wb") as out:
+        _ = out.write(xlsx)
 
-    reader = pd.ExcelFile(BytesIO(xlsx))
+    reader = pd.ExcelFile(filename)
 
     assert len(reader.sheet_names) == len(datasets) + 2
-    summary = reader.parse(sheet_name="Summary", skiprows=2)
+    summary = pd.read_excel(filename, sheet_name="Summary", skiprows=2)
     assert len(summary) == len(df)
 
     assert np.allclose(summary["GIS acres"], results.acres)
@@ -493,12 +487,12 @@ async def test_create_xlsx_file_single_area(format):
     assert np.allclose(summary["Number of areas in analysis unit"], results["count"])
     assert summary["State(s)"].tolist() == results.states.tolist()
 
-    details = reader.parse(sheet_name="Data details", skiprows=2)
+    details = pd.read_excel(filename, sheet_name="Data details", skiprows=2)
     assert len(details) == len(datasets)
     assert details["Name"].tolist() == [d["name"] for id, d in DATASETS.items() if id in datasets]
 
     # skip caption at end
-    landfire_evt = reader.parse(sheet_name="LANDFIRE EVT", skiprows=2)
+    landfire_evt = pd.read_excel(filename, sheet_name="LANDFIRE EVT", skiprows=2)
     assert len(landfire_evt) == 4
     assert landfire_evt.columns.tolist() == [
         "Analysis unit",
@@ -521,7 +515,7 @@ async def test_create_xlsx_file_single_area(format):
     ]
     assert np.allclose(landfire_evt["Acres"], list(results.iloc[0].landfire_evt.values()))
 
-    nlcd_landcover = reader.parse(sheet_name="Landcover trends", skiprows=2)
+    nlcd_landcover = pd.read_excel(filename, sheet_name="Landcover trends", skiprows=2)
     assert (
         nlcd_landcover.columns.tolist()
         == ["Analysis unit", "Analysis area\n(acres)", "Land cover type"] + nlcd_value_columns
@@ -533,7 +527,7 @@ async def test_create_xlsx_file_single_area(format):
             nlcd_landcover[nlcd_value_columns].iloc[i].values, results.nlcd_landcover.iloc[0][landcover_type], atol=1e-4
         )
 
-    slr_depth = reader.parse(sheet_name="SLR inundation area", skiprows=2)
+    slr_depth = pd.read_excel(filename, sheet_name="SLR inundation area", skiprows=2)
     # only nodata is areas outside counties
     slr_depth_col_ix = list(range(11)) + [12]
     slr_value_cols = np.array(slr_depth_value_columns).take(slr_depth_col_ix).tolist()
@@ -546,12 +540,12 @@ async def test_create_xlsx_file_single_area(format):
         results.slr_depth.iloc[0].take(list(range(0, 11)) + [12]),
     )
 
-    slr_proj = reader.parse(sheet_name="Projected SLR", skiprows=2)
+    slr_proj = pd.read_excel(filename, sheet_name="Projected SLR", skiprows=2)
 
     assert slr_proj.columns.tolist() == ["Analysis unit"] + slr_proj_value_columns
     assert slr_proj.iloc[0]["Has projected SLR?"] == "no"
 
-    urban = reader.parse(sheet_name="Urbanization", skiprows=2)
+    urban = pd.read_excel(filename, sheet_name="Urbanization", skiprows=2)
     assert (
         urban.columns.tolist()
         == ["Analysis unit", "Analysis area\n(acres)", "Urbanization level"] + urban_value_columns
@@ -592,14 +586,14 @@ async def test_create_xlsx_file_multiple_areas_partial_overlap(format):
     results = await get_analysis_unit_results(df, datasets)
     xlsx = create_xlsx(results, datasets)
 
-    if SAVE_XLSX:
-        with open("/tmp/test_create_xlsx_file_multiple_areas_partial_overlap.xlsx", "wb") as out:
-            _ = out.write(xlsx)
+    filename = "/tmp/test_create_xlsx_file_multiple_areas_partial_overlap.xlsx"
+    with open(filename, "wb") as out:
+        _ = out.write(xlsx)
 
-    reader = pd.ExcelFile(BytesIO(xlsx))
+    reader = pd.ExcelFile(filename)
 
     assert len(reader.sheet_names) == len(datasets) + 2
-    summary = reader.parse(sheet_name="Summary", skiprows=2)
+    summary = pd.read_excel(filename, sheet_name="Summary", skiprows=2)
     assert len(summary) == len(df)
 
     assert np.allclose(summary["GIS acres"], results.acres)
@@ -608,11 +602,11 @@ async def test_create_xlsx_file_multiple_areas_partial_overlap(format):
     assert np.allclose(summary["Number of areas in analysis unit"], results["count"])
     assert summary["State(s)"].tolist() == results.states.tolist()
 
-    details = reader.parse(sheet_name="Data details", skiprows=2)
+    details = pd.read_excel(filename, sheet_name="Data details", skiprows=2)
     assert len(details) == len(datasets)
     assert details["Name"].tolist() == [d["name"] for id, d in DATASETS.items() if id in datasets]
 
-    slr_depth = reader.parse(sheet_name="SLR inundation area", skiprows=2)
+    slr_depth = pd.read_excel(filename, sheet_name="SLR inundation area", skiprows=2)
     slr_depth_col_ix = list(range(11)) + [12]
     slr_value_cols = np.array(slr_depth_value_columns).take(slr_depth_col_ix).tolist()
     assert (
@@ -624,11 +618,11 @@ async def test_create_xlsx_file_multiple_areas_partial_overlap(format):
         results.slr_depth.iloc[0].take(slr_depth_col_ix),
     )
 
-    slr_proj = reader.parse(sheet_name="Projected SLR", skiprows=2)
+    slr_proj = pd.read_excel(filename, sheet_name="Projected SLR", skiprows=2)
     assert slr_proj.columns.tolist() == ["Analysis unit"] + slr_proj_value_columns
     assert slr_proj["Has projected SLR?"].iloc[:3].tolist() == ["no"] * 3
 
-    urban = reader.parse(sheet_name="Urbanization", skiprows=2, nrows=2)
+    urban = pd.read_excel(filename, sheet_name="Urbanization", skiprows=2, nrows=2)
     assert (
         urban.columns.tolist()
         == ["Analysis unit", "Analysis area\n(acres)", "Urbanization level"] + urban_value_columns
@@ -668,14 +662,14 @@ async def test_create_xlsx_file_multiple_areas(format):
     results = await get_analysis_unit_results(df, datasets)
     xlsx = create_xlsx(results, datasets)
 
-    if SAVE_XLSX:
-        with open("/tmp/test_create_xlsx_file_multiple_areas.xlsx", "wb") as out:
-            _ = out.write(xlsx)
+    filename = "/tmp/test_create_xlsx_file_multiple_areas.xlsx"
+    with open(filename, "wb") as out:
+        _ = out.write(xlsx)
 
-    reader = pd.ExcelFile(BytesIO(xlsx))
+    reader = pd.ExcelFile(filename)
 
     assert len(reader.sheet_names) == len(datasets) + 2
-    summary = reader.parse(sheet_name="Summary", skiprows=2)
+    summary = pd.read_excel(filename, sheet_name="Summary", skiprows=2)
     assert len(summary) == len(df)
 
     assert np.allclose(summary["GIS acres"], results.acres)
@@ -684,11 +678,11 @@ async def test_create_xlsx_file_multiple_areas(format):
     assert np.allclose(summary["Number of areas in analysis unit"], results["count"])
     assert summary["State(s)"].tolist() == results.states.tolist()
 
-    details = reader.parse(sheet_name="Data details", skiprows=2)
+    details = pd.read_excel(filename, sheet_name="Data details", skiprows=2)
     assert len(details) == len(datasets)
     assert details["Name"].tolist() == [d["name"] for id, d in DATASETS.items() if id in datasets]
 
-    slr_depth = reader.parse(sheet_name="SLR inundation area", skiprows=2)
+    slr_depth = pd.read_excel(filename, sheet_name="SLR inundation area", skiprows=2)
     assert (
         slr_depth.columns.tolist()
         == ["Analysis unit", "Analysis area\n(acres)", "Area outside extent of this dataset\n(acres)"]
@@ -697,12 +691,12 @@ async def test_create_xlsx_file_multiple_areas(format):
     # last value is nodata, ignore that for comparison because it is shuffled to a different column
     assert np.allclose(slr_depth[slr_depth_value_columns].iloc[0].values, results.slr_depth.iloc[0][:-1])
 
-    slr_proj = reader.parse(sheet_name="Projected SLR", skiprows=2)
+    slr_proj = pd.read_excel(filename, sheet_name="Projected SLR", skiprows=2)
     assert slr_proj.columns.tolist() == ["Analysis unit"] + slr_proj_value_columns
     assert slr_proj["Has projected SLR?"].iloc[:15].tolist() == ["yes"] * 15
     assert np.allclose(slr_proj.iloc[0][slr_proj_value_columns[2:]].values, results.slr_proj.iloc[0][0]["values"])
 
-    urban = reader.parse(sheet_name="Urbanization", skiprows=2, nrows=2)
+    urban = pd.read_excel(filename, sheet_name="Urbanization", skiprows=2, nrows=2)
     assert (
         urban.columns.tolist()
         == [
@@ -748,14 +742,14 @@ async def test_create_xlsx_file_west_coast(format):
     results = await get_analysis_unit_results(df, datasets)
     xlsx = create_xlsx(results, datasets)
 
-    if SAVE_XLSX:
-        with open("/tmp/test_create_xlsx_file_west_coast.xlsx", "wb") as out:
-            _ = out.write(xlsx)
+    filename = "/tmp/test_create_xlsx_file_west_coast.xlsx"
+    with open(filename, "wb") as out:
+        _ = out.write(xlsx)
 
-    reader = pd.ExcelFile(BytesIO(xlsx))
+    reader = pd.ExcelFile(filename)
 
     assert len(reader.sheet_names) == len(datasets) + 2
-    summary = reader.parse(sheet_name="Summary", skiprows=2)
+    summary = pd.read_excel(filename, sheet_name="Summary", skiprows=2)
     assert len(summary) == len(df)
 
     assert np.allclose(summary["GIS acres"], results.acres)
@@ -764,7 +758,7 @@ async def test_create_xlsx_file_west_coast(format):
     assert np.allclose(summary["Number of areas in analysis unit"], results["count"])
     assert summary["State(s)"].tolist() == results.states.tolist()
 
-    slr_depth = reader.parse(sheet_name="SLR inundation area", skiprows=2)
+    slr_depth = pd.read_excel(filename, sheet_name="SLR inundation area", skiprows=2)
     # drops inland counties because not applicable
     slr_depth_col_ix = list(range(11))
     slr_value_cols = np.array(slr_depth_value_columns).take(slr_depth_col_ix).tolist()
@@ -776,11 +770,11 @@ async def test_create_xlsx_file_west_coast(format):
         slr_depth[slr_value_cols].iloc[0].fillna(0).values, results.slr_depth.iloc[0].take(slr_depth_col_ix)
     )
 
-    slr_proj = reader.parse(sheet_name="Projected SLR", skiprows=2)
+    slr_proj = pd.read_excel(filename, sheet_name="Projected SLR", skiprows=2)
     assert slr_proj.columns.tolist() == ["Analysis unit"] + slr_proj_value_columns
     assert slr_proj["Has projected SLR?"].iloc[:3].tolist() == ["no"]
 
-    urban = reader.parse(sheet_name="Urbanization", skiprows=2, nrows=2)
+    urban = pd.read_excel(filename, sheet_name="Urbanization", skiprows=2, nrows=2)
     assert (
         urban.columns.tolist()
         == ["Analysis unit", "Analysis area\n(acres)", "Urbanization level"] + urban_value_columns

@@ -31,7 +31,7 @@ def add_nlcd_inundation_frequency_sheet(xlsx, df, name_col_width, area_col_width
     inundation_frequency = inundation_frequency.join(
         inundation_frequency.groupby(level=0)[value_columns].sum().sum(axis=1).rename("total_acres")
     )
-    inundation_frequency["label"] = inundation_frequency.label.fillna("")
+    inundation_frequency["label"] = inundation_frequency.label.astype(str).fillna("")
 
     # use first year to calculate nodata
     inundation_frequency["outside_dataset_acres"] = (
