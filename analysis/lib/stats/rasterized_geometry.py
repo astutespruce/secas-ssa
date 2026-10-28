@@ -4,9 +4,9 @@ import shapely
 from analysis.constants import ANALYSIS_BOUNDS, M2_ACRES, STANDARD_RESOLUTION
 from analysis.lib.geometry import to_dict
 from analysis.lib.raster import RasterExtent, WindowGeometryMask
-from api.settings import SHARED_DATA_DIR
+from api.settings import SOUTHEAST_BLUEPRINT_DATA_DIR
 
-data_dir = SHARED_DATA_DIR / "inputs"
+data_dir = SOUTHEAST_BLUEPRINT_DATA_DIR / "inputs"
 bnd_dir = data_dir / "boundaries"
 states_filename = bnd_dir / "states.feather"
 

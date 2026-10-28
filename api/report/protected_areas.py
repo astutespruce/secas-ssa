@@ -12,13 +12,14 @@ def add_protected_areas_sheet(xlsx, df, name_col_width, area_col_width):
         protected_areas = df.protected_areas.explode()
         ix = protected_areas.isnull()
         protected_areas.loc[ix] = protected_areas.loc[ix].apply(
-            lambda x: {"name": "", "owner": "", "gap_status": "", "acres": 0}
+            lambda x: {"name": "no protected areas in this area", "owner": "", "gap_status": "", "acres": np.nan}
         )
         protected_areas = protected_areas.apply(pd.Series)
 
     else:
         protected_areas = pd.DataFrame(
-            [{"name": "", "owner": "", "gap_status": "", "acres": 0}] * len(df), index=df.index
+            [{"name": "no protected areas in this area", "owner": "", "gap_status": "", "acres": np.nan}] * len(df),
+            index=df.index,
         )
 
     protected_areas = df[["acres"]].rename(columns={"acres": "total_acres"}).join(protected_areas)

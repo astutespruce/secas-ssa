@@ -14,7 +14,7 @@ from analysis.constants import DATA_CRS, MASK_RESOLUTION, STANDARD_RESOLUTION
 from analysis.lib.raster import add_overviews, clip_window, create_lowres_mask, remap, shift_window
 
 LANDFIRE_NODATA = np.int16(-9999)
-NODATA = np.uint16(32767)
+NODATA = np.int16(32767)
 WINDOW_SIZE = 4096
 
 
@@ -47,7 +47,7 @@ df = (
 df["alpha"] = 255
 
 df = df.loc[df.src_value != LANDFIRE_NODATA].sort_values(by="label").reset_index(drop=True)
-df["value"] = df.index.astype("uint16")
+df["value"] = df.index.astype("int16")
 df[["value", "label", "group"]].to_feather(out_dir / "landfire_evt.feather")
 
 # Remap values to contiguous integers
@@ -81,7 +81,7 @@ if not outfilename.exists():
 
         meta = {
             "driver": "GTiff",
-            "dtype": "uint16",
+            "dtype": "int16",
             "nodata": NODATA,
             "width": width,
             "height": height,
@@ -89,7 +89,6 @@ if not outfilename.exists():
             "crs": DATA_CRS,
             "transform": transform,
             "compress": "zstd",
-            "predictor": 2,
             "tiled": True,
             "blockxsize": 256,
             "blockysize": 256,
@@ -97,10 +96,8 @@ if not outfilename.exists():
 
         with (
             rasterio.Env(GDAL_CACHEMAX=2048, GDAL_NUM_THREADS="ALL_CPUS"),
-            rasterio.open(outfilename, "w", **meta) as outfile,
+            rasterio.open(outfilename, "w", BIGTIFF="YES", **meta) as outfile,
         ):
-            outfile.write_colormap(1, colormap)
-
             for src in [conus, carib]:
                 # process data by window to avoid running out of memory
                 for window in Bar(message=f"Processing {src.name}", max=len(windows)).iter(windows):
@@ -117,12 +114,15 @@ if not outfilename.exists():
                         continue
 
                     data = src.read(1, window=read_window)
-                    data = remap(data, remap_table, nodata=np.int16(NODATA), fill=np.int16(NODATA)).astype("uint16")
+                    data = remap(data, remap_table, nodata=np.int16(NODATA), fill=np.int16(NODATA)).astype("int16")
 
                     out_window = shift_window(read_window, transform_for_window(read_window, src.transform), transform)
                     outfile.write(data, 1, window=out_window)
 
-            add_overviews(outfilename)
+            # add_overviews(outfilename)
+
+    # with rasterio.open(outfilename, "r+") as outfile:
+    #     outfile.write_colormap(1, colormap)
 
 
 outfilename = out_dir / "landfire_evt_mask.tif"

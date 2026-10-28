@@ -1,3 +1,4 @@
+import numpy as np
 import pandas as pd
 
 from analysis.constants import DATASETS
@@ -17,18 +18,23 @@ def add_indicator_sheet(xlsx, df, dataset_id, name_col_width, area_label):
     tmp = df[["rasterized_acres"]].join(tmp)
 
     # calculate area outside dataset
-    tmp["outside_dataset"] = tmp.rasterized_acres - tmp[columns].sum(axis=1)
+    tmp["outside_dataset_acres"] = tmp.rasterized_acres - tmp[columns].sum(axis=1)
     # remove small rounding-related errors
-    tmp.loc[tmp.outside_dataset < 0, "outside_dataset"] = 0
+    tmp.loc[tmp.outside_dataset_acres < 0, "outside_dataset_acres"] = 0
+
+    tmp.loc[tmp.rasterized_acres == tmp.outside_dataset_acres, columns] = np.nan
 
     # reorder columns
-    tmp = tmp[["rasterized_acres", "outside_dataset"] + columns]
-    has_area_outside = tmp.outside_dataset.max() > 1e-2
+    tmp = tmp[["rasterized_acres", "outside_dataset_acres"] + columns]
+    has_area_outside = tmp.outside_dataset_acres.max() > 1e-2
     if not has_area_outside:
-        tmp = tmp.drop(columns=["outside_dataset"])
+        tmp = tmp.drop(columns=["outside_dataset_acres"])
 
     tmp = tmp.rename(
-        columns={"rasterized_acres": area_label, "outside_dataset": "Area outside extent of this dataset\n(acres)"}
+        columns={
+            "rasterized_acres": area_label,
+            "outside_dataset_acres": "Area outside extent of this dataset\n(acres)",
+        }
     ).reset_index()
 
     column_widths = [name_col_width] + ([col_width] * (len(tmp.columns) - 1))

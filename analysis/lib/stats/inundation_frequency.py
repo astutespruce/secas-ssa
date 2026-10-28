@@ -2,17 +2,36 @@ from collections import defaultdict
 
 import rasterio
 
-from analysis.constants import NLCD_INDEXES, NLCD_INUNDATION_FREQUENCY
+from analysis.constants import DATASETS, NLCD_INDEXES, NLCD_INUNDATION_FREQUENCY
 from api.settings import DATA_DIR
 
 BINS = list(NLCD_INUNDATION_FREQUENCY.keys())
 
-inundation_frequency_dir = DATA_DIR / "inputs/inundation_frequency"
+src_dir = DATA_DIR / "inputs"
 
-inundation_frequency_filename = inundation_frequency_dir / "nlcd_inundation_frequency.tif"
+mask_filename = src_dir / DATASETS["nlcd_inundation_freq"]["filename"].replace(".tif", "_mask.tif")
 
 
-def summarize_nlcd_inundation_frequency_in_aoi(rasterized_geometry):
+def open_rasters(datasets):
+    """Open raster file for each dataset included in dataset_ids
+
+    Parameters
+    ----------
+    dataset_ids : list of str
+        list of dataset IDs
+
+    Returns
+    -------
+    dict
+        {<dataset_id>: <rasterio file handle>, ...}
+    """
+    if "nlcd_inundation_freq" in datasets:
+        return {"nlcd_inundation_freq": rasterio.open(src_dir / DATASETS["nlcd_inundation_freq"]["filename"])}
+
+    return {}
+
+
+def summarize_nlcd_inundation_frequency_in_aoi(src, rasterized_geometry):
     """Calculate the area of overlap between shapes and inundation frequency
     by NLCD 2021 land cover class.
 
@@ -20,6 +39,7 @@ def summarize_nlcd_inundation_frequency_in_aoi(rasterized_geometry):
 
     Parameters
     ----------
+    src : rasterio reader
     rasterized_geometry : RasterizedGeometry
 
     Returns
@@ -30,8 +50,7 @@ def summarize_nlcd_inundation_frequency_in_aoi(rasterized_geometry):
         {<NLCD index>: [<inundation freq bin 0 acres>,...], ...}
     """
 
-    with rasterio.open(inundation_frequency_filename) as src:
-        acres = rasterized_geometry.get_acres_by_bin(src, BINS)
+    acres = rasterized_geometry.get_acres_by_bin(src, BINS)
 
     results = defaultdict(list)
     for key, entry in NLCD_INUNDATION_FREQUENCY.items():

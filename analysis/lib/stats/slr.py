@@ -5,24 +5,45 @@ import rasterio
 import shapely
 
 from analysis.constants import (
+    DATASETS,
     SLR_DEPTH_VALUES,
     SLR_NODATA_VALUES,
     SLR_PROJ_COLUMNS,
     SLR_PROJ_SCENARIOS,
     SLR_YEARS,
 )
-from api.settings import SHARED_DATA_DIR
+from api.settings import SOUTHEAST_BLUEPRINT_DATA_DIR
 
 SLR_BINS = [v["value"] for v in SLR_DEPTH_VALUES + SLR_NODATA_VALUES]
 
 
-src_dir = SHARED_DATA_DIR / "inputs/threats/slr"
-slr_mask_filename = src_dir / "slr_mask.tif"
-depth_filename = src_dir / "slr.tif"
-proj_filename = src_dir / "noaa_1deg_cells.feather"
+src_dir = SOUTHEAST_BLUEPRINT_DATA_DIR / "inputs/threats"
+
+mask_filename = src_dir / DATASETS["slr_depth"]["filename"].replace(".tif", "_mask.tif")
+
+proj_filename = src_dir / DATASETS["slr_proj"]["filename"]
 
 
-def summarize_slr_in_aoi(rasterized_geometry):
+def open_rasters(datasets):
+    """Open raster file for each dataset included in dataset_ids
+
+    Parameters
+    ----------
+    dataset_ids : list of str
+        list of dataset IDs
+
+    Returns
+    -------
+    dict
+        {<dataset_id>: <rasterio file handle>, ...}
+    """
+    if "slr_depth" in datasets or "slr_proj" in datasets:
+        return {"slr_depth": rasterio.open(src_dir / DATASETS["slr_depth"]["filename"])}
+
+    return {}
+
+
+def summarize_slr_in_aoi(src, rasterized_geometry):
     """Calculate the area of overlap between geometries and each level of SLR
     between 0 (currently inundated) and 6 meters.
 
@@ -33,6 +54,7 @@ def summarize_slr_in_aoi(rasterized_geometry):
 
     Parameters
     ----------
+    src : rasterio reader
     rasterized_geometry : RasterizedGeometry
 
     Returns
@@ -41,8 +63,7 @@ def summarize_slr_in_aoi(rasterized_geometry):
         [area for 0ft inundation, area for 1ft, ..., area for 10f, area for nodata cols...]
     """
 
-    with rasterio.open(depth_filename) as src:
-        acres = rasterized_geometry.get_acres_by_bin(src, bins=SLR_BINS)
+    acres = rasterized_geometry.get_acres_by_bin(src, bins=SLR_BINS)
 
     slr_nodata_acres = rasterized_geometry.acres - acres.sum()
     if slr_nodata_acres < 1e-6:

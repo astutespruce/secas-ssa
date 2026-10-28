@@ -24,7 +24,7 @@ def add_landfire_evt_sheet(xlsx, df, name_col_width, area_col_width, area_label)
     landfire_evt.loc[landfire_evt.outside_dataset_acres < 1e-6, "outside_dataset_acres"] = 0
     landfire_evt["label"] = landfire_evt.label.fillna("")
     landfire_evt["group"] = landfire_evt.group.fillna("")
-    landfire_evt["acres"] = landfire_evt.acres.fillna("0")
+    landfire_evt["acres"] = landfire_evt.acres.fillna(np.nan)
 
     breaks = np.arange(1, len(landfire_evt))[landfire_evt.index[1:] != landfire_evt.index[:-1]].tolist()
 

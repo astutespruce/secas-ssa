@@ -21,7 +21,7 @@ def add_ncld_landcover_sheet(xlsx, df, name_col_width, area_col_width, area_labe
     )
     nlcd_landcover["acres"] = nlcd_landcover.acres.astype(object)
     ix = nlcd_landcover.acres.isnull()
-    nlcd_landcover.loc[ix, "acres"] = nlcd_landcover.loc[ix].acres.apply(lambda x: [0] * len(value_columns))
+    nlcd_landcover.loc[ix, "acres"] = nlcd_landcover.loc[ix].acres.apply(lambda x: [np.nan] * len(value_columns))
     # convert acres from list into DataFrame and join
     acres = pd.DataFrame(nlcd_landcover.acres.tolist(), index=nlcd_landcover.index, columns=value_columns)
     nlcd_landcover = nlcd_landcover.drop(columns=["acres"]).join(acres).reset_index(level=-1)
@@ -72,13 +72,13 @@ def add_ncld_impervious_sheet(xlsx, df, name_col_width, area_col_width, area_lab
     dataset = DATASETS["nlcd_impervious"]
 
     nlcd_impervious = df.nlcd_impervious.apply(pd.Series)
-    nlcd_impervious.columns = value_columns
+    nlcd_impervious.columns = value_columns + ["outside_dataset_acres"]
 
     nlcd_impervious = df[["rasterized_acres"]].join(nlcd_impervious)
-    nlcd_impervious["outside_dataset_acres"] = nlcd_impervious.rasterized_acres - nlcd_impervious[value_columns].sum(
-        axis=1
-    )
     nlcd_impervious = nlcd_impervious[["rasterized_acres", "outside_dataset_acres"] + value_columns]
+    nlcd_impervious.loc[nlcd_impervious.rasterized_acres == nlcd_impervious.outside_dataset_acres, value_columns] = (
+        np.nan
+    )
 
     num_left_area_columns = 2
     has_area_outside_dataset = nlcd_impervious.outside_dataset_acres.max() > 1e-2
@@ -94,9 +94,7 @@ def add_ncld_impervious_sheet(xlsx, df, name_col_width, area_col_width, area_lab
     ).reset_index()
 
     column_widths = [name_col_width] + [area_col_width] * num_left_area_columns + ([12] * len(NLCD_YEARS))
-    area_columns = list(range(1, num_left_area_columns + 1)) + list(
-        range(1 + num_left_area_columns + 1, len(value_columns) + num_left_area_columns + 3)
-    )
+    area_columns = list(range(1, len(nlcd_impervious.columns)))
     write_excel(
         xlsx,
         nlcd_impervious,

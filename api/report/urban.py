@@ -25,11 +25,13 @@ def add_urbanization_sheet(xlsx, df, name_col_width, area_col_width, area_label)
     )
     urban["acres"] = urban.acres.astype(object)
     ix = urban.acres.isnull()
-    urban.loc[ix, "acres"] = urban.loc[ix].acres.apply(lambda x: [0] * len(value_columns))
+    urban.loc[ix, "acres"] = urban.loc[ix].acres.apply(lambda x: [np.nan] * len(value_columns))
 
     # convert acres from list into DataFrame and join (nodata already calculated in last position)
     acres = pd.DataFrame(urban.acres.tolist(), index=urban.index, columns=value_columns + ["outside_dataset_acres"])
     urban = urban.drop(columns=["acres"]).join(acres).reset_index(level=-1)
+
+    urban.loc[urban.rasterized_acres == urban.outside_dataset_acres, value_columns] = np.nan
 
     urban["urban_level"] = urban.urban_level.map({"high": "High", "low": "Low"})
 

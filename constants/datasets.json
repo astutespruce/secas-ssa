@@ -57,6 +57,7 @@
   "datasets": [
     {
       "id": "nlcd_landcover",
+      "filename": "nlcd_annual/landcover_{year}.tif",
       "name": "Land cover trends (1985-2025)",
       "sheet_name": "Landcover trends",
       "source": "U.S. Geological Survey",
@@ -69,6 +70,7 @@
     },
     {
       "id": "nlcd_impervious",
+      "filename": "nlcd_annual/impervious_{year}.tif",
       "name": "Impervious surface trends (1985-2025)",
       "sheet_name": "Impervious surface trends",
       "source": "U.S. Geological Survey",
@@ -81,6 +83,7 @@
     },
     {
       "id": "landfire_evt",
+      "filename": "landfire/landfire_evt.tif",
       "name": "LANDFIRE Existing Vegetation Type",
       "sheet_name": "LANDFIRE EVT",
       "source": "LANDFIRE",
@@ -93,18 +96,20 @@
     },
     {
       "id": "urban",
+      "filename": "urban/urban_{year}.tif",
       "name": "Current and projected urbanization",
       "sheet_name": "Urbanization",
       "source": "FUTURES",
       "date": "2023",
       "citation": "Center for Geospatial Analytics, NC State University (June 2023)",
       "url": "https://www.sciencebase.gov/catalog/item/63f50297d34efa0476b04cf7",
-      "description": "The FUTURES urban growth model predicts the likelihood that an area will urbanize at every decade from 2030 to 2100. Developed areas from the 2021 National Landcover Database serve as the baseline for current urban areas. The model simulates landscape change based on trends in population growth, local development suitability factors, and an urban patch-growing algorithm. It considers environmental drivers like distance to floodplain, slope, and available infrastructure, and even socio-economic status. The probability of urbanization for each area reflects how many times it urbanized out of 50 model runs.  Limited to the inland continental Southeast.",
-      "valueDescription": "Current urbanization is derived from NLCD 2021 (legacy version).  Projected urbanization for 2030 through 2100 is based on the proportion of stochastic simulations out of 50 that predicted a given pixel will convert to urban.  The Low level of urbanization includes areas where at least 50% of the runs predicted that a pixel will convert to urban, and the High level of urbanization corresponds to areas where any of the runs predicted that a pixel will urbanize.  To calculate the total amount of urbanization within each analysis area, the proportion of stochastic urbanization simulations that predict urbanization for a given pixel is multiplied by the area associated with each proportion.",
-      "methods": "Urbanization data were converted from floating point probabilities provided by the Center for Geospatial Analytics to the count of stochastic simulations out of 50, and reprojected to match the standard grid used in this tool and clipped to Southeastern states."
+      "description": "The FUTURES urban growth model predicts the likelihood that an area will urbanize at every decade from 2030 to 2100. Developed areas from the 2021 National Landcover Dataset serve as the baseline for current urban areas. The model simulates landscape change based on trends in population growth, local development suitability factors, and an urban patch-growing algorithm. It considers environmental drivers like distance to floodplain, slope, and available infrastructure, and even socio-economic status. The probability of urbanization for each area reflects how many times it urbanized out of 50 model runs.  Data are limited to the continental U.S.",
+      "valueDescription": "Current urbanization is derived from NLCD 2021 (legacy version).  Projected urbanization for 2030 through 2100 is based on the proportion of stochastic simulations out of 50 that predicted a given pixel will convert to urban.  The Low level of urbanization includes areas where at least 50% of the runs predicted that a pixel will convert to urban, and the High level of urbanization corresponds to areas where any of the runs predicted that a pixel will urbanize.  To calculate the total amount of urbanization within each analysis area, the proportion of stochastic urbanization simulations that predict urbanization for a given pixel is multiplied by the area associated with each proportion.  Data are limited to the continental U.S.",
+      "methods": "Urbanization data were converted from floating point probabilities provided by the Center for Geospatial Analytics to the count of stochastic simulations out of 50 and combined with NLCD 2021 to set areas that are already urban or areas outside the extent of NLCD where urbanization data are not available."
     },
     {
       "id": "slr_depth",
+      "filename": "slr/slr.tif",
       "name": "Sea-level rise inundation area",
       "sheet_name": "SLR inundation area",
       "source": "National Oceanic and Atmospheric Administration",
@@ -117,6 +122,7 @@
     },
     {
       "id": "slr_proj",
+      "filename": "slr/noaa_1deg_cells.feather",
       "name": "Projected sea-level rise",
       "sheet_name": "Projected SLR",
       "source": "National Oceanic and Atmospheric Administration",
@@ -124,13 +130,13 @@
       "url": "https://oceanservice.noaa.gov/hazards/sealevelrise/sealevelrise-tech-report.html",
       "date": "2022",
       "description": "Sea-level rise projections are derived from 1-degree grid cells that accompany the 2022 Sea Level Rise Technical Report by NOAA.  Values show the area-weighted mean of 1-degree grid cells that overlap each analysis unit based on a baseline of 2000.  Sea-level rise scenarios correspond to a global sea level rise of between 1, 1.64, 3.2, 4.9, and 6.56 feet.  Note: these data were only extracted for Southeastern states, Puerto Rico, and U.S. Virgin Islands.",
-      "valueDescription": "Sea-level rise projections are derived from 1-degree grid cells that accompany the 2022 Sea Level Rise Technical Report by NOAA.  Values show the area-weighted mean of 1-degree grid cells that overlap each analysis unit based on a baseline of 2000.  Sea-level rise scenarios correspond to a global sea level rise of between 1, 1.64, 3.2, 4.9, and 6.56 feet. Note: these data were only extracted for Southeastern states, Puerto Rico, and U.S. Virgin Islands.\n",
+      "valueDescription": "Sea-level rise projections are derived from 1-degree grid cells that accompany the 2022 Sea Level Rise Technical Report by NOAA.  Values show the area-weighted mean of 1-degree grid cells that overlap each analysis unit based on a baseline of 2000.  Sea-level rise scenarios correspond to a global sea level rise of between 1, 1.64, 3.2, 4.9, and 6.56 feet. Note: these data were only extracted for Southeastern states, Puerto Rico, and U.S. Virgin Islands.",
       "methods": "1-degree grid cell sea-level rise projection data were downloaded from NOAA and limited to those that overlap with areas where sea-level rise inundation depth were modeled by NOAA.  Note: these data were only extracted for Southeastern states, Puerto Rico, and U.S. Virgin Islands."
     },
 
     {
       "id": "se_blueprint_coastalshorelinecondition",
-      "filename": "CoastalShorelineCondition.tif",
+      "filename": "indicators/CoastalShorelineCondition.tif",
       "name": "Coastal shoreline condition",
       "sheet_name": "Coastal shoreline condition",
       "date": "2026",
@@ -169,7 +175,7 @@
     },
     {
       "id": "se_blueprint_caribbeancoastalshorelinecondition",
-      "filename": "CaribbeanCoastalShorelineCondition.tif",
+      "filename": "indicators/CaribbeanCoastalShorelineCondition.tif",
       "name": "Caribbean Coastal shoreline condition",
       "sheet_name": "Caribbean coastal condition",
       "date": "2026",
@@ -193,7 +199,7 @@
     },
     {
       "id": "se_blueprint_resilientcoastalsites",
-      "filename": "ResilientCoastalSites.tif",
+      "filename": "indicators/ResilientCoastalSites.tif",
       "name": "Resilient coastal sites",
       "sheet_name": "Resilient coastal sites",
       "date": "2026",
@@ -247,7 +253,7 @@
     },
     {
       "id": "se_blueprint_stablecoastalwetlands",
-      "filename": "StableCoastalWetlands.tif",
+      "filename": "indicators/StableCoastalWetlands.tif",
       "name": "Stable coastal wetlands",
       "sheet_name": "Stable coastal wetlands",
       "date": "2026",
@@ -277,7 +283,7 @@
     },
     {
       "id": "se_blueprint_naturallandcoverinfloodplains",
-      "filename": "NaturalLandcoverInFloodplains.tif",
+      "filename": "indicators/NaturalLandcoverInFloodplains.tif",
       "name": "Natural landcover in floodplains",
       "sheet_name": "Floodplain natural landcover",
       "date": "2026",
@@ -316,14 +322,14 @@
         }
       ],
       "nodata_label": "Not within an estimated floodplain or outside floodplain natural landcover data extent",
-      "description": "This indicator measures the amount of natural landcover in the estimated floodplain of rivers and streams within each catchment. It assesses the stream channel and its surrounding riparian buffer, measuring the percent of unaltered habitat like forests, wetlands, or open water (rather than agriculture or development). Intact vegetated buffers within the floodplain of rivers and streams provide aquatic habitat, improve water quality, reduce erosion and flooding, recharge groundwater, and more. This indicator originates from the National Land Cover Database and applies to the Environmental Protection Agency's estimated floodplain, which spatially defines areas estimated to be inundated by a 100-year flood (also known as the 1% annual chance flood).  Data are only available within the extent of the Southeast Conservation Blueprint.",
+      "description": "This indicator measures the amount of natural landcover in the estimated floodplain of rivers and streams within each catchment. It assesses the stream channel and its surrounding riparian buffer, measuring the percent of unaltered habitat like forests, wetlands, or open water (rather than agriculture or development). Intact vegetated buffers within the floodplain of rivers and streams provide aquatic habitat, improve water quality, reduce erosion and flooding, recharge groundwater, and more. This indicator originates from the National Land Cover Dataset and applies to the Environmental Protection Agency's estimated floodplain, which spatially defines areas estimated to be inundated by a 100-year flood (also known as the 1% annual chance flood).  Data are only available within the extent of the Southeast Conservation Blueprint.",
       "methods": "Data were used without additional modification.",
       "url": "https://secas-fws.hub.arcgis.com/maps/fws::natural-landcover-in-floodplains-southeast-blueprint-indicator/about"
     },
 
     {
       "id": "se_blueprint_caribbeannaturallandcoverinfloodplains",
-      "filename": "CaribbeanNaturalLandcoverInFloodplains.tif",
+      "filename": "indicators/CaribbeanNaturalLandcoverInFloodplains.tif",
       "name": "Caribbean natural landcover in floodplains",
       "sheet_name": "Caribbean floodplain landcover",
       "date": "2026",
@@ -369,7 +375,7 @@
 
     {
       "id": "se_blueprint_networkcomplexity",
-      "filename": "NetworkComplexity.tif",
+      "filename": "indicators/NetworkComplexity.tif",
       "name": "Aquatic network complexity",
       "sheet_name": "Aquatic network complexity",
       "date": "2026",
@@ -425,7 +431,7 @@
 
     {
       "id": "se_blueprint_caribbeannetworkcomplexity",
-      "filename": "CaribbeanNetworkComplexity.tif",
+      "filename": "indicators/CaribbeanNetworkComplexity.tif",
       "name": "Caribbean aquatic network complexity",
       "sheet_name": "Caribbean network complexity",
       "date": "2026",
@@ -466,7 +472,7 @@
 
     {
       "id": "se_blueprint_firefrequency",
-      "filename": "FireFrequency.tif",
+      "filename": "indicators/FireFrequency.tif",
       "name": "Fire frequency",
       "sheet_name": "Fire frequency",
       "date": "2026",
@@ -515,7 +521,7 @@
     },
     {
       "id": "se_blueprint_intacthabitatcores",
-      "filename": "IntactHabitatCores.tif",
+      "filename": "indicators/IntactHabitatCores.tif",
       "name": "Intact habitat cores",
       "sheet_name": "Intact habitat cores",
       "date": "2026",
@@ -549,7 +555,7 @@
     },
     {
       "id": "se_blueprint_resilientterrestrialsites",
-      "filename": "ResilientTerrestrialSites.tif",
+      "filename": "indicators/ResilientTerrestrialSites.tif",
       "name": "Resilient terrestrial sites",
       "sheet_name": "Resilient terrestrial sites",
       "date": "2026",
@@ -603,6 +609,7 @@
     },
     {
       "id": "sarp_aquatic_barriers",
+      "filename": "boundaries/sarp_huc12_stats.fgb",
       "name": "Aquatic barriers",
       "sheet_name": "Aquatic barriers",
       "source": "Southeast Aquatic Resources Partnership",
@@ -615,6 +622,7 @@
     },
     {
       "id": "sarp_aquatic_network_alteration",
+      "filename": "boundaries/sarp_huc12_stats.fgb",
       "name": "Aquatic network alteration",
       "sheet_name": "Aquatic network alteration",
       "source": "Southeast Aquatic Resources Partnership",
@@ -627,6 +635,7 @@
     },
     {
       "id": "nlcd_inundation_freq",
+      "filename": "inundation_frequency/nlcd_inundation_frequency.tif",
       "name": "Inundation frequency by land cover class",
       "sheet_name": "Inundation frequency",
       "source": "Yvonne Allen, USFWS",
@@ -639,6 +648,7 @@
     },
     {
       "id": "protected_areas",
+      "filename": "boundaries/protected_areas_with_gap_status.fgb",
       "name": "Protected areas (PAD-US)",
       "sheet_name": "Protected areas",
       "source": "U.S. Geological Survey",

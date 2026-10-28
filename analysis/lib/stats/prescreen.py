@@ -4,30 +4,28 @@ import rasterio
 from analysis.constants import ANALYSIS_BOUNDS, DATASETS, MASK_RESOLUTION
 from analysis.lib.geometry import to_dict_all
 from analysis.lib.raster import RasterExtent, WindowGeometryMask
-from analysis.lib.stats.inundation_frequency import inundation_frequency_dir
-from analysis.lib.stats.landfire import src_dir as landfire_dir
-from analysis.lib.stats.nlcd import src_dir as nlcd_dir
+from analysis.lib.stats.inundation_frequency import mask_filename as inundation_frequency_mask_filename
+from analysis.lib.stats.landfire import mask_filename as landfire_mask_filename
+from analysis.lib.stats.nlcd import impervious_mask_filename, landcover_mask_filename
 from analysis.lib.stats.se_blueprint_indicators import src_dir as indicators_dir
-from analysis.lib.stats.slr import src_dir as slr_dir
-from analysis.lib.stats.urban import src_dir as urban_dir
-from api.settings import SHARED_DATA_DIR
-
-data_dir = SHARED_DATA_DIR / "inputs"
+from analysis.lib.stats.slr import mask_filename as slr_mask_filename
+from analysis.lib.stats.urban import mask_filename as urban_mask_filename
 
 lowres_analysis_extent = RasterExtent(ANALYSIS_BOUNDS, resolution=MASK_RESOLUTION)
 
 
-indicators = [d for d in DATASETS.values() if d["id"].startswith("se_")]
-
-# all datasets are pixel-aligned 30m, but may have different origin points
 raster_datasets = {
-    **{d["id"]: indicators_dir / d["filename"].replace(".tif", "_mask.tif") for d in indicators},
-    "landfire_evt": landfire_dir / "landfire_evt_mask.tif",
-    "nlcd_landcover": nlcd_dir / "landcover_mask.tif",
-    "nlcd_impervious": nlcd_dir / "impervious_mask.tif",
-    "nlcd_inundation_freq": inundation_frequency_dir / "nlcd_inundation_frequency_mask.tif",
-    "slr_depth": slr_dir / "slr_mask.tif",
-    "urban": urban_dir / "urban_mask.tif",
+    **{
+        d["id"]: indicators_dir / d["filename"].replace(".tif", "_mask.tif")
+        for d in DATASETS.values()
+        if d["id"].startswith("se_blueprint")
+    },
+    "landfire_evt": landfire_mask_filename,
+    "nlcd_landcover": landcover_mask_filename,
+    "nlcd_impervious": impervious_mask_filename,
+    "nlcd_inundation_freq": inundation_frequency_mask_filename,
+    "slr_depth": slr_mask_filename,
+    "urban": urban_mask_filename,
 }
 
 

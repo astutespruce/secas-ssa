@@ -2,9 +2,12 @@ import pandas as pd
 import shapely
 from pyogrio import read_dataframe
 
+from analysis.constants import DATASETS
 from api.settings import DATA_DIR
 
-huc12_filename = DATA_DIR / "inputs/boundaries/sarp_huc12_stats.fgb"
+src_dir = DATA_DIR / "inputs"
+
+huc12_filename = src_dir / DATASETS["sarp_aquatic_barriers"]["filename"]
 
 
 def extract_sarp_huc12_stats(df, read_mask):

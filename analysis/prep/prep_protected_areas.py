@@ -120,6 +120,6 @@ df.owner.drop_duplicates().to_csv("/tmp/names.csv", index=False)
 # Use FGB (instead of Feather) for more optimal reading by area of interest
 print("Writing files")
 write_dataframe(
-    df[["name", "owner", "gap_status", "geometry"]],
+    df[["name", "owner", "gap_status", "geometry"]].explode(ignore_index=True),
     out_dir / "protected_areas_with_gap_status.fgb",
 )

@@ -62,13 +62,13 @@ def write_excel(
     df.to_excel(xlsx, sheet_name=sheet_name, startrow=data_start_row, index=False)
     ws = xlsx.sheets[sheet_name]
 
-    if caption is not None:
-        add_caption(ws, table_counter=len(xlsx.sheets), caption=caption)
-
     ### set column widths
     for i, width in enumerate(column_widths):
         letter = get_column_letter(i + 1)
         ws.column_dimensions[letter].width = width
+
+    if caption is not None:
+        add_caption(ws, table_counter=len(xlsx.sheets), caption=caption)
 
     ### set cell styles
     for col_idx, col in enumerate(ws.columns):

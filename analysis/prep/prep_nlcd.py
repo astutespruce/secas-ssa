@@ -28,16 +28,13 @@ impervious_colormap = {
 start = time()
 
 # use secas-blueprint boundaries
-bnd_dir = Path("../secas-blueprint/data/inputs/boundaries")
 src_dir = Path("source_data/nlcd_annual")
 out_dir = Path("data/inputs/nlcd_annual")
 out_dir.mkdir(parents=True, exist_ok=True)
-tmp_dir = Path("/tmp")
 
 
 landcover_tifs = sorted(src_dir.glob("landcover/*/*.tif"))
 impervious_tifs = sorted(src_dir.glob("impervious/*/*.tif"))
-
 
 with rasterio.open((landcover_tifs + impervious_tifs)[0]) as src:
     windows = []

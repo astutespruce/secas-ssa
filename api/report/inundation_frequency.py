@@ -22,7 +22,9 @@ def add_nlcd_inundation_frequency_sheet(xlsx, df, name_col_width, area_col_width
     )
     inundation_frequency = inundation_frequency.astype(object)
     ix = inundation_frequency.acres.isnull()
-    inundation_frequency.loc[ix, "acres"] = inundation_frequency.loc[ix].acres.apply(lambda x: [0] * len(value_columns))
+    inundation_frequency.loc[ix, "acres"] = inundation_frequency.loc[ix].acres.apply(
+        lambda x: [np.nan] * len(value_columns)
+    )
     acres = pd.DataFrame(inundation_frequency.acres.tolist(), index=inundation_frequency.index, columns=value_columns)
     inundation_frequency = inundation_frequency.drop(columns=["acres"]).join(acres).reset_index(level=-1)
 

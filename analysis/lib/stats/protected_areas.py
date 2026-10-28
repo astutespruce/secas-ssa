@@ -3,10 +3,13 @@ import pandas as pd
 import shapely
 from pyogrio import read_dataframe
 
-from analysis.constants import M2_ACRES
+from analysis.constants import DATASETS, M2_ACRES
 from api.settings import DATA_DIR
 
-protected_areas_filename = DATA_DIR / "inputs/boundaries/protected_areas_with_gap_status.fgb"
+src_dir = DATA_DIR / "inputs"
+
+protected_areas_filename = src_dir / DATASETS["protected_areas"]["filename"]
+
 columns = ["name", "owner", "gap_status"]
 
 

@@ -439,9 +439,11 @@ async def test_get_analysis_unit_results_west_coast(format):
     assert row.protected_areas[0]["gap_status"] == "2"
     assert np.isclose(row.protected_areas[0]["acres"], 12.8445)
 
-    # TODO: urban will be added
-    # assert list(row.urban.keys()) == ["high", "low"]
-    # assert np.allclose(row.urban["high"], [0, 0, 0, 0, 0, 0, 0, 0, 0, row.rasterized_acres, 0])
+    assert list(row.urban.keys()) == ["high", "low"]
+    assert np.allclose(
+        row.urban["high"],
+        [909.5935, 909.718, 909.718, 909.718, 909.718, 909.718, 909.718, 909.718, 909.718, 4395.058, 0],
+    )
 
 
 @pytest.mark.anyio
@@ -629,13 +631,7 @@ async def test_create_xlsx_file_multiple_areas_partial_overlap(format):
     urban = reader.parse(sheet_name="Urbanization", skiprows=2, nrows=2)
     assert (
         urban.columns.tolist()
-        == [
-            "Analysis unit",
-            "Analysis area\n(acres)",
-            "Area outside extent of this dataset\n(acres)",
-            "Urbanization level",
-        ]
-        + urban_value_columns
+        == ["Analysis unit", "Analysis area\n(acres)", "Urbanization level"] + urban_value_columns
     )
     assert urban["Urbanization level"].tolist() == ["Low", "High"]
     for i, level in enumerate(urban["Urbanization level"].values):
@@ -720,7 +716,9 @@ async def test_create_xlsx_file_multiple_areas(format):
     assert urban["Urbanization level"].tolist() == ["Low", "High"]
     for i, level in enumerate(urban["Urbanization level"].values):
         # last column is nodata, omitted here
-        assert np.allclose(urban[urban_value_columns].iloc[i].values, results.urban.iloc[0][level.lower()][:-1])
+        assert np.allclose(
+            urban[urban_value_columns].iloc[i].fillna(0).values, results.urban.iloc[0][level.lower()][:-1]
+        )
 
 
 @pytest.mark.anyio
@@ -775,8 +773,7 @@ async def test_create_xlsx_file_west_coast(format):
         == ["Analysis unit", "Analysis area\n(acres)", "Area outside extent of this dataset\n(acres)"] + slr_value_cols
     )
     assert np.allclose(
-        slr_depth[slr_value_cols].iloc[0].values,
-        results.slr_depth.iloc[0].take(slr_depth_col_ix),
+        slr_depth[slr_value_cols].iloc[0].fillna(0).values, results.slr_depth.iloc[0].take(slr_depth_col_ix)
     )
 
     slr_proj = reader.parse(sheet_name="Projected SLR", skiprows=2)
@@ -786,13 +783,7 @@ async def test_create_xlsx_file_west_coast(format):
     urban = reader.parse(sheet_name="Urbanization", skiprows=2, nrows=2)
     assert (
         urban.columns.tolist()
-        == [
-            "Analysis unit",
-            "Analysis area\n(acres)",
-            "Area outside extent of this dataset\n(acres)",
-            "Urbanization level",
-        ]
-        + urban_value_columns
+        == ["Analysis unit", "Analysis area\n(acres)", "Urbanization level"] + urban_value_columns
     )
     assert urban["Urbanization level"].tolist() == ["Low", "High"]
     for i, level in enumerate(urban["Urbanization level"].values):

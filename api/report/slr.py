@@ -67,6 +67,8 @@ def add_slr_inundation_sheet(xlsx, df, name_col_width, area_label):
     slr = df[["rasterized_acres"]].join(df.slr_depth.apply(pd.Series))
     slr.columns = ["rasterized_acres"] + depth_value_columns + ["outside_dataset_acres"]
 
+    slr.loc[slr.rasterized_acres == slr.outside_dataset_acres, depth_value_columns] = np.nan
+
     # reorder columns so that nodata comes first
     slr = (
         slr[["rasterized_acres", "outside_dataset_acres"] + depth_value_columns]

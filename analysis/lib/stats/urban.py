@@ -1,19 +1,35 @@
 import numpy as np
 import rasterio
 
-from analysis.constants import (
-    URBAN_BINS,
-    URBAN_PROBABILITIES,
-    URBAN_THRESHOLD,
-    URBAN_YEARS,
-)
-from api.settings import SHARED_DATA_DIR
+from analysis.constants import DATASETS, URBAN_BINS, URBAN_PROBABILITIES, URBAN_THRESHOLD, URBAN_YEARS
+from api.settings import DATA_DIR
 
-src_dir = SHARED_DATA_DIR / "inputs/threats/urban"
-urban_filename = str(src_dir / "urban_{year}.tif")
+src_dir = DATA_DIR / "inputs"
+
+mask_filename = src_dir / DATASETS["urban"]["filename"].format(year="mask")
 
 
-def summarize_urban_in_aoi(rasterized_geometry):
+def open_rasters(dataset_ids):
+    """Open raster file for each nlcd dataset included in dataset_ids
+
+    Parameters
+    ----------
+    dataset_ids : list of str
+        list of dataset IDs
+
+    Returns
+    -------
+    dict
+        {<dataset_id>_<year>: <rasterio file handle>, ...}
+    """
+    if "urban" in dataset_ids:
+        filename = DATASETS["urban"]["filename"]
+        return {f"urban_{year}": rasterio.open(src_dir / filename.format(year=year)) for year in URBAN_YEARS}
+
+    return {}
+
+
+def summarize_urban_in_aoi(files, rasterized_geometry):
     """Calculate the area of overlap between shapes and urbanization
     for each decade from 2030 to 2100.
 
@@ -37,8 +53,7 @@ def summarize_urban_in_aoi(rasterized_geometry):
     low_urban_acres = np.zeros((len(URBAN_YEARS) + 3,))
 
     for year_index, year in enumerate(URBAN_YEARS):
-        with rasterio.open(urban_filename.format(year=year)) as src:
-            urban_prob_acres = rasterized_geometry.get_acres_by_bin(src, URBAN_BINS)
+        urban_prob_acres = rasterized_geometry.get_acres_by_bin(files[f"urban_{year}"], URBAN_BINS)
 
         # high urbanization is sum of acres by probability bin * probability
         high_urban_acres[year_index + 1] = (urban_prob_acres * URBAN_PROBABILITIES).sum()
