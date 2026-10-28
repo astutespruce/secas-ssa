@@ -185,7 +185,7 @@
 					target="_blank"
 				>
 					National Land Cover Database
-				</a> land cover and impervious surface for 1985, 2000, 2015, 2020, and 2024
+				</a> land cover and impervious surface for 1985, 2000, 2015, 2020, and 2025
 			</li>
 			<li>
 				<a href="https://landfire.gov/vegetation/evt" target="_blank">
