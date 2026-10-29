@@ -1,5 +1,5 @@
 import sentry_sdk
-from fastapi import FastAPI
+from fastapi import APIRouter, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.requests import Request
 from fastapi.responses import Response
@@ -11,7 +11,9 @@ from api.routes.report import router as report_router
 from api.settings import ALLOWED_ORIGINS, ENABLE_CORS, SENTRY_DSN
 
 ### Create the main API app and routes
-app = FastAPI(root_path="/api", redoc_url=None, docs_url=None)
+app = FastAPI(redoc_url=None, docs_url=None)
+router = APIRouter(prefix="/api")
+app.include_router(router)
 
 if ENABLE_CORS:
     app.add_middleware(
@@ -22,14 +24,14 @@ if ENABLE_CORS:
     )
 
 
-@app.get("/health", status_code=200)
-@app.head("/health", status_code=200)
+@router.get("/health", status_code=200)
+@router.head("/health", status_code=200)
 async def health_endpoint():
     return Response()
 
 
-app.include_router(jobs_router)
-app.include_router(report_router)
+router.include_router(jobs_router)
+router.include_router(report_router)
 
 ### Setup middleware
 if SENTRY_DSN:
