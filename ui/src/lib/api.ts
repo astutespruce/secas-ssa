@@ -111,7 +111,7 @@ const pollJob = async (jobId: string, onProgress: ProgressCallback) => {
 		return {
 			result: null,
 			error:
-				'network errors were encountered.  The server may be too busy or your network connection may be having problems.  Please try again in a few minutes.'
+				'network errors were encountered. The server may be too busy or your network connection may be having problems. Please try again in a few minutes.'
 		}
 	}
 
@@ -119,13 +119,13 @@ const pollJob = async (jobId: string, onProgress: ProgressCallback) => {
 		captureException('Report job timed out')
 		return {
 			result: null,
-			error: 'timeout while running job.  Your areas may be too big or complex.'
+			error: 'timeout while running job. Your areas may be too big or complex.'
 		}
 	}
 
 	captureException('Job had an unexpected error')
 	return {
 		result: null,
-		error: 'unexpected errors prevented your job from completing successfully.  Please try again.'
+		error: 'unexpected errors prevented your job from completing successfully. Please try again.'
 	}
 }
