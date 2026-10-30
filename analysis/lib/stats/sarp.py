@@ -2,18 +2,23 @@ import pandas as pd
 import shapely
 from pyogrio import read_dataframe
 
+from analysis.constants import DATASETS
 from api.settings import DATA_DIR
 
-huc12_filename = DATA_DIR / "inputs/sarp_huc12_stats.fgb"
+src_dir = DATA_DIR / "inputs"
+
+huc12_filename = src_dir / DATASETS["sarp_aquatic_barriers"]["filename"]
 
 
-def extract_sarp_huc12_stats(df):
+def extract_sarp_huc12_stats(df, read_mask):
     """Extract SARP HUC12 statistics at HUC12 level
 
     Parameters
     ----------
     df : GeoDataFrame
         contains geometries that define the analysis units.
+    read_mask : Polygon or MultiPolygon
+        union of all bounding boxes of features in df, used to read from file
 
     Returns
     -------
@@ -21,9 +26,6 @@ def extract_sarp_huc12_stats(df):
         contains a record with statistics for each record in df
     """
 
-    tmp = df.explode(ignore_index=False, index_parts=False)
-    # use union of individual area bounding boxes to read features
-    read_mask = shapely.union_all(shapely.envelope(tmp.geometry.values))
     # NOTE: pyogrio does not currently work properly for use_arrow=True if the
     # mask does not overlap and returns no features, so we can't use it here.
     huc12 = read_dataframe(

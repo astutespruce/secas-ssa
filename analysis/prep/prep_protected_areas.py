@@ -1,25 +1,18 @@
-from pathlib import Path
 import warnings
+from pathlib import Path
 
-import geopandas as gp
-from pyogrio import read_dataframe, write_dataframe
 import shapely
+from pyogrio import read_dataframe, write_dataframe
 
-from analysis.constants import SECAS_STATES
-from analysis.lib.geometry import make_valid, dissolve
+from analysis.lib.geometry import dissolve, make_valid
 
 warnings.filterwarnings("ignore", message=".*polygon with more than 100 parts.*")
 
-NODATA = 255
-
 src_dir = Path("../secas-blueprint/source_data/protected_areas")
-bnd_dir = Path("../secas-blueprint/data/inputs/boundaries")
 data_dir = Path("data")
-out_dir = data_dir / "inputs/protected_areas"
+out_dir = data_dir / "inputs/boundaries"
 out_dir.mkdir(exist_ok=True)
 
-
-bnd_df = gp.read_feather(bnd_dir / "se_boundary.feather", columns=["geometry"])
 
 ################################################################################
 ### Compile protected areas
@@ -29,7 +22,8 @@ bnd_df = gp.read_feather(bnd_dir / "se_boundary.feather", columns=["geometry"])
 print("Processing PAD-US lands...")
 
 # read specific states; data are already in EPSG:5070
-states = ",".join(f"'{s}'" for s in SECAS_STATES + ["UNKF"])
+states = read_dataframe(out_dir / "states.fgb", columns=["id"], read_geometry=False).sort_values("id").id.tolist()
+states = ",".join(f"'{s}'" for s in states + ["UNKF"])
 df = read_dataframe(
     src_dir / "pad_us4.1.gpkg",
     layer="PADUS4_1Combined_Proclamation_Marine_Fee_Designation_Easement",
@@ -51,16 +45,10 @@ df = read_dataframe(
 df = df.loc[~df.Agg_Src.str.contains("_BOEM_")].drop(columns=["Agg_Src"])
 
 # drop proclamation boundaries but retain military lands that only show up as proclamation
-df = df.loc[(df.Category != "Proclamation") | (df.Des_Tp == "MIL")].reset_index(
-    drop=True
-)
+df = df.loc[(df.Category != "Proclamation") | (df.Des_Tp == "MIL")].reset_index(drop=True)
 
 df = df.drop_duplicates()
 
-
-tree = shapely.STRtree(df.geometry.values)
-ix = tree.query(bnd_df.geometry.values[0], predicate="intersects")
-df = df.iloc[ix].copy()
 
 print("making valid and exploding parts...")
 df["geometry"] = make_valid(df.geometry.values)
@@ -78,9 +66,7 @@ df = df.rename(columns={"Unit_Nm": "name", "Loc_Own": "owner", "GAP_Sts": "gap_s
 df["name"] = df.name.str.replace(".Wilderness Area", " (Wilderness Area)", regex=False)
 
 
-df.loc[(df.owner == "Fee") & (df.Own_Name == "FWS"), "owner"] = (
-    "US Fish and Wildlife Service"
-)
+df.loc[(df.owner == "Fee") & (df.Own_Name == "FWS"), "owner"] = "US Fish and Wildlife Service"
 
 df["owner"] = (
     df.owner.replace("UNK", "")
@@ -92,9 +78,7 @@ df["owner"] = (
     .replace("Private Owners", "Private")
     .replace("NGO", "Non-Governmental Organization")
     .replace("UNITED STATES ARMY", "US Army")
-    .str.replace(
-        "United States of America", "US Federal Government", regex=False, case=False
-    )
+    .str.replace("United States of America", "US Federal Government", regex=False, case=False)
     .replace("United Sates of America", "US Federal Government")
     .replace("US Govt", "US Federal Government")
     .replace("United States Govt", "US Federal Government")
@@ -136,6 +120,6 @@ df.owner.drop_duplicates().to_csv("/tmp/names.csv", index=False)
 # Use FGB (instead of Feather) for more optimal reading by area of interest
 print("Writing files")
 write_dataframe(
-    df[["name", "owner", "gap_status", "geometry"]],
+    df[["name", "owner", "gap_status", "geometry"]].explode(ignore_index=True),
     out_dir / "protected_areas_with_gap_status.fgb",
 )

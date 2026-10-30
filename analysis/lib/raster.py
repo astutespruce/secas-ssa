@@ -10,6 +10,8 @@ from rasterio.enums import Resampling
 from rasterio.mask import geometry_mask
 from rasterio.vrt import WarpedVRT
 from rasterio.windows import Window
+from rasterio.windows import bounds as window_bounds
+from rasterio.windows import transform as transform_for_window
 
 from analysis.constants import DATA_CRS, OVERVIEW_FACTORS
 
@@ -85,6 +87,7 @@ def unique(arr):
 @nb.njit(
     [
         "uint8[:,:](uint8[:,:],uint8[:,:],uint8,uint8)",
+        "int16[:,:](int16[:,:],int16[:,:],int16,int16)",
         "uint16[:,:](uint16[:,:],uint16[:,:],uint16,uint16)",
     ],
     cache=True,
@@ -120,7 +123,7 @@ def remap(arr, remap_table, nodata, fill):
     for i in range(len(remap_table)):
         table[remap_table[i][0]] = remap_table[i][1]
 
-    out = np.ones_like(arr) * fill
+    out = np.full(shape=arr.shape, fill_value=fill)
 
     for i in range(rows):
         for j in range(cols):
@@ -131,37 +134,6 @@ def remap(arr, remap_table, nodata, fill):
                 out[i, j] = table[value]
 
     return out
-
-
-def get_window(dataset, bounds, boundless=True):
-    """Calculate the window into dataset that contains bounds, for boundless reading.
-
-    If boundless is False and the window falls outside the bounds of the dataset,
-    one or both of the dimensions may be 0.
-
-    Parameters
-    ----------
-    dataset : open rasterio dataset
-    bounds : list-like of [xmin, ymin, xmax, ymax]
-    boundless : bool, optional (default: True)
-        if True, returned window may extend beyond the dataset
-
-    Returns
-    -------
-    rasterio.windows.Window instance
-    """
-    window = dataset.window(*bounds)
-    window_floored = window.round_offsets(op="floor", pixel_precision=3)
-    col_off = window_floored.col_off
-    row_off = window_floored.row_off
-    width = math.ceil(window.width + window.col_off - window_floored.col_off)
-    height = math.ceil(window.height + window.row_off - window_floored.row_off)
-
-    window = Window(col_off, row_off, width, height)
-    if boundless:
-        return window
-
-    return clip_window(window, dataset.width, dataset.height)
 
 
 def clip_window(window, max_width, max_height):
@@ -216,27 +188,6 @@ def shift_window(window, window_transform, transform):
     col_off = int(round((window_transform.c - transform.c) / transform.a))
     row_off = int(round((window_transform.f - transform.f) / transform.e))
     return Window(col_off=col_off, row_off=row_off, width=window.width, height=window.height)
-
-
-def boundless_raster_geometry_mask(dataset, shapes, bounds, all_touched=False):
-    """Alternative to rasterio.mask::raster_geometry_mask that allows boundless
-    reads from raster data sources.
-
-    Parameters
-    ----------
-    dataset : open rasterio dataset
-    shapes : list-like of geometry objects that provide __geo_interface__
-    bounds : list-like of [xmin, ymin, xmax, ymax]
-    all_touched : bool, optional (default: False)
-    """
-
-    window = get_window(dataset, bounds)
-
-    transform = dataset.window_transform(window)
-    out_shape = (int(window.height), int(window.width))
-    mask = geometry_mask(shapes, transform=transform, out_shape=out_shape, all_touched=all_touched)
-
-    return mask, transform, window
 
 
 def create_lowres_mask(filename, outfilename, resolution, ignore_zero=False):
@@ -362,7 +313,7 @@ def window_overlaps(window, dataset):
 
     Parameters
     ----------
-    window : reasterio.wndows.Window
+    window : reasterio.windows.Window
     dataset : open rasterio dataset
 
     Returns
@@ -376,57 +327,6 @@ def window_overlaps(window, dataset):
     return False
 
 
-def get_overlapping_windows(src, geometry, bounds, window_size):
-    """Extract windows of window_size for reading from src that overlap with
-    geometry.
-
-    Parameters
-    ----------
-    src : open rasterio Dataset
-    geometry : shapely geometry
-    bounds : [xmin, ymin, xmax, ymax]
-        Bounds of geometry
-    window_size : int
-
-    Returns
-    -------
-
-    tuple of:
-        (
-            ndarray of rasterio.windows.Window,
-            ratio of number of overlapping windows to total number of windows in extent
-        )
-    """
-
-    # Select all windows that intersect geometry
-    res = src.res[0]
-    src_bounds = src.bounds
-    start_row = math.floor(math.floor((src_bounds[3] - bounds[3]) / res) / window_size) * window_size
-    end_row = math.ceil(math.ceil((src_bounds[3] - bounds[1]) / res) / window_size) * window_size + 1
-    start_col = math.floor(math.floor((bounds[0] - src_bounds[0]) / res) / window_size) * window_size
-    end_col = math.ceil(math.ceil((bounds[2] - src_bounds[0]) / res) / window_size) * window_size + 1
-
-    windows = [
-        Window(row_off=row_off, col_off=col_off, width=window_size, height=window_size)
-        for row_off, col_off in product(
-            range(start_row, end_row, window_size),
-            range(start_col, end_col, window_size),
-        )
-    ]
-
-    total_windows = len(windows)
-
-    if total_windows == 0:
-        return [], 0
-
-    window_boxes = shapely.box(*np.array([src.window_bounds(w) for w in windows]).T)
-    shapely.prepare(geometry)
-    ix = shapely.intersects(geometry, window_boxes)
-    windows = np.array(windows)[ix]
-
-    return windows, len(windows) / total_windows
-
-
 class WindowGeometryMask(object):
     """Geometry mask with an associated read window for optimized
     reading from the dataset
@@ -434,18 +334,19 @@ class WindowGeometryMask(object):
     NOTE: all pixels within geometry mask are True
     """
 
-    def __init__(self, dataset, window, shapes, all_touched=False):
+    def __init__(self, transform, window, shapes, all_touched=False):
         """Create full resolution geometry mask and associated read window
 
         Parameters
         ----------
-        dataset : open rasterio dataset
+        transform : Affine
+            transform for the full extent that is the basis for window
         window : rasterio.windows.Window
         shapes : list-like of GeoJSON geometry objects
         """
-        self.dataset_transform = dataset.transform
+        self.transform = transform
         self.window = window
-        self.window_transform = dataset.window_transform(window)
+        self.window_transform = transform_for_window(window, transform)
         self.shape_mask = geometry_mask(
             shapes,
             transform=self.window_transform,
@@ -453,6 +354,15 @@ class WindowGeometryMask(object):
             all_touched=all_touched,
             invert=True,
         )
+
+        # DEBUG:
+        # write_raster(
+        #     "/tmp/shape_mask.tif",
+        #     self.shape_mask.astype("uint8"),
+        #     transform=self.window_transform,
+        #     crs=DATA_CRS,
+        #     nodata=0,
+        # )
 
     def detect_data(self, dataset):
         """Detect if there are any non-NODATA pixel values in the dataset within
@@ -470,10 +380,11 @@ class WindowGeometryMask(object):
         bool
             returns True if there are non-NODATA pixel values present
         """
-        if dataset.transform.a != self.dataset_transform.a or dataset.transform.e != self.dataset_transform.e:
+
+        if dataset.transform.a != self.transform.a or dataset.transform.e != self.transform.e:
             raise ValueError(f"{dataset.name} resolution does not match that used for mask windows")
 
-        if dataset.transform == self.dataset_transform:
+        if dataset.transform == self.transform:
             read_window = self.window
 
         else:
@@ -506,12 +417,12 @@ class WindowGeometryMask(object):
             Total number of pixels for each bin
         """
         # DEBUG: check for implementation errors
-        if dataset.transform.a != self.dataset_transform.a or dataset.transform.e != self.dataset_transform.e:
+        if dataset.transform.a != self.transform.a or dataset.transform.e != self.transform.e:
             raise ValueError(f"{dataset.name} resolution does not match that used for mask windows")
 
         read_window = (
             self.window
-            if dataset.transform == self.dataset_transform
+            if dataset.transform == self.transform
             else shift_window(self.window, self.window_transform, dataset.transform)
         )
         nodata = getattr(np, dataset.dtypes[0])(dataset.nodata)
@@ -526,3 +437,97 @@ class WindowGeometryMask(object):
         # extract values inside geometry except where they are NODATA
         count_values_inplace(data, self.shape_mask, out, nodata)
         return out
+
+
+class RasterExtent:
+    """Helper class to calculate windows instead of having an extent raster"""
+
+    def __init__(self, bounds: list[float], resolution: float):
+        self.bounds = bounds
+        self.resolution = resolution
+        self.transform = Affine(resolution, 0, bounds[0], 0, -resolution, bounds[3])
+        self.width = math.ceil((bounds[2] - bounds[0]) / resolution)
+        self.height = math.ceil((bounds[3] - bounds[1]) / resolution)
+
+    def window_bounds(self, window: Window):
+        return window_bounds(window, self.transform)
+
+    def window_transform(self, window: Window):
+        return transform_for_window(window, self.transform)
+
+    def get_overlapping_windows(self, geometry, bounds, window_size):
+        """Extract windows of window_size for reading within extent that overlap with
+        geometry.
+
+        Parameters
+        ----------
+        geometry : shapely geometry
+        bounds : [xmin, ymin, xmax, ymax]
+            Bounds of geometry
+        window_size : int
+
+        Returns
+        -------
+
+        tuple of:
+            (
+                ndarray of rasterio.windows.Window,
+                ratio of number of overlapping windows to total number of windows in extent
+            )
+        """
+
+        # Select all windows that intersect geometry
+        start_row = math.floor(math.floor((self.bounds[3] - bounds[3]) / self.resolution) / window_size) * window_size
+        end_row = math.ceil(math.ceil((self.bounds[3] - bounds[1]) / self.resolution) / window_size) * window_size + 1
+        start_col = math.floor(math.floor((bounds[0] - self.bounds[0]) / self.resolution) / window_size) * window_size
+        end_col = math.ceil(math.ceil((bounds[2] - self.bounds[0]) / self.resolution) / window_size) * window_size + 1
+
+        windows = [
+            Window(row_off=row_off, col_off=col_off, width=window_size, height=window_size)
+            for row_off, col_off in product(
+                range(start_row, end_row, window_size),
+                range(start_col, end_col, window_size),
+            )
+        ]
+
+        total_windows = len(windows)
+
+        if total_windows == 0:
+            return [], 0
+
+        window_boxes = shapely.box(*np.array([self.window_bounds(w) for w in windows]).T)
+        shapely.prepare(geometry)
+        ix = shapely.intersects(geometry, window_boxes)
+        windows = np.array(windows)[ix]
+
+        return windows, len(windows) / total_windows
+
+    def get_window(self, bounds, boundless=True):
+        """Calculate the window into extent that contains bounds, for boundless reading.
+
+        If boundless is False and the window falls outside the bounds of the extent,
+        one or both of the dimensions may be 0.
+
+        Parameters
+        ----------
+        bounds : list-like of [xmin, ymin, xmax, ymax]
+        boundless : bool, optional (default: True)
+            if True, returned window may extend beyond the dataset
+
+        Returns
+        -------
+        rasterio.windows.Window instance
+        """
+
+        start_row = math.floor((self.bounds[3] - bounds[3]) / self.resolution)
+        end_row = math.ceil((self.bounds[3] - bounds[1]) / self.resolution)
+        start_col = math.floor((bounds[0] - self.bounds[0]) / self.resolution)
+        end_col = math.ceil((bounds[2] - self.bounds[0]) / self.resolution)
+        height = end_row - start_row
+        width = end_col - start_col
+
+        window = Window(col_off=start_col, row_off=start_row, width=width, height=height)
+        if boundless:
+            return window
+
+        return clip_window(window, self.width, self.height)

@@ -21,12 +21,13 @@ data/inputs/nlcd_annual/*
 data/inputs/protected_areas/*
 !data/inputs/protected_areas/README.md
 data/inputs/sarp*
-!data/inputs/sarp/README.md
+!data/inputs/README.md
 data/inputs/threats/slr/*
-!data/inputs/threats/slr/README.md
-data/inputs/threats/urban/*
-!data/inputs/threats/urban/README.md
+!data/inputs/slr/README.md
+data/inputs/urban/*
+!data/inputs/urban/README.md
 data/inputs/inundation_frequency
+
 
 /source_data/inundation_frequency/*
 !/source_data/inundation_frequency/README.md

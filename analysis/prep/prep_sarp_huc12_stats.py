@@ -1,19 +1,18 @@
-import geopandas as gp
+from pathlib import Path
+
 import numpy as np
 import shapely
-from pyogrio import read_dataframe, read_info, write_dataframe
+from pyogrio import read_dataframe, write_dataframe
 
-from analysis.constants import DATA_CRS, SECAS_STATES
-from api.settings import SHARED_DATA_DIR
+from analysis.constants import DATA_CRS
+from api.settings import DATA_DIR
 
-crs = read_info("source_data/sarp/huc12_stats.fgb")["crs"]
+src_dir = Path("source_data/sarp/")
 
-states = gp.read_feather(SHARED_DATA_DIR / "inputs/boundaries/states.feather").to_crs(crs)
-states = states.loc[states.id.isin(SECAS_STATES)]
-read_mask = shapely.union_all(shapely.envelope(states.geometry.values))
-df = read_dataframe("source_data/sarp/huc12_stats.fgb", use_arrow=True, mask=read_mask).to_crs(DATA_CRS)
+df = read_dataframe(src_dir / "huc12_stats.fgb", use_arrow=True).to_crs(DATA_CRS)
 
-states = states.to_crs(DATA_CRS)
-ix = np.unique(shapely.STRtree(df.geometry.values).query(states.geometry.values, predicate="intersects")[1])
+states = read_dataframe(DATA_DIR / "inputs/boundaries/states.fgb", columns=[], use_arrow=True)
+bnd = shapely.coverage_union_all(states.geometry.values)
+ix = np.unique(shapely.STRtree(df.geometry.values).query(bnd, predicate="intersects"))
 df = df.take(ix).sort_values(by="geometry")
-write_dataframe(df, "data/inputs/sarp_huc12_stats.fgb")
+write_dataframe(df, "data/inputs/boundaries/sarp_huc12_stats.fgb")

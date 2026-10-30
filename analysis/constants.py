@@ -13,31 +13,16 @@ M_MILES = 0.000621371
 STANDARD_RESOLUTION = 30  # meters
 AREA_PRECISION = 2
 
+
+# these are the union of NLCD CONUS and Southeast Blueprint, expanded to full pixels
+ANALYSIS_BOUNDS = [-2415585.0, -79155.0, 3418905.0, 3314805.0]
+
+
 # 32 is OK for regional level maps; 16 is more typical for big areas like ACF
 OVERVIEW_FACTORS = [2, 4, 8, 16, 32]
 
 MASK_RESOLUTION = 480  # meters
 
-SECAS_STATES = [
-    "AL",
-    "AR",
-    "FL",
-    "GA",
-    "KY",
-    "LA",
-    "MS",
-    "MO",
-    "MS",
-    "NC",
-    "OK",
-    "PR",
-    "SC",
-    "TN",
-    "TX",
-    "VA",
-    "VI",
-    "WV",
-]
 
 NLCD_YEARS = [1985, 2000, 2015, 2020, 2025]
 
@@ -104,7 +89,6 @@ SLR_NODATA_VALUES = [
         "key": "not_applicable",
         "label": "Sea-level rise unlikely to be a threat (inland counties)",
     },
-    {"value": 13, "key": "not_available", "label": "Sea-level rise data unavailable"},
 ]
 SLR_YEARS = [2020, 2030, 2040, 2050, 2060, 2070, 2080, 2090, 2100]
 SLR_PROJ_SCENARIOS = {
@@ -137,5 +121,5 @@ datasets_json = json.loads(open(json_dir / "datasets.json").read())
 DATASETS = {e["id"]: e for e in datasets_json["datasets"]}
 CATEGORIES = {e["id"]: e for e in datasets_json["categories"]}
 
-LANDFIRE_CODES = json.loads(open(json_dir / "landfire_evt.json").read())
-LANDFIRE_INDEXES = {i: e for i, e in enumerate(LANDFIRE_CODES.values())}
+# this is calculated after extracting LANDFIRE data and used for indexes
+NUM_LANDFIRE_VALUES = 862

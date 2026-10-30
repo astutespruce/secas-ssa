@@ -3,33 +3,34 @@ import pandas as pd
 import shapely
 from pyogrio import read_dataframe
 
-from analysis.constants import M2_ACRES
+from analysis.constants import DATASETS, M2_ACRES
 from api.settings import DATA_DIR
 
-protected_areas_filename = DATA_DIR / "inputs/protected_areas/protected_areas_with_gap_status.fgb"
+src_dir = DATA_DIR / "inputs"
+
+protected_areas_filename = src_dir / DATASETS["protected_areas"]["filename"]
+
 columns = ["name", "owner", "gap_status"]
 
 
-def extract_protected_area_stats(df):
+def extract_protected_area_stats(df, read_mask):
     """Extract intersection of areas of interest with protected areas data
 
-        Parameters
-        ----------
+    Parameters
+    ----------
     df : GeoDataFrame
         area of interest
+    read_mask : Polygon or MultiPolygon
+        union of all bounding boxes of features in df, used to read from file
 
-        Returns
-        -------
-        DataFrame
-            one row per original row with list of protected area info [{"name": <>, "owner": <>, "gap_status": <>, "acres": <>}, ...]
+    Returns
+    -------
+    DataFrame
+        one row per original row with list of protected area info [{"name": <>, "owner": <>, "gap_status": <>, "acres": <>}, ...]
 
     """
 
     index_name = df.index.name or "index"
-
-    tmp = df.explode(ignore_index=False, index_parts=False)
-    # use union of individual area bounding boxes to read features
-    read_mask = shapely.union_all(shapely.envelope(tmp.geometry.values))
 
     # NOTE: pyogrio does not currently work properly for use_arrow=True if the
     # mask does not overlap and returns no features, so we can't use it here.

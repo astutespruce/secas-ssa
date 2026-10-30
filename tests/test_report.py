@@ -1,11 +1,8 @@
-import os
 import shutil
-from io import BytesIO
 
 import numpy as np
 import pandas as pd
 import pytest
-from dotenv import load_dotenv
 from pyogrio.geopandas import read_dataframe
 
 from analysis.constants import DATA_CRS, DATASETS
@@ -22,10 +19,7 @@ from api.report.xlsx import create_xlsx
 from api.settings import TEMP_DIR
 from api.tasks.report import get_report_inputs
 
-load_dotenv()
-
-# add to .env file to name saving test files
-SAVE_XLSX = bool(os.getenv("TEST_SAVE_XLSX", False))
+pd.options.io.excel.xlsx.reader = "calamine"
 
 
 # mock redis context for set progress
@@ -244,14 +238,7 @@ async def test_get_analysis_unit_results_single_area(format):
     results = await get_analysis_unit_results(df, datasets)
 
     assert len(results) == len(df)
-    for col in [
-        "states",
-        "count",
-        "acres",
-        "rasterized_acres",
-        "overlap_acres",
-        "outside_extent_acres",
-    ]:
+    for col in ["states", "count", "acres", "rasterized_acres"]:
         assert col in results.columns
 
     row = results.iloc[0]
@@ -259,25 +246,16 @@ async def test_get_analysis_unit_results_single_area(format):
     assert row.states == "Alabama"
     assert row["count"] == 1
     assert np.isclose(row.acres, 51.026)
-    assert np.isclose(row.rasterized_acres, 50.7059)
-    assert np.isclose(row.overlap_acres, 50.7059)
-    assert np.isclose(row.outside_extent_acres, 0)
+
+    assert np.isclose(row.rasterized_acres, 50.9283)
 
     # Landfire EVT is stored as a dict of indexes and acres
-    assert list(row.landfire_evt.keys()) == [64, 93, 133, 496]
-    assert np.allclose(list(row.landfire_evt.values()), [10.8973, 3.1135, 36.0279, 0.6672], atol=1e-4)
+    assert list(row.landfire_evt.keys()) == [656, 658, 706, 714]
+    assert np.allclose(list(row.landfire_evt.values()), [3.1135, 0.6672, 36.2503, 10.8973], atol=1e-4)
 
     # NLCD landcover is stored as a dict of arrays
-    assert list(row.nlcd_landcover.keys()) == [
-        "Deciduous forest",
-        "Evergreen forest",
-        "Mixed forest",
-    ]
-    assert np.allclose(
-        row.nlcd_landcover["Deciduous forest"],
-        [48.2596, 48.9268, 48.9268, 48.9268, 48.9268],
-        atol=1e-4,
-    )
+    assert list(row.nlcd_landcover.keys()) == ["Deciduous forest", "Evergreen forest", "Mixed forest"]
+    assert np.allclose(row.nlcd_landcover["Deciduous forest"], [48.4820, 49.1492, 49.1492, 49.1492, 49.1492], atol=1e-4)
 
     assert len(row.protected_areas) == 1
     assert row.protected_areas[0]["name"] == "Talladega National Forest"
@@ -286,10 +264,10 @@ async def test_get_analysis_unit_results_single_area(format):
     assert np.isclose(row.protected_areas[0]["acres"], 34.5465)
 
     assert len(row.slr_depth) == 14
-    assert np.allclose(row.slr_depth, [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 50.705946, 0])
+    assert np.allclose(row.slr_depth, [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, row.rasterized_acres, 0])
 
     assert list(row.urban.keys()) == ["high", "low"]
-    assert np.allclose(row.urban["high"], [0, 0, 0, 0, 0, 0, 0, 0, 0, 50.705946, 0])
+    assert np.allclose(row.urban["high"], [0, 0, 0, 0, 0, 0, 0, 0, 0, row.rasterized_acres, 0])
 
 
 @pytest.mark.anyio
@@ -303,33 +281,14 @@ async def test_get_analysis_unit_results_multiple_areas_partial_overlap(format):
     results = await get_analysis_unit_results(df, datasets)
 
     assert len(results) == len(df)
-    for col in [
-        "states",
-        "count",
-        "acres",
-        "rasterized_acres",
-        "overlap_acres",
-        "outside_extent_acres",
-    ]:
+    for col in ["states", "count", "acres", "rasterized_acres"]:
         assert col in results.columns
 
-    assert results.states.fillna("").values.tolist() == [
-        "North Carolina",
-        "",
-        "Missouri",
-    ]
+    assert results.states.fillna("").values.tolist() == ["North Carolina", "Minnesota", "Missouri"]
 
     assert results["count"].values.tolist() == [1] * 3
     assert np.allclose(results["acres"], [280.4020, 394.7394, 68.8730])
-    assert np.allclose(results["rasterized_acres"], [280.6619, 397.4190, 69.6095])
-    assert np.allclose(results["rasterized_acres"], [280.6619, 397.4190, 69.6095])
-    assert np.allclose(results["outside_extent_acres"], [0, 397.4190, 0])
-
-    outside_row = results.iloc[1]
-    assert np.isnan(outside_row.landfire_evt)
-    assert np.isnan(outside_row.nlcd_landcover)
-    assert np.isnan(outside_row.slr_depth)
-    assert np.isnan(outside_row.urban)
+    assert np.allclose(results["rasterized_acres"], [279.9947, 396.7518, 69.8319])
 
 
 @pytest.mark.anyio
@@ -351,8 +310,7 @@ async def test_get_analysis_unit_results_multiple_areas_partial_overlap_dissolve
     assert results["count"].values.tolist() == [3]
 
     assert np.allclose(results["acres"], [744.0144])
-    assert np.allclose(results["rasterized_acres"], [747.6904])
-    assert np.allclose(results["outside_extent_acres"], [397.4190])
+    assert np.allclose(results["rasterized_acres"], [746.5783])
 
 
 @pytest.mark.anyio
@@ -365,21 +323,13 @@ async def test_get_analysis_unit_results_multiple_areas(format):
     results = await get_analysis_unit_results(df, datasets)
 
     assert len(results) == len(df)
-    for col in [
-        "states",
-        "count",
-        "acres",
-        "rasterized_acres",
-        "overlap_acres",
-        "outside_extent_acres",
-    ]:
+    for col in ["states", "count", "acres", "rasterized_acres"]:
         assert col in results.columns
 
     assert results.states.fillna("").values.tolist() == ["Georgia", "Florida", "Mississippi", "Puerto Rico", ""]
     assert results["count"].values.tolist() == [1] * 5
     assert np.allclose(results["acres"], [313.13876187, 40.55673456, 99.02771972, 147.19913421, 5386.09794185])
-    assert np.allclose(results["rasterized_acres"], [312.241878, 40.698, 99.187947, 147.0027645, 5386.1723955])
-    assert np.allclose(results["outside_extent_acres"], [0, 0, 0, 0, 0])
+    assert np.allclose(results["rasterized_acres"].tolist(), [312.6867, 41.1430, 99.1879, 147.2252, 5386.8396])
 
     ga_poly = results.iloc[0]
     fl_poly = results.iloc[1]
@@ -393,10 +343,10 @@ async def test_get_analysis_unit_results_multiple_areas(format):
 
     assert np.allclose(
         fl_poly.slr_depth,
-        [25.1306, 38.9190, 40.6982, 40.6982, 40.6982, 40.6982, 40.6982, 40.6982, 40.6982, 40.6982, 40.6982, 0, 0, 0],
+        [25.5754, 39.3638, 41.1430, 41.1430, 41.1430, 41.1430, 41.1430, 41.1430, 41.1430, 41.1430, 41.1430, 0, 0, 0],
     )
 
-    assert np.allclose(pr_poly.slr_depth, [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 147.0028, 0, 0])
+    assert np.allclose(pr_poly.slr_depth, [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, pr_poly.rasterized_acres, 0, 0])
 
     pr_slr_proj = pr_poly.slr_proj
     assert len(pr_slr_proj) == 5
@@ -408,16 +358,86 @@ async def test_get_analysis_unit_results_multiple_areas(format):
 
     assert np.allclose(
         ga_poly.urban["low"],
-        [22.9066, 22.9066, 22.9066, 22.9066, 22.9066, 22.9066, 22.9066, 22.9066, 22.9066, 289.3352, 0.0],
+        [22.9066, 22.9066, 22.9066, 22.9066, 22.9066, 22.9066, 22.9066, 22.9066, 22.9066, 289.7800, 0],
     )
     assert np.allclose(
         ga_poly.urban["high"],
-        [22.9066, 23.1557, 24.1654, 24.3122, 25.5620, 26.68734, 27.2656, 27.5725, 28.0039, 284.2380, 0],
+        [22.9066, 23.1602, 24.1743, 24.3211, 25.5754, 26.7051, 27.2834, 27.5903, 28.0217, 284.6650, 0],
     )
 
     assert np.allclose(fl_poly.urban["high"], [0] * 9 + [fl_poly.rasterized_acres] + [0])
     assert np.allclose(pr_poly.urban["high"], [0] * 10 + [pr_poly.rasterized_acres])
     assert np.allclose(marine_poly.urban["high"], [0] * 10 + [marine_poly.rasterized_acres])
+
+
+@pytest.mark.anyio
+@pytest.mark.parametrize("format", ["shp"])
+async def test_get_analysis_unit_results_west_coast(format):
+    filename = f"{format}_poly_west_coast.zip"
+    dataset = filename.replace(f"{format}_", "").replace(".zip", f".{format}")
+    df = read_dataframe(f"/vsizip/tests/fixtures/{filename}/{dataset}", columns=[], use_arrow=True).to_crs(DATA_CRS)
+
+    datasets = get_available_datasets(df)
+
+    unexpected_datasets = ["slr_depth", "slr_proj"]
+    for dataset in unexpected_datasets:
+        assert dataset not in datasets
+
+    results = await get_analysis_unit_results(df, datasets)
+
+    assert len(results) == len(df)
+    for col in ["states", "count", "acres", "rasterized_acres"]:
+        assert col in results.columns
+
+    row = results.iloc[0]
+
+    assert row.states == "California"
+    assert row["count"] == 1
+    assert np.isclose(row.acres, 5294.93)
+    assert np.isclose(row.pixels, 23853)
+    assert np.isclose(row.rasterized_acres, 5304.78)
+
+    # Landfire EVT is stored as a dict of indexes and acres
+    assert len(row.landfire_evt.keys()) == 30
+    assert list(row.landfire_evt.keys())[:4] == [56, 58, 62, 67]
+    assert np.allclose(list(row.landfire_evt.values())[:4], [7.1166, 1982.4246, 2.8911, 60.4913], atol=1e-4)
+
+    # NLCD landcover is stored as a dict of arrays
+    assert list(row.nlcd_landcover.keys()) == [
+        "Open water",
+        "Developed (open space)",
+        "Developed (low intensity)",
+        "Developed (medium intensity)",
+        "Developed (high intensity)",
+        "Barren land",
+        "Deciduous forest",
+        "Evergreen forest",
+        "Mixed forest",
+        "Shrub/scrub",
+        "Grassland/herbaceous",
+        "Pasture/hay",
+        "Cultivated crops",
+        "Woody wetlands",
+        "Emergent herbaceous wetlands",
+    ]
+    assert np.allclose(
+        row.nlcd_landcover["Evergreen forest"], [2699.202, 2626.0343, 2559.9831, 2620.252, 2588.2272], atol=1e-4
+    )
+
+    assert len(row.protected_areas) == 10
+    assert (
+        row.protected_areas[0]["name"]
+        == "Agricultural Conservation Easement Program - Wetland Reserve Easements (ACEP-WRE), Humboldt, CA"
+    )
+    assert row.protected_areas[0]["owner"] == ""
+    assert row.protected_areas[0]["gap_status"] == "2"
+    assert np.isclose(row.protected_areas[0]["acres"], 12.8445)
+
+    assert list(row.urban.keys()) == ["high", "low"]
+    assert np.allclose(
+        row.urban["high"],
+        [909.5935, 909.718, 909.718, 909.718, 909.718, 909.718, 909.718, 909.718, 909.718, 4395.058, 0],
+    )
 
 
 @pytest.mark.anyio
@@ -451,14 +471,14 @@ async def test_create_xlsx_file_single_area(format):
     results = await get_analysis_unit_results(df, datasets)
     xlsx = create_xlsx(results, datasets)
 
-    if SAVE_XLSX:
-        with open("/tmp/test_create_xlsx_file_single_area.xlsx", "wb") as out:
-            _ = out.write(xlsx)
+    filename = "/tmp/test_create_xlsx_file_single_area.xlsx"
+    with open(filename, "wb") as out:
+        _ = out.write(xlsx)
 
-    reader = pd.ExcelFile(BytesIO(xlsx))
+    reader = pd.ExcelFile(filename)
 
     assert len(reader.sheet_names) == len(datasets) + 2
-    summary = reader.parse(sheet_name="Summary", skiprows=2)
+    summary = pd.read_excel(filename, sheet_name="Summary", skiprows=2)
     assert len(summary) == len(df)
 
     assert np.allclose(summary["GIS acres"], results.acres)
@@ -467,37 +487,38 @@ async def test_create_xlsx_file_single_area(format):
     assert np.allclose(summary["Number of areas in analysis unit"], results["count"])
     assert summary["State(s)"].tolist() == results.states.tolist()
 
-    details = reader.parse(sheet_name="Data details", skiprows=2)
+    details = pd.read_excel(filename, sheet_name="Data details", skiprows=2)
     assert len(details) == len(datasets)
     assert details["Name"].tolist() == [d["name"] for id, d in DATASETS.items() if id in datasets]
 
     # skip caption at end
-    landfire_evt = reader.parse(sheet_name="LANDFIRE EVT", skiprows=2)
+    landfire_evt = pd.read_excel(filename, sheet_name="LANDFIRE EVT", skiprows=2)
     assert len(landfire_evt) == 4
     assert landfire_evt.columns.tolist() == [
         "Analysis unit",
-        "Analysis acres",
+        "Analysis area\n(acres)",
+        "Acres",
         "Existing Vegetation Type",
         "Group",
-        "Acres",
     ]
     assert landfire_evt["Existing Vegetation Type"].tolist() == [
-        "Southern Piedmont Mesic Forest",
         "Southeastern Interior Longleaf Pine Woodland",
-        "Southern Piedmont Dry Oak Forest",
         "Southeastern Native Ruderal Forest",
+        "Southern Piedmont Dry Oak Forest",
+        "Southern Piedmont Mesic Forest",
     ]
     assert landfire_evt["Group"].tolist() == [
-        "White Oak-Beech Forest and Woodland",
         "Longleaf Pine Woodland",
-        "Chestnut Oak-Virginia Pine Forest and Woodland",
         "Introduced Upland Vegetation-Treed",
+        "Chestnut Oak-Virginia Pine Forest and Woodland",
+        "White Oak-Beech Forest and Woodland",
     ]
     assert np.allclose(landfire_evt["Acres"], list(results.iloc[0].landfire_evt.values()))
 
-    nlcd_landcover = reader.parse(sheet_name="Landcover trends", skiprows=2)
+    nlcd_landcover = pd.read_excel(filename, sheet_name="Landcover trends", skiprows=2)
     assert (
-        nlcd_landcover.columns.tolist() == ["Analysis unit", "Analysis acres", "Land cover type"] + nlcd_value_columns
+        nlcd_landcover.columns.tolist()
+        == ["Analysis unit", "Analysis area\n(acres)", "Land cover type"] + nlcd_value_columns
     )
     assert nlcd_landcover["Land cover type"].tolist() == list(results.nlcd_landcover.iloc[0].keys())
 
@@ -506,23 +527,29 @@ async def test_create_xlsx_file_single_area(format):
             nlcd_landcover[nlcd_value_columns].iloc[i].values, results.nlcd_landcover.iloc[0][landcover_type], atol=1e-4
         )
 
-    slr_depth = reader.parse(sheet_name="SLR inundation area", skiprows=2)
+    slr_depth = pd.read_excel(filename, sheet_name="SLR inundation area", skiprows=2)
     # only nodata is areas outside counties
     slr_depth_col_ix = list(range(11)) + [12]
     slr_value_cols = np.array(slr_depth_value_columns).take(slr_depth_col_ix).tolist()
-    assert slr_depth.columns.tolist() == ["Analysis unit", "Analysis acres"] + slr_value_cols
+    assert (
+        slr_depth.columns.tolist()
+        == ["Analysis unit", "Analysis area\n(acres)", "Area outside extent of this dataset\n(acres)"] + slr_value_cols
+    )
     assert np.allclose(
         slr_depth[slr_value_cols].iloc[0].values,
         results.slr_depth.iloc[0].take(list(range(0, 11)) + [12]),
     )
 
-    slr_proj = reader.parse(sheet_name="Projected SLR", skiprows=2)
+    slr_proj = pd.read_excel(filename, sheet_name="Projected SLR", skiprows=2)
 
-    assert slr_proj.columns.tolist() == ["Analysis unit", "Analysis acres"] + slr_proj_value_columns
+    assert slr_proj.columns.tolist() == ["Analysis unit"] + slr_proj_value_columns
     assert slr_proj.iloc[0]["Has projected SLR?"] == "no"
 
-    urban = reader.parse(sheet_name="Urbanization", skiprows=2)
-    assert urban.columns.tolist() == ["Analysis unit", "Analysis acres", "Urbanization level"] + urban_value_columns
+    urban = pd.read_excel(filename, sheet_name="Urbanization", skiprows=2)
+    assert (
+        urban.columns.tolist()
+        == ["Analysis unit", "Analysis area\n(acres)", "Urbanization level"] + urban_value_columns
+    )
     assert urban["Urbanization level"].tolist() == ["Low", "High"]
     for i, level in enumerate(urban["Urbanization level"].values):
         # last column is nodata, omitted here
@@ -559,47 +586,46 @@ async def test_create_xlsx_file_multiple_areas_partial_overlap(format):
     results = await get_analysis_unit_results(df, datasets)
     xlsx = create_xlsx(results, datasets)
 
-    if SAVE_XLSX:
-        with open("/tmp/test_create_xlsx_file_multiple_areas_partial_overlap.xlsx", "wb") as out:
-            _ = out.write(xlsx)
+    filename = "/tmp/test_create_xlsx_file_multiple_areas_partial_overlap.xlsx"
+    with open(filename, "wb") as out:
+        _ = out.write(xlsx)
 
-    reader = pd.ExcelFile(BytesIO(xlsx))
+    reader = pd.ExcelFile(filename)
 
     assert len(reader.sheet_names) == len(datasets) + 2
-    summary = reader.parse(sheet_name="Summary", skiprows=2)
+    summary = pd.read_excel(filename, sheet_name="Summary", skiprows=2)
     assert len(summary) == len(df)
 
     assert np.allclose(summary["GIS acres"], results.acres)
-    # when there is partial overlap, we have two rasterized area columns: within and outside
-    assert np.allclose(summary["Acres within Southeast data extent (rasterized to 30m pixels)"], results.overlap_acres)
-    assert np.allclose(
-        summary["Acres outside Southeast data extent (rasterized to 30m pixels)"], results.outside_extent_acres
-    )
+    assert np.allclose(summary["Analysis acres (rasterized to 30m pixels)"], results.rasterized_acres)
     assert np.allclose(summary["Number of 30m pixels in analysis unit"], results.pixels)
     assert np.allclose(summary["Number of areas in analysis unit"], results["count"])
     assert summary["State(s)"].tolist() == results.states.tolist()
 
-    details = reader.parse(sheet_name="Data details", skiprows=2)
+    details = pd.read_excel(filename, sheet_name="Data details", skiprows=2)
     assert len(details) == len(datasets)
     assert details["Name"].tolist() == [d["name"] for id, d in DATASETS.items() if id in datasets]
 
-    slr_depth = reader.parse(sheet_name="SLR inundation area", skiprows=2)
+    slr_depth = pd.read_excel(filename, sheet_name="SLR inundation area", skiprows=2)
     slr_depth_col_ix = list(range(11)) + [12]
     slr_value_cols = np.array(slr_depth_value_columns).take(slr_depth_col_ix).tolist()
-    assert slr_depth.columns.tolist() == ["Analysis unit", "Acres within Southeast data extent"] + slr_value_cols
+    assert (
+        slr_depth.columns.tolist()
+        == ["Analysis unit", "Analysis area\n(acres)", "Area outside extent of this dataset\n(acres)"] + slr_value_cols
+    )
     assert np.allclose(
         slr_depth[slr_value_cols].iloc[0].values,
         results.slr_depth.iloc[0].take(slr_depth_col_ix),
     )
 
-    slr_proj = reader.parse(sheet_name="Projected SLR", skiprows=2)
-    assert slr_proj.columns.tolist() == ["Analysis unit", "Acres within Southeast data extent"] + slr_proj_value_columns
+    slr_proj = pd.read_excel(filename, sheet_name="Projected SLR", skiprows=2)
+    assert slr_proj.columns.tolist() == ["Analysis unit"] + slr_proj_value_columns
     assert slr_proj["Has projected SLR?"].iloc[:3].tolist() == ["no"] * 3
 
-    urban = reader.parse(sheet_name="Urbanization", skiprows=2, nrows=2)
+    urban = pd.read_excel(filename, sheet_name="Urbanization", skiprows=2, nrows=2)
     assert (
         urban.columns.tolist()
-        == ["Analysis unit", "Acres within Southeast data extent", "Urbanization level"] + urban_value_columns
+        == ["Analysis unit", "Analysis area\n(acres)", "Urbanization level"] + urban_value_columns
     )
     assert urban["Urbanization level"].tolist() == ["Low", "High"]
     for i, level in enumerate(urban["Urbanization level"].values):
@@ -636,14 +662,14 @@ async def test_create_xlsx_file_multiple_areas(format):
     results = await get_analysis_unit_results(df, datasets)
     xlsx = create_xlsx(results, datasets)
 
-    if SAVE_XLSX:
-        with open("/tmp/test_create_xlsx_file_multiple_areas.xlsx", "wb") as out:
-            _ = out.write(xlsx)
+    filename = "/tmp/test_create_xlsx_file_multiple_areas.xlsx"
+    with open(filename, "wb") as out:
+        _ = out.write(xlsx)
 
-    reader = pd.ExcelFile(BytesIO(xlsx))
+    reader = pd.ExcelFile(filename)
 
     assert len(reader.sheet_names) == len(datasets) + 2
-    summary = reader.parse(sheet_name="Summary", skiprows=2)
+    summary = pd.read_excel(filename, sheet_name="Summary", skiprows=2)
     assert len(summary) == len(df)
 
     assert np.allclose(summary["GIS acres"], results.acres)
@@ -652,29 +678,106 @@ async def test_create_xlsx_file_multiple_areas(format):
     assert np.allclose(summary["Number of areas in analysis unit"], results["count"])
     assert summary["State(s)"].tolist() == results.states.tolist()
 
-    details = reader.parse(sheet_name="Data details", skiprows=2)
+    details = pd.read_excel(filename, sheet_name="Data details", skiprows=2)
     assert len(details) == len(datasets)
     assert details["Name"].tolist() == [d["name"] for id, d in DATASETS.items() if id in datasets]
 
-    slr_depth = reader.parse(sheet_name="SLR inundation area", skiprows=2)
-    slr_depth_col_ix = [13] + list(range(13))
-    slr_value_cols = np.array(slr_depth_value_columns).take(slr_depth_col_ix).tolist()
-    assert slr_depth.columns.tolist() == ["Analysis unit", "Analysis acres"] + slr_value_cols
-    assert np.allclose(
-        slr_depth[slr_value_cols].iloc[0].values,
-        results.slr_depth.iloc[0].take(slr_depth_col_ix),
+    slr_depth = pd.read_excel(filename, sheet_name="SLR inundation area", skiprows=2)
+    assert (
+        slr_depth.columns.tolist()
+        == ["Analysis unit", "Analysis area\n(acres)", "Area outside extent of this dataset\n(acres)"]
+        + slr_depth_value_columns
     )
+    # last value is nodata, ignore that for comparison because it is shuffled to a different column
+    assert np.allclose(slr_depth[slr_depth_value_columns].iloc[0].values, results.slr_depth.iloc[0][:-1])
 
-    slr_proj = reader.parse(sheet_name="Projected SLR", skiprows=2)
-    assert slr_proj.columns.tolist() == ["Analysis unit", "Analysis acres"] + slr_proj_value_columns
+    slr_proj = pd.read_excel(filename, sheet_name="Projected SLR", skiprows=2)
+    assert slr_proj.columns.tolist() == ["Analysis unit"] + slr_proj_value_columns
     assert slr_proj["Has projected SLR?"].iloc[:15].tolist() == ["yes"] * 15
     assert np.allclose(slr_proj.iloc[0][slr_proj_value_columns[2:]].values, results.slr_proj.iloc[0][0]["values"])
 
-    urban = reader.parse(sheet_name="Urbanization", skiprows=2, nrows=2)
+    urban = pd.read_excel(filename, sheet_name="Urbanization", skiprows=2, nrows=2)
     assert (
         urban.columns.tolist()
-        == ["Analysis unit", "Analysis acres", "Urbanization level", "Outside extent of this dataset"]
+        == [
+            "Analysis unit",
+            "Analysis area\n(acres)",
+            "Area outside extent of this dataset\n(acres)",
+            "Urbanization level",
+        ]
         + urban_value_columns
+    )
+    assert urban["Urbanization level"].tolist() == ["Low", "High"]
+    for i, level in enumerate(urban["Urbanization level"].values):
+        # last column is nodata, omitted here
+        assert np.allclose(
+            urban[urban_value_columns].iloc[i].fillna(0).values, results.urban.iloc[0][level.lower()][:-1]
+        )
+
+
+@pytest.mark.anyio
+@pytest.mark.parametrize("format", ["shp"])
+async def test_create_xlsx_file_west_coast(format):
+    filename = f"{format}_poly_west_coast.zip"
+    dataset = filename.replace(f"{format}_", "").replace(".zip", f".{format}")
+    df = read_dataframe(f"/vsizip/tests/fixtures/{filename}/{dataset}", columns=["id"], use_arrow=True).to_crs(DATA_CRS)
+
+    df = dissolve(df.explode(ignore_index=True), by="id").set_index("id")
+
+    # representative sample of datasets
+    datasets = [
+        "landfire_evt",
+        "nlcd_impervious",
+        "nlcd_inundation_freq",
+        "nlcd_landcover",
+        "protected_areas",
+        "sarp_aquatic_barriers",
+        "sarp_aquatic_network_alteration",
+        "se_blueprint_resilientterrestrialsites",
+        "slr_depth",
+        "slr_proj",
+        "urban",
+    ]
+
+    results = await get_analysis_unit_results(df, datasets)
+    xlsx = create_xlsx(results, datasets)
+
+    filename = "/tmp/test_create_xlsx_file_west_coast.xlsx"
+    with open(filename, "wb") as out:
+        _ = out.write(xlsx)
+
+    reader = pd.ExcelFile(filename)
+
+    assert len(reader.sheet_names) == len(datasets) + 2
+    summary = pd.read_excel(filename, sheet_name="Summary", skiprows=2)
+    assert len(summary) == len(df)
+
+    assert np.allclose(summary["GIS acres"], results.acres)
+    assert np.allclose(summary["Analysis acres (rasterized to 30m pixels)"], results.rasterized_acres)
+    assert np.allclose(summary["Number of 30m pixels in analysis unit"], results.pixels)
+    assert np.allclose(summary["Number of areas in analysis unit"], results["count"])
+    assert summary["State(s)"].tolist() == results.states.tolist()
+
+    slr_depth = pd.read_excel(filename, sheet_name="SLR inundation area", skiprows=2)
+    # drops inland counties because not applicable
+    slr_depth_col_ix = list(range(11))
+    slr_value_cols = np.array(slr_depth_value_columns).take(slr_depth_col_ix).tolist()
+    assert (
+        slr_depth.columns.tolist()
+        == ["Analysis unit", "Analysis area\n(acres)", "Area outside extent of this dataset\n(acres)"] + slr_value_cols
+    )
+    assert np.allclose(
+        slr_depth[slr_value_cols].iloc[0].fillna(0).values, results.slr_depth.iloc[0].take(slr_depth_col_ix)
+    )
+
+    slr_proj = pd.read_excel(filename, sheet_name="Projected SLR", skiprows=2)
+    assert slr_proj.columns.tolist() == ["Analysis unit"] + slr_proj_value_columns
+    assert slr_proj["Has projected SLR?"].iloc[:3].tolist() == ["no"]
+
+    urban = pd.read_excel(filename, sheet_name="Urbanization", skiprows=2, nrows=2)
+    assert (
+        urban.columns.tolist()
+        == ["Analysis unit", "Analysis area\n(acres)", "Urbanization level"] + urban_value_columns
     )
     assert urban["Urbanization level"].tolist() == ["Low", "High"]
     for i, level in enumerate(urban["Urbanization level"].values):

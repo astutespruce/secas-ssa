@@ -1,127 +1,26 @@
-import geopandas as gp
-import numpy as np
 import pandas as pd
-import rasterio
 import shapely
+from pyogrio import read_dataframe
 
-from analysis.constants import M2_ACRES, SECAS_STATES
-from analysis.lib.geometry import to_dict
-from analysis.lib.raster import WindowGeometryMask, get_overlapping_windows, get_window
-from analysis.lib.stats.inundation_frequency import (
-    summarize_nlcd_inundation_frequency_in_aoi,
-)
+from analysis.constants import DATASETS, M2_ACRES, NLCD_YEARS, URBAN_YEARS
+from analysis.lib.stats.inundation_frequency import open_rasters as open_inundation_frequency_rasters
+from analysis.lib.stats.inundation_frequency import summarize_nlcd_inundation_frequency_in_aoi
+from analysis.lib.stats.landfire import open_rasters as open_landfire_rasters
 from analysis.lib.stats.landfire import summarize_landfire_evt_in_aoi
-from analysis.lib.stats.nlcd import (
-    summarize_nlcd_impervious_in_aoi,
-    summarize_nlcd_landcover_in_aoi,
-)
+from analysis.lib.stats.nlcd import open_rasters as open_nlcd_rasters
+from analysis.lib.stats.nlcd import summarize_nlcd_impervious_in_aoi, summarize_nlcd_landcover_in_aoi
 from analysis.lib.stats.protected_areas import extract_protected_area_stats
+from analysis.lib.stats.rasterized_geometry import RasterizedGeometry
 from analysis.lib.stats.sarp import extract_sarp_huc12_stats
+from analysis.lib.stats.se_blueprint_indicators import open_rasters as open_indicator_rasters
 from analysis.lib.stats.se_blueprint_indicators import summarize_indicator_in_aoi
 from analysis.lib.stats.slr import extract_slr_proj_in_analysis_areas, summarize_slr_in_aoi
+from analysis.lib.stats.slr import open_rasters as open_slr_rasters
+from analysis.lib.stats.urban import open_rasters as open_urban_rasters
 from analysis.lib.stats.urban import summarize_urban_in_aoi
-from api.settings import SHARED_DATA_DIR
+from api.settings import DATA_DIR
 
-data_dir = SHARED_DATA_DIR / "inputs"
-bnd_dir = data_dir / "boundaries"
-boundary_filename = bnd_dir / "se_boundary.feather"
-extent_filename = bnd_dir / "blueprint_extent.tif"
-extent_mask_filename = bnd_dir / "blueprint_extent_mask.tif"
-states_filename = bnd_dir / "states.feather"
-
-
-WINDOW_SIZE = 2048  # approx 16 MB for 8 bit data
-
-
-class RasterizedGeometry(object):
-    """Helper class to detect and extract data for a rasterized geometry
-    Similar to RasterizedGeometry in secas-blueprint respository but without a
-    low resolution mask for detecting datasets (handled prior to calling here)
-    """
-
-    def __init__(self, geometry):
-        """_summary_
-
-        Parameters
-        ----------
-        geometry : shapely geometry
-        """
-        self.bounds = shapely.bounds(geometry)
-
-        all_shapes = [to_dict(geometry)]
-
-        # create masks and windows
-        with rasterio.open(extent_filename) as src:
-            windows, ratio = get_overlapping_windows(src, geometry, bounds=self.bounds, window_size=WINDOW_SIZE)
-
-            num_windows = len(windows)
-            self.masks = []
-
-            # threshold for using windows determined by testing performance
-            if num_windows >= 50 or (num_windows > 1 and ratio <= 0.25):
-                for window in windows:
-                    # clip geometry to window then rasterize
-                    clipped = shapely.clip_by_rect(geometry, *src.window_bounds(window))
-                    mask = WindowGeometryMask(src, window, shapes=[to_dict(clipped)])
-                    self.masks.append(mask)
-
-            else:
-                window = get_window(src, self.bounds)
-                mask = WindowGeometryMask(src, window, all_shapes)
-                self.masks.append(mask)
-
-            # cell size in acres
-            self.cellsize = src.res[0] * src.res[1] * M2_ACRES
-
-            self.pixels = sum(mask.shape_mask.sum() for mask in self.masks)
-            self.acres = self.pixels * self.cellsize
-
-            count = np.zeros((2,), dtype="uint64")
-            for mask in self.masks:
-                mask.get_pixel_count_by_bin(src, out=count)
-
-            self.within_extent_pixels = count[1]
-            self.within_extent_acres = self.within_extent_pixels * self.cellsize
-
-            self.outside_extent_acres = (self.pixels - self.within_extent_pixels) * self.cellsize
-
-    def get_pixel_count_by_bin(self, dataset, bins):
-        """Get count of pixels in each bin
-
-        Parameters
-        ----------
-        dataset : open rasterio dataset
-        bins : list-like
-            List-like of values ranging from 0 to max value (not sparse!).
-            Counts will be generated that correspond to this list of bins.
-
-        Returns
-        -------
-        ndarray
-            Total number of pixels for each bin
-        """
-        count = np.zeros((len(bins),), dtype="uint64")
-        for mask in self.masks:
-            mask.get_pixel_count_by_bin(dataset, out=count)
-
-        return count
-
-    def get_acres_by_bin(self, dataset, bins):
-        """Get acres in each bin
-
-        Parameters
-        ----------
-        dataset : open rasterio dataset
-        bins : list-like
-            List-like of values ranging from 0 to max value (not sparse!).
-            Counts will be generated that correspond to this list of bins.
-
-        Returns
-        -------
-        ndarray
-            Total number of acres for each bin
-        """
-        return self.get_pixel_count_by_bin(dataset, bins) * self.cellsize
+states_filename = DATA_DIR / "inputs/boundaries/states.fgb"
 
 
 async def get_analysis_unit_results(df, datasets, progress_callback=None):
@@ -141,8 +40,12 @@ async def get_analysis_unit_results(df, datasets, progress_callback=None):
     DataFrame
     """
 
-    states = gp.read_feather(states_filename, columns=["state", "id", "geometry"])
-    states = states.loc[states.id.isin(SECAS_STATES)]
+    # use union of individual area bounding boxes to read features
+    read_mask = shapely.union_all(shapely.envelope(df.explode(ignore_index=False, index_parts=False).geometry.values))
+
+    # NOTE: pyogrio does not currently work properly for use_arrow=True if the
+    # mask does not overlap and returns no features, so we can't use it here.
+    states = read_dataframe(states_filename, columns=["state", "id", "geometry"], mask=read_mask)
     left, right = shapely.STRtree(states.geometry.values).query(df.geometry.values, predicate="intersects")
     state_join = (
         pd.DataFrame({"state": states.state.values.take(right)}, index=df.index.values.take(left))
@@ -158,80 +61,97 @@ async def get_analysis_unit_results(df, datasets, progress_callback=None):
     df["acres"] = shapely.area(df.geometry.values) * M2_ACRES
     df["bounds"] = shapely.bounds(df.geometry.values).tolist()
 
-    results = []
+    files = {}
 
-    count = 0
+    try:
+        files.update(
+            {
+                **open_slr_rasters(datasets),
+                **open_urban_rasters(datasets),
+                **open_nlcd_rasters(datasets),
+                **open_landfire_rasters(datasets),
+                **open_indicator_rasters(datasets),
+                **open_inundation_frequency_rasters(datasets),
+            }
+        )
 
-    for index, row in df.iterrows():
-        rasterized_geometry = RasterizedGeometry(row.geometry)
+        results = []
+        count = 0
 
-        result = {
-            "pixels": rasterized_geometry.pixels,
-            "rasterized_acres": rasterized_geometry.acres,
-            "overlap_acres": rasterized_geometry.within_extent_acres,
-            "outside_extent_acres": rasterized_geometry.outside_extent_acres,
-        }
+        for index, row in df.iterrows():
+            rasterized_geometry = RasterizedGeometry(row.geometry)
 
-        # short-circuit if there are no overlapping pixels
-        if rasterized_geometry.within_extent_acres == 0:
+            result = {
+                "pixels": rasterized_geometry.pixels,
+                "rasterized_acres": rasterized_geometry.acres,
+            }
+
+            # short-circuit if there are no rasterized pixels
+            if rasterized_geometry.acres == 0:
+                results.append(result)
+
+                if progress_callback is not None:
+                    await progress_callback(100 * count / len(df))
+
+                count += 1
+                continue
+
+            # Extract SLR
+            if "slr_depth" in datasets or "slr_proj" in datasets:
+                result["slr_depth"] = summarize_slr_in_aoi(files["slr_depth"], rasterized_geometry)
+
+            # Extract urban
+            if "urban" in datasets:
+                result["urban"] = summarize_urban_in_aoi(files, rasterized_geometry)
+
+            # Extract NLCD
+            if "nlcd_landcover" in datasets:
+                result["nlcd_landcover"] = summarize_nlcd_landcover_in_aoi(files, rasterized_geometry)
+
+            if "nlcd_impervious" in datasets:
+                result["nlcd_impervious"] = summarize_nlcd_impervious_in_aoi(files, rasterized_geometry)
+
+            # Extract LANDFIRE EVT
+            if "landfire_evt" in datasets:
+                result["landfire_evt"] = summarize_landfire_evt_in_aoi(files["landfire_evt"], rasterized_geometry)
+
+            # Extract SE Blueprint indicators
+            se_blueprint_indicators = [dataset for dataset in datasets if dataset.startswith("se_blueprint")]
+            for dataset in se_blueprint_indicators:
+                result[dataset] = summarize_indicator_in_aoi(files[dataset], dataset, rasterized_geometry)
+
+            # Extract inundation frequency
+            if "nlcd_inundation_freq" in datasets:
+                result["nlcd_inundation_freq"] = summarize_nlcd_inundation_frequency_in_aoi(
+                    files["nlcd_inundation_freq"], rasterized_geometry
+                )
+
             results.append(result)
 
             if progress_callback is not None:
                 await progress_callback(100 * count / len(df))
 
             count += 1
-            continue
 
-        # Extract SLR
-        if "slr_depth" in datasets or "slr_proj" in datasets:
-            result["slr_depth"] = summarize_slr_in_aoi(rasterized_geometry)
+        out = df[["states", "count", "acres"]].join(pd.DataFrame(results, index=df.index))
 
-        # Extract urban
-        if "urban" in datasets:
-            result["urban"] = summarize_urban_in_aoi(rasterized_geometry)
+        if len(set(["sarp_aquatic_barriers", "sarp_aquatic_network_alteration"]).intersection(datasets)) > 0:
+            sarp_huc12_stats = extract_sarp_huc12_stats(df, read_mask=read_mask)
+            if sarp_huc12_stats is not None:
+                out = out.join(sarp_huc12_stats)
 
-        # Extract NLCD
-        if "nlcd_landcover" in datasets:
-            result["nlcd_landcover"] = summarize_nlcd_landcover_in_aoi(rasterized_geometry)
+        if "protected_areas" in datasets:
+            protected_area_stats = extract_protected_area_stats(df, read_mask=read_mask)
+            if protected_area_stats is not None:
+                out = out.join(protected_area_stats)
 
-        if "nlcd_impervious" in datasets:
-            result["nlcd_impervious"] = summarize_nlcd_impervious_in_aoi(rasterized_geometry)
+        if "slr_proj" in datasets:
+            slr_proj = extract_slr_proj_in_analysis_areas(df)
+            if slr_proj is not None:
+                out = out.join(slr_proj)
 
-        # Extract LANDFIRE EVT
-        if "landfire_evt" in datasets:
-            result["landfire_evt"] = summarize_landfire_evt_in_aoi(rasterized_geometry)
+        return out
 
-        # Extract SE Blueprint indicators
-        se_blueprint_indicators = [dataset for dataset in datasets if dataset.startswith("se_blueprint")]
-        for dataset in se_blueprint_indicators:
-            result[dataset] = summarize_indicator_in_aoi(dataset, rasterized_geometry)
-
-        # Extract inundation frequency
-        if "nlcd_inundation_freq" in datasets:
-            result["nlcd_inundation_freq"] = summarize_nlcd_inundation_frequency_in_aoi(rasterized_geometry)
-
-        results.append(result)
-
-        if progress_callback is not None:
-            await progress_callback(100 * count / len(df))
-
-        count += 1
-
-    out = df[["states", "count", "acres"]].join(pd.DataFrame(results, index=df.index))
-
-    if len(set(["sarp_aquatic_barriers", "sarp_aquatic_network_alteration"]).intersection(datasets)) > 0:
-        sarp_huc12_stats = extract_sarp_huc12_stats(df)
-        if sarp_huc12_stats is not None:
-            out = out.join(sarp_huc12_stats)
-
-    if "protected_areas" in datasets:
-        protected_area_stats = extract_protected_area_stats(df)
-        if protected_area_stats is not None:
-            out = out.join(protected_area_stats)
-
-    if "slr_proj" in datasets:
-        slr_proj = extract_slr_proj_in_analysis_areas(df)
-        if slr_proj is not None:
-            out = out.join(slr_proj)
-
-    return out
+    finally:
+        for raster in files.values():
+            raster.close()

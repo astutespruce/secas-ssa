@@ -1,108 +1,100 @@
-import math
 from pathlib import Path
 from time import time
 
 import numpy as np
 import rasterio
-from rasterio.enums import Resampling
-from rasterio.vrt import WarpedVRT
-from rasterio.warp import transform_bounds
+from progress.bar import Bar
 from rasterio.windows import Window
 
 from analysis.constants import DATA_CRS, MASK_RESOLUTION, NLCD_CODES, NLCD_INDEXES
 from analysis.lib.colors import hex_to_uint8, interpolate_colormap
-from analysis.lib.raster import add_overviews, create_lowres_mask, remap, write_raster
+from analysis.lib.raster import add_overviews, clip_window, create_lowres_mask, remap, write_raster
 
 NODATA = 255
-
-start = time()
-
-# use secas-blueprint boundaries
-bnd_dir = Path("../secas-blueprint/data/inputs/boundaries")
-src_dir = Path("source_data/nlcd_annual")
-out_dir = Path("data/inputs/nlcd_annual")
-tmp_dir = Path("/tmp")
-
-out_dir.mkdir(parents=True, exist_ok=True)
-
-bnd_raster = rasterio.open(bnd_dir / "contiguous_southeast_inland_mask.tif")
-
-### Extract landcover
-print("Processing landcover")
+WINDOW_SIZE = 4096
 
 # values are remapped to contiguous integers starting from 0
 landcover_colormap = {i: hex_to_uint8(e["color"]) + (255,) for i, e in enumerate(NLCD_INDEXES.values())}
 landcover_remap_table = np.array([(k, i) for i, k in enumerate(NLCD_CODES.keys())], dtype="uint8")
+impervious_colormap = {
+    0: (255, 255, 255, 0),
+    **{
+        i + 1: hex_to_uint8(color) + (255,)
+        for i, color in enumerate(interpolate_colormap({1: "#F3C6A8", 100: "#C40A0A"}))
+    },
+}
 
-for infile in sorted(src_dir.glob("landcover/*/*.tif")):
+
+start = time()
+
+# use secas-blueprint boundaries
+src_dir = Path("source_data/nlcd_annual")
+out_dir = Path("data/inputs/nlcd_annual")
+out_dir.mkdir(parents=True, exist_ok=True)
+
+
+landcover_tifs = sorted(src_dir.glob("landcover/*/*.tif"))
+impervious_tifs = sorted(src_dir.glob("impervious/*/*.tif"))
+
+with rasterio.open((landcover_tifs + impervious_tifs)[0]) as src:
+    windows = []
+    for row_off in np.arange(src.height, step=WINDOW_SIZE):
+        for col_off in np.arange(src.width, step=WINDOW_SIZE):
+            windows.append(Window(row_off=row_off, col_off=col_off, width=WINDOW_SIZE, height=WINDOW_SIZE))
+
+    meta = {
+        "driver": "GTiff",
+        "dtype": "uint8",
+        "nodata": NODATA,
+        "width": src.width,
+        "height": src.height,
+        "count": 1,
+        "crs": DATA_CRS,
+        "transform": src.transform,
+        "compress": "zstd",
+        "predictor": 2,
+        "tiled": True,
+        "blockxsize": 256,
+        "blockysize": 256,
+    }
+
+
+################################################################################
+### Extract landcover
+################################################################################
+print("Processing landcover")
+
+
+for infile in landcover_tifs:
+    year_start = time()
     year = int(infile.stem.split("_")[3])
+
     outfilename = out_dir / f"landcover_{year}.tif"
 
     if outfilename.exists():
         continue
 
-    year_start = time()
-    print(f"Extracting {infile}")
+    with (
+        rasterio.Env(GDAL_CACHEMAX=2048, GDAL_NUM_THREADS="ALL_CPUS"),
+        rasterio.open(infile) as src,
+        rasterio.open(outfilename, "w", **meta) as outfile,
+    ):
+        outfile.write_colormap(1, landcover_colormap)
 
-    with rasterio.open(infile) as src:
-        target_bounds = transform_bounds(bnd_raster.crs, src.crs, *bnd_raster.bounds)
-        window = src.window(*target_bounds)
-        window_floored = window.round_offsets(op="floor", pixel_precision=3)
-        w = math.ceil(window.width + window.col_off - window_floored.col_off)
-        h = math.ceil(window.height + window.row_off - window_floored.row_off)
-        window = Window(window_floored.col_off, window_floored.row_off, w, h)
-        # make sure that window is within extent of data
-        window = window.intersection(Window(0, 0, src.width, src.height))
-        transform = src.window_transform(window)
+        # process data by window to avoid running out of memory
+        for window in Bar(message=f"Processing {year}", max=len(windows)).iter(windows):
+            # clip window to file
+            window = clip_window(window, max_width=src.width, max_height=src.height)
+            data = src.read(1, window=window)
 
-        data = src.read(1, window=window)
-        tmp_filename = tmp_dir / f"nlcd_landcover_{year}.tif"
-        write_raster(tmp_filename, data, transform=transform, crs=src.crs, nodata=int(src.nodata))
-        del data
+            # Remap values to contiguous integers
+            # NOTE: NLCD NODATA is 250, but we ignore it here and it gets filled to 255
+            data = remap(data, landcover_remap_table, nodata=NODATA, fill=NODATA)
+            outfile.write(data, 1, window=window)
 
-    ### Warp to match the Blueprint
-    with rasterio.open(tmp_filename) as src:
-        print("Warping...")
-        vrt = WarpedVRT(
-            src,
-            width=bnd_raster.width,
-            height=bnd_raster.height,
-            nodata=int(src.nodata),
-            transform=bnd_raster.transform,
-            crs=DATA_CRS,
-            resampling=Resampling.nearest,
-        )
+    add_overviews(outfilename)
 
-        data = vrt.read()[0]
-
-        ### Set areas outside the Blueprint to NODATA
-        print("Masking to the Blueprint")
-        extent_data = bnd_raster.read(1)
-        data[(data == int(src.nodata)) | (extent_data == 0)] = NODATA
-        del extent_data
-
-        ### Remap values to contiguous integers
-        print("Remapping to contiguous integers")
-        data = remap(data, landcover_remap_table, nodata=NODATA, fill=NODATA)
-
-        write_raster(
-            outfilename,
-            data,
-            transform=bnd_raster.transform,
-            crs=bnd_raster.crs,
-            nodata=NODATA,
-        )
-
-        del data
-
-        with rasterio.open(outfilename, "r+") as src:
-            src.write_colormap(1, landcover_colormap)
-
-        add_overviews(outfilename)
-
-        tmp_filename.unlink()
-
-        print(f"Done with {year} in {time() - year_start:.2f}s")
+    print(f"Done with {year} in {time() - year_start:.2f}s")
 
 
 outfilename = out_dir / "landcover_mask.tif"
@@ -115,80 +107,38 @@ if not outfilename.exists():
         ignore_zero=False,
     )
 
+################################################################################
 ### Extract percent impervious
+################################################################################
 print("Processing percent impervious")
 
-# values are remapped to contiguous integers starting from 0
-impervious_colormap = {
-    0: (255, 255, 255, 0),
-    **{
-        i + 1: hex_to_uint8(color) + (255,)
-        for i, color in enumerate(interpolate_colormap({1: "#F3C6A8", 100: "#C40A0A"}))
-    },
-}
-
-for infile in sorted(src_dir.glob("impervious/*/*.tif")):
+for infile in impervious_tifs:
+    year_start = time()
     year = int(infile.stem.split("_")[3])
+
     outfilename = out_dir / f"impervious_{year}.tif"
 
     if outfilename.exists():
         continue
 
-    year_start = time()
-    print(f"Extracting {infile}")
+    with (
+        rasterio.Env(GDAL_CACHEMAX=2048, GDAL_NUM_THREADS="ALL_CPUS"),
+        rasterio.open(infile) as src,
+        rasterio.open(outfilename, "w", **meta) as outfile,
+    ):
+        outfile.write_colormap(1, impervious_colormap)
 
-    ### Extract within extent of SE Blueprint
-    with rasterio.open(infile) as src:
-        target_bounds = transform_bounds(bnd_raster.crs, src.crs, *bnd_raster.bounds)
-        window = src.window(*target_bounds)
-        window_floored = window.round_offsets(op="floor", pixel_precision=3)
-        w = math.ceil(window.width + window.col_off - window_floored.col_off)
-        h = math.ceil(window.height + window.row_off - window_floored.row_off)
-        window = Window(window_floored.col_off, window_floored.row_off, w, h)
-        # make sure that window is within extent of data
-        window = window.intersection(Window(0, 0, src.width, src.height))
-        transform = src.window_transform(window)
+        # process data by window to avoid running out of memory
+        for window in Bar(message=f"Processing {year}", max=len(windows)).iter(windows):
+            # clip window to file
+            window = clip_window(window, max_width=src.width, max_height=src.height)
+            data = src.read(1, window=window)
+            data = np.where(data == int(src.nodata), NODATA, data)
+            outfile.write(data, 1, window=window)
 
-        data = src.read(1, window=window)
+    add_overviews(outfilename)
 
-        tmp_filename = tmp_dir / f"nlcd_impervious_{year}.tif"
-        write_raster(tmp_filename, data, transform=transform, crs=src.crs, nodata=int(src.nodata))
-
-    ### Warp to match the SE Blueprint
-    # This is a very minor shift because projections are very similar (WGS84 => NAD83)
-    with rasterio.open(tmp_filename) as src:
-        vrt = WarpedVRT(
-            src,
-            width=bnd_raster.width,
-            height=bnd_raster.height,
-            nodata=int(src.nodata),
-            transform=bnd_raster.transform,
-            crs=DATA_CRS,
-            resampling=Resampling.nearest,
-        )
-
-        data = vrt.read()[0]
-
-        ### Set areas outside the SE Blueprint to NODATA
-        print("Masking to inland areas in the SE")
-        data[(data == int(src.nodata)) | (bnd_raster.read(1) == 0)] = NODATA
-
-        write_raster(
-            outfilename,
-            data,
-            transform=bnd_raster.transform,
-            crs=bnd_raster.crs,
-            nodata=NODATA,
-        )
-
-        with rasterio.open(outfilename, "r+") as src:
-            src.write_colormap(1, impervious_colormap)
-
-        add_overviews(outfilename)
-
-        tmp_filename.unlink()
-
-        print(f"Done with {year} in {time() - year_start:.2f}s")
+    print(f"Done with {year} in {time() - year_start:.2f}s")
 
 
 outfilename = out_dir / "impervious_mask.tif"
